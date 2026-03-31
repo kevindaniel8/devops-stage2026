@@ -1,0 +1,148 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile pour le cluster PostgreSQL repmr (master + replica)
+require 'yaml'
+
+# Configuration
+VAGRANT_API_VERSION = "2"
+VAGRANT_BOX_URL = "bento/ubuntu-24.04"
+
+# Variables statiques pour éviter les erreurs YAML
+MASTER_IP = "192.168.56.21"
+REPLICA_IP = "192.168.56.22"
+NEW_SERVER_IP = "192.168.56.23"
+POSTGRES_PASSWORD = "postgres"
+REPMGR_PASSWORD = "repmgr_password"
+
+# Nombre de VMs (seulement master et replica au démarrage)
+NODES = {
+  'master' => {
+    'ip' => MASTER_IP,
+    'host_port' => 5433,
+    'memory' => 1024,
+    'cpus' => 1
+  },
+  'replica' => {
+    'ip' => REPLICA_IP,
+    'host_port' => 5434,
+    'memory' => 1024,
+    'cpus' => 1
+  },
+  'newserver' => {
+    'ip' => NEW_SERVER_IP,
+    'host_port' => 5435,
+    'memory' => 1024,
+    'cpus' => 1
+  }
+}
+
+Vagrant.configure(VAGRANT_API_VERSION) do |config|
+  # Configuration globale
+  config.vm.box = VAGRANT_BOX_URL
+  config.ssh.insert_key = false
+  config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+
+  # Configuration des VMs (seulement master et replica au démarrage)
+  NODES.each do |name, node_config|
+    # Ne créer que master et replica au démarrage
+    next if name == 'newserver'
+    
+    config.vm.define name do |node|
+      # Configuration réseau
+      node.vm.network "private_network", ip: node_config['ip']
+      node.vm.network "forwarded_port", guest: 5432, host: node_config['host_port']
+
+      # Configuration hardware
+      node.vm.provider "virtualbox" do |vb|
+        vb.name = "postgres-#{name}"
+        vb.memory = node_config['memory']
+        vb.cpus = node_config['cpus']
+      end
+
+      # Configuration hostname
+      node.vm.hostname = "postgres-#{name}"
+
+      # Provisioning différent selon le nœud
+      if name == 'master'
+        # Installation PostgreSQL uniquement pour le master
+        node.vm.provision "ansible" do |ansible|
+          ansible.playbook = "playbooks/setup_postgresql.yml"
+          ansible.inventory_path = "inventory/production.ini"
+          ansible.extra_vars = {
+            'postgres_password' => POSTGRES_PASSWORD,
+            'repmgr_password' => REPMGR_PASSWORD,
+            'postgresql_version' => 16,
+            'postgres_user' => 'postgres',
+            'repmgr_user' => 'repmgr',
+            'repmgr_database' => 'repmgr',
+            'master_ip' => MASTER_IP,
+            'replica_ip' => REPLICA_IP,
+            'new_server_ip' => NEW_SERVER_IP
+          }
+          ansible.become = true
+          ansible.limit = "master"
+        end
+      elsif name == 'replica'
+        # Installation PostgreSQL uniquement pour la replica
+        node.vm.provision "ansible" do |ansible|
+          ansible.playbook = "playbooks/setup_postgresql.yml"
+          ansible.inventory_path = "inventory/production.ini"
+          ansible.extra_vars = {
+            'postgres_password' => POSTGRES_PASSWORD,
+            'repmgr_password' => REPMGR_PASSWORD,
+            'postgresql_version' => 16,
+            'postgres_user' => 'postgres',
+            'repmgr_user' => 'repmgr',
+            'repmgr_database' => 'repmgr',
+            'master_ip' => MASTER_IP,
+            'replica_ip' => REPLICA_IP,
+            'new_server_ip' => NEW_SERVER_IP
+          }
+          ansible.become = true
+          ansible.limit = "replica"
+        end
+      end
+    end
+  end
+
+  # Configuration finale du cluster (après création des 2 VMs)
+  config.vm.define "cluster_setup", autostart: false do |node|
+    node.vm.provision "ansible" do |ansible|
+      ansible.playbook = "playbooks/setup_repmgr.yml"
+      ansible.inventory_path = "inventory/production.ini"
+      ansible.extra_vars = {
+        'postgres_password' => POSTGRES_PASSWORD,
+        'repmgr_password' => REPMGR_PASSWORD,
+        'postgresql_version' => 16,
+        'postgres_user' => 'postgres',
+        'repmgr_user' => 'repmgr',
+        'repmgr_database' => 'repmgr',
+        'master_ip' => MASTER_IP,
+        'replica_ip' => REPLICA_IP,
+        'new_server_ip' => NEW_SERVER_IP
+      }
+      ansible.become = true
+      ansible.limit = "all"
+    end
+  end
+
+  # Scripts de post-provisioning
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "🎉 Cluster PostgreSQL repmgr déployé avec succès !"
+    echo "==============================================="
+    echo ""
+    echo "📱 Connexions :"
+    echo "   Master : #{MASTER_IP}:5432 (postgres/#{POSTGRES_PASSWORD})"
+    echo "   Replica : #{REPLICA_IP}:5432 (postgres/#{POSTGRES_PASSWORD})"
+    echo ""
+    echo "🔧 Tests :"
+    echo "   cd /vagrant && ./scripts/test_cluster.sh"
+    echo ""
+    echo "🔍 Monitoring :"
+    echo "   ansible postgresql_cluster -i inventory/production.ini -m setup -a 'cmd=pg_isready'"
+    echo ""
+    echo "⚠️  N'oubliez pas de lancer :"
+    echo "   vagrant up cluster_setup"
+  SHELL
+end

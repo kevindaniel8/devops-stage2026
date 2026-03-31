@@ -1,0 +1,1547 @@
+2026-03-20 21:39:41,643 p=159073 u=kevin n=ansible | PLAY [Installation PostgreSQL] *************************************************
+2026-03-20 21:39:41,654 p=159073 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-20 21:39:55,523 p=159073 u=kevin n=ansible | ok: [master]
+2026-03-20 21:39:55,550 p=159073 u=kevin n=ansible | TASK [Ajout de la clé GPG PostgreSQL] ******************************************
+2026-03-20 21:39:58,586 p=159073 u=kevin n=ansible | [WARNING]: Module remote_tmp /root/.ansible/tmp did not exist and was created
+with a mode of 0700, this may cause issues when running as another user. To
+avoid this, create the remote_tmp dir with the correct permissions manually
+
+2026-03-20 21:39:58,587 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:39:58,599 p=159073 u=kevin n=ansible | TASK [Ajout du dépôt PostgreSQL] ***********************************************
+2026-03-20 21:40:18,049 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:40:18,060 p=159073 u=kevin n=ansible | TASK [Installation de PostgreSQL] **********************************************
+2026-03-20 21:41:15,762 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:41:15,784 p=159073 u=kevin n=ansible | TASK [Installation de repmgr depuis les dépôts PostgreSQL] *********************
+2026-03-20 21:41:28,616 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:41:28,629 p=159073 u=kevin n=ansible | TASK [Initialisation du cluster PostgreSQL si nécessaire] **********************
+2026-03-20 21:41:29,374 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:41:29,387 p=159073 u=kevin n=ansible | TASK [Configuration du mot de passe postgres] **********************************
+2026-03-20 21:41:30,508 p=159073 u=kevin n=ansible | [WARNING]: Module remote_tmp /var/lib/********ql/.ansible/tmp did not exist and
+was created with a mode of 0700, this may cause issues when running as another
+user. To avoid this, create the remote_tmp dir with the correct permissions
+manually
+
+2026-03-20 21:41:30,522 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:41:30,535 p=159073 u=kevin n=ansible | TASK [Création de l'utilisateur repmgr avec droits étendus] ********************
+2026-03-20 21:41:31,351 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:41:31,360 p=159073 u=kevin n=ansible | TASK [Configuration de search_path pour repmgr] ********************************
+2026-03-20 21:41:32,360 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:41:32,392 p=159073 u=kevin n=ansible | TASK [Création de la base repmgr] **********************************************
+2026-03-20 21:41:33,688 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:41:33,700 p=159073 u=kevin n=ansible | TASK [Configuration de pg_hba.conf] ********************************************
+2026-03-20 21:41:35,498 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:41:35,522 p=159073 u=kevin n=ansible | TASK [Configuration de postgresql.conf (réplication)] **************************
+2026-03-20 21:41:36,281 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:41:36,296 p=159073 u=kevin n=ansible | TASK [Création du dossier d'archive WAL] ***************************************
+2026-03-20 21:41:37,054 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:41:37,069 p=159073 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour appliquer la configuration] ******************
+2026-03-20 21:41:41,414 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:41:41,427 p=159073 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt] ***************************************
+2026-03-20 21:41:47,080 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:41:47,093 p=159073 u=kevin n=ansible | TASK [Installation de l'extension repmgr] **************************************
+2026-03-20 21:41:48,126 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:41:48,139 p=159073 u=kevin n=ansible | TASK [Configuration des permissions repmgr] ************************************
+2026-03-20 21:41:48,844 p=159073 u=kevin n=ansible | changed: [master]
+2026-03-20 21:41:48,861 p=159073 u=kevin n=ansible | TASK [Affichage du statut PostgreSQL] ******************************************
+2026-03-20 21:41:48,892 p=159073 u=kevin n=ansible | ok: [master] => {
+    "msg": "🎉 PostgreSQL installé sur master !\n📍 IP: 192.168.56.21\n🔧 Version: 16\n👤 Utilisateur: postgres\n🗄️ Base repmgr: repmgr\n"
+}
+2026-03-20 21:41:48,928 p=159073 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-20 21:41:48,928 p=159073 u=kevin n=ansible | master                     : ok=18   changed=16   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-20 21:43:08,091 p=163033 u=kevin n=ansible | PLAY [Installation PostgreSQL] *************************************************
+2026-03-20 21:43:08,106 p=163033 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-20 21:43:22,391 p=163033 u=kevin n=ansible | ok: [replica]
+2026-03-20 21:43:22,417 p=163033 u=kevin n=ansible | TASK [Ajout de la clé GPG PostgreSQL] ******************************************
+2026-03-20 21:43:26,331 p=163033 u=kevin n=ansible | [WARNING]: Module remote_tmp /root/.ansible/tmp did not exist and was created
+with a mode of 0700, this may cause issues when running as another user. To
+avoid this, create the remote_tmp dir with the correct permissions manually
+
+2026-03-20 21:43:26,332 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:43:26,344 p=163033 u=kevin n=ansible | TASK [Ajout du dépôt PostgreSQL] ***********************************************
+2026-03-20 21:43:47,174 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:43:47,188 p=163033 u=kevin n=ansible | TASK [Installation de PostgreSQL] **********************************************
+2026-03-20 21:44:46,515 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:44:46,531 p=163033 u=kevin n=ansible | TASK [Installation de repmgr depuis les dépôts PostgreSQL] *********************
+2026-03-20 21:45:00,400 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:45:00,417 p=163033 u=kevin n=ansible | TASK [Initialisation du cluster PostgreSQL si nécessaire] **********************
+2026-03-20 21:45:01,243 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:45:01,255 p=163033 u=kevin n=ansible | TASK [Configuration du mot de passe postgres] **********************************
+2026-03-20 21:45:02,270 p=163033 u=kevin n=ansible | [WARNING]: Module remote_tmp /var/lib/********ql/.ansible/tmp did not exist and
+was created with a mode of 0700, this may cause issues when running as another
+user. To avoid this, create the remote_tmp dir with the correct permissions
+manually
+
+2026-03-20 21:45:02,272 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:45:02,283 p=163033 u=kevin n=ansible | TASK [Création de l'utilisateur repmgr avec droits étendus] ********************
+2026-03-20 21:45:03,188 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:45:03,201 p=163033 u=kevin n=ansible | TASK [Configuration de search_path pour repmgr] ********************************
+2026-03-20 21:45:04,129 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:45:04,149 p=163033 u=kevin n=ansible | TASK [Création de la base repmgr] **********************************************
+2026-03-20 21:45:05,278 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:45:05,290 p=163033 u=kevin n=ansible | TASK [Configuration de pg_hba.conf] ********************************************
+2026-03-20 21:45:07,124 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:45:07,134 p=163033 u=kevin n=ansible | TASK [Configuration de postgresql.conf (réplication)] **************************
+2026-03-20 21:45:07,907 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:45:07,921 p=163033 u=kevin n=ansible | TASK [Création du dossier d'archive WAL] ***************************************
+2026-03-20 21:45:08,713 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:45:08,725 p=163033 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour appliquer la configuration] ******************
+2026-03-20 21:45:13,038 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:45:13,050 p=163033 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt] ***************************************
+2026-03-20 21:45:18,701 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:45:18,716 p=163033 u=kevin n=ansible | TASK [Installation de l'extension repmgr] **************************************
+2026-03-20 21:45:19,701 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:45:19,716 p=163033 u=kevin n=ansible | TASK [Configuration des permissions repmgr] ************************************
+2026-03-20 21:45:20,401 p=163033 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:45:20,415 p=163033 u=kevin n=ansible | TASK [Affichage du statut PostgreSQL] ******************************************
+2026-03-20 21:45:20,444 p=163033 u=kevin n=ansible | ok: [replica] => {
+    "msg": "🎉 PostgreSQL installé sur replica !\n📍 IP: 192.168.56.22\n🔧 Version: 16\n👤 Utilisateur: postgres\n🗄️ Base repmgr: repmgr\n"
+}
+2026-03-20 21:45:20,483 p=163033 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-20 21:45:20,483 p=163033 u=kevin n=ansible | replica                    : ok=18   changed=16   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-20 21:46:30,571 p=166710 u=kevin n=ansible | PLAY [Configuration repmgr du cluster] *****************************************
+2026-03-20 21:46:30,587 p=166710 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-20 21:46:34,168 p=166710 u=kevin n=ansible | fatal: [newserver]: UNREACHABLE! => {"changed": false, "msg": "Data could not be sent to remote host \"192.168.56.23\". Make sure this host can be reached over ssh: ssh: connect to host 192.168.56.23 port 22: No route to host\r\n", "unreachable": true}
+2026-03-20 21:46:36,323 p=166710 u=kevin n=ansible | ok: [master]
+2026-03-20 21:46:36,370 p=166710 u=kevin n=ansible | ok: [replica]
+2026-03-20 21:46:36,405 p=166710 u=kevin n=ansible | TASK [Création du dossier de configuration repmgr] *****************************
+2026-03-20 21:46:37,233 p=166710 u=kevin n=ansible | changed: [master]
+2026-03-20 21:46:37,330 p=166710 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:46:37,346 p=166710 u=kevin n=ansible | TASK [Configuration de repmgr.conf pour master] ********************************
+2026-03-20 21:46:37,397 p=166710 u=kevin n=ansible | skipping: [replica]
+2026-03-20 21:46:38,963 p=166710 u=kevin n=ansible | changed: [master]
+2026-03-20 21:46:38,983 p=166710 u=kevin n=ansible | TASK [Configuration de repmgr.conf pour replica] *******************************
+2026-03-20 21:46:39,014 p=166710 u=kevin n=ansible | skipping: [master]
+2026-03-20 21:46:40,615 p=166710 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:46:40,636 p=166710 u=kevin n=ansible | TASK [Création du fichier .pgpass pour repmgr] *********************************
+2026-03-20 21:46:42,194 p=166710 u=kevin n=ansible | changed: [master]
+2026-03-20 21:46:42,372 p=166710 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:46:42,383 p=166710 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour réplication] *********************************
+2026-03-20 21:46:47,270 p=166710 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:46:47,303 p=166710 u=kevin n=ansible | changed: [master]
+2026-03-20 21:46:47,319 p=166710 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt] ***************************************
+2026-03-20 21:46:53,314 p=166710 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:46:53,326 p=166710 u=kevin n=ansible | changed: [master]
+2026-03-20 21:46:53,339 p=166710 u=kevin n=ansible | TASK [Enregistrement du master] ************************************************
+2026-03-20 21:46:53,388 p=166710 u=kevin n=ansible | skipping: [replica]
+2026-03-20 21:46:54,100 p=166710 u=kevin n=ansible | changed: [master]
+2026-03-20 21:46:54,115 p=166710 u=kevin n=ansible | TASK [Pause après enregistrement du master] ************************************
+2026-03-20 21:46:54,137 p=166710 u=kevin n=ansible | Pausing for 10 seconds
+2026-03-20 21:47:04,143 p=166710 u=kevin n=ansible | ok: [master]
+2026-03-20 21:47:04,158 p=166710 u=kevin n=ansible | TASK [Arrêter PostgreSQL sur replica] ******************************************
+2026-03-20 21:47:04,183 p=166710 u=kevin n=ansible | skipping: [master]
+2026-03-20 21:47:05,556 p=166710 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:47:05,569 p=166710 u=kevin n=ansible | TASK [Nettoyer les données existantes] *****************************************
+2026-03-20 21:47:05,603 p=166710 u=kevin n=ansible | skipping: [master]
+2026-03-20 21:47:06,238 p=166710 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:47:06,251 p=166710 u=kevin n=ansible | TASK [Clonage depuis le master (comme dans le script fonctionnel)] *************
+2026-03-20 21:47:06,290 p=166710 u=kevin n=ansible | skipping: [master]
+2026-03-20 21:47:11,687 p=166710 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:47:11,704 p=166710 u=kevin n=ansible | TASK [Démarrage PostgreSQL replica] ********************************************
+2026-03-20 21:47:11,732 p=166710 u=kevin n=ansible | skipping: [master]
+2026-03-20 21:47:16,069 p=166710 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:47:16,081 p=166710 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt] ***************************************
+2026-03-20 21:47:16,107 p=166710 u=kevin n=ansible | skipping: [master]
+2026-03-20 21:47:21,725 p=166710 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:47:21,736 p=166710 u=kevin n=ansible | TASK [Enregistrement du replica] ***********************************************
+2026-03-20 21:47:21,769 p=166710 u=kevin n=ansible | skipping: [master]
+2026-03-20 21:47:22,566 p=166710 u=kevin n=ansible | changed: [replica]
+2026-03-20 21:47:22,579 p=166710 u=kevin n=ansible | TASK [Vérification du cluster] *************************************************
+2026-03-20 21:47:22,623 p=166710 u=kevin n=ansible | skipping: [replica]
+2026-03-20 21:47:23,423 p=166710 u=kevin n=ansible | changed: [master]
+2026-03-20 21:47:23,435 p=166710 u=kevin n=ansible | TASK [Affichage du statut final] ***********************************************
+2026-03-20 21:47:23,479 p=166710 u=kevin n=ansible | skipping: [replica]
+2026-03-20 21:47:23,495 p=166710 u=kevin n=ansible | ok: [master] => {
+    "msg": "🎉 Cluster PostgreSQL repmgr configuré !\n📍 Nœud: master (Master)\n📊 Cluster:\n ID | Name  | Role    | Status    | Upstream | Location | Priority | Timeline | Connection string                                                                                \\n----+-------+---------+-----------+----------+----------+----------+----------+---------------------------------------------------------------------------------------------------\\n 1  | node1 | primary | * running |          | default  | 100      | 1        | host=192.168.56.21 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\\n 2  | node2 | standby |   running | node1    | default  | 100      | 1        | host=192.168.56.22 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\n"
+}
+2026-03-20 21:47:23,555 p=166710 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-20 21:47:23,556 p=166710 u=kevin n=ansible | master                     : ok=10   changed=7    unreachable=0    failed=0    skipped=7    rescued=0    ignored=0   
+2026-03-20 21:47:23,556 p=166710 u=kevin n=ansible | newserver                  : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-20 21:47:23,556 p=166710 u=kevin n=ansible | replica                    : ok=12   changed=11   unreachable=0    failed=0    skipped=4    rescued=0    ignored=0   
+2026-03-20 22:07:33,035 p=178711 u=kevin n=ansible | PLAY [Configuration repmgr du cluster] *****************************************
+2026-03-20 22:07:33,049 p=178711 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-20 22:07:38,111 p=178711 u=kevin n=ansible | ok: [master]
+2026-03-20 22:07:38,224 p=178711 u=kevin n=ansible | ok: [replica]
+2026-03-20 22:07:38,265 p=178711 u=kevin n=ansible | TASK [Création du dossier de configuration repmgr] *****************************
+2026-03-20 22:07:39,147 p=178711 u=kevin n=ansible | ok: [master]
+2026-03-20 22:07:39,258 p=178711 u=kevin n=ansible | ok: [replica]
+2026-03-20 22:07:39,276 p=178711 u=kevin n=ansible | TASK [Configuration de repmgr.conf pour master] ********************************
+2026-03-20 22:07:39,336 p=178711 u=kevin n=ansible | skipping: [replica]
+2026-03-20 22:07:40,788 p=178711 u=kevin n=ansible | ok: [master]
+2026-03-20 22:07:40,801 p=178711 u=kevin n=ansible | TASK [Configuration de repmgr.conf pour replica] *******************************
+2026-03-20 22:07:40,838 p=178711 u=kevin n=ansible | skipping: [master]
+2026-03-20 22:07:42,143 p=178711 u=kevin n=ansible | ok: [replica]
+2026-03-20 22:07:42,157 p=178711 u=kevin n=ansible | TASK [Création du fichier .pgpass pour repmgr] *********************************
+2026-03-20 22:07:43,558 p=178711 u=kevin n=ansible | ok: [master]
+2026-03-20 22:07:43,756 p=178711 u=kevin n=ansible | ok: [replica]
+2026-03-20 22:07:43,774 p=178711 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour réplication] *********************************
+2026-03-20 22:07:48,423 p=178711 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:07:48,526 p=178711 u=kevin n=ansible | changed: [master]
+2026-03-20 22:07:48,542 p=178711 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt] ***************************************
+2026-03-20 22:07:54,447 p=178711 u=kevin n=ansible | changed: [master]
+2026-03-20 22:07:54,545 p=178711 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:07:54,560 p=178711 u=kevin n=ansible | TASK [Enregistrement du master] ************************************************
+2026-03-20 22:07:54,613 p=178711 u=kevin n=ansible | skipping: [replica]
+2026-03-20 22:07:55,296 p=178711 u=kevin n=ansible | changed: [master]
+2026-03-20 22:07:55,319 p=178711 u=kevin n=ansible | TASK [Pause après enregistrement du master] ************************************
+2026-03-20 22:07:55,345 p=178711 u=kevin n=ansible | Pausing for 10 seconds
+2026-03-20 22:08:05,351 p=178711 u=kevin n=ansible | ok: [master]
+2026-03-20 22:08:05,363 p=178711 u=kevin n=ansible | TASK [Arrêter PostgreSQL sur replica] ******************************************
+2026-03-20 22:08:05,389 p=178711 u=kevin n=ansible | skipping: [master]
+2026-03-20 22:08:06,653 p=178711 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:08:06,664 p=178711 u=kevin n=ansible | TASK [Nettoyer les données existantes] *****************************************
+2026-03-20 22:08:06,702 p=178711 u=kevin n=ansible | skipping: [master]
+2026-03-20 22:08:07,326 p=178711 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:08:07,338 p=178711 u=kevin n=ansible | TASK [Clonage depuis le master (comme dans le script fonctionnel)] *************
+2026-03-20 22:08:07,368 p=178711 u=kevin n=ansible | skipping: [master]
+2026-03-20 22:08:10,654 p=178711 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:08:10,666 p=178711 u=kevin n=ansible | TASK [Démarrage PostgreSQL replica] ********************************************
+2026-03-20 22:08:10,695 p=178711 u=kevin n=ansible | skipping: [master]
+2026-03-20 22:08:14,943 p=178711 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:08:14,958 p=178711 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt] ***************************************
+2026-03-20 22:08:14,999 p=178711 u=kevin n=ansible | skipping: [master]
+2026-03-20 22:08:20,728 p=178711 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:08:20,741 p=178711 u=kevin n=ansible | TASK [Enregistrement du replica] ***********************************************
+2026-03-20 22:08:20,769 p=178711 u=kevin n=ansible | skipping: [master]
+2026-03-20 22:08:21,541 p=178711 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:08:21,553 p=178711 u=kevin n=ansible | TASK [Vérification du cluster] *************************************************
+2026-03-20 22:08:21,617 p=178711 u=kevin n=ansible | skipping: [replica]
+2026-03-20 22:08:22,422 p=178711 u=kevin n=ansible | changed: [master]
+2026-03-20 22:08:22,440 p=178711 u=kevin n=ansible | TASK [Affichage du statut final] ***********************************************
+2026-03-20 22:08:22,481 p=178711 u=kevin n=ansible | skipping: [replica]
+2026-03-20 22:08:22,532 p=178711 u=kevin n=ansible | ok: [master] => {
+    "msg": "🎉 Cluster PostgreSQL repmgr configuré !\n📍 Nœud: master (Master)\n📊 Cluster:\n ID | Name  | Role    | Status    | Upstream | Location | Priority | Timeline | Connection string                                                                                \\n----+-------+---------+-----------+----------+----------+----------+----------+---------------------------------------------------------------------------------------------------\\n 1  | node1 | primary | * running |          | default  | 100      | 1        | host=192.168.56.21 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\\n 2  | node2 | standby |   running | node1    | default  | 100      | 1        | host=192.168.56.22 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\n"
+}
+2026-03-20 22:08:22,610 p=178711 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-20 22:08:22,611 p=178711 u=kevin n=ansible | master                     : ok=10   changed=4    unreachable=0    failed=0    skipped=7    rescued=0    ignored=0   
+2026-03-20 22:08:22,611 p=178711 u=kevin n=ansible | replica                    : ok=12   changed=8    unreachable=0    failed=0    skipped=4    rescued=0    ignored=0   
+2026-03-20 22:25:17,137 p=188387 u=kevin n=ansible | PLAY [Installation PostgreSQL] *************************************************
+2026-03-20 22:25:17,147 p=188387 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-20 22:25:30,371 p=188387 u=kevin n=ansible | ok: [master]
+2026-03-20 22:25:30,389 p=188387 u=kevin n=ansible | TASK [Ajout de la clé GPG PostgreSQL] ******************************************
+2026-03-20 22:25:32,846 p=188387 u=kevin n=ansible | [WARNING]: Module remote_tmp /root/.ansible/tmp did not exist and was created
+with a mode of 0700, this may cause issues when running as another user. To
+avoid this, create the remote_tmp dir with the correct permissions manually
+
+2026-03-20 22:25:32,846 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:25:32,856 p=188387 u=kevin n=ansible | TASK [Ajout du dépôt PostgreSQL] ***********************************************
+2026-03-20 22:25:45,451 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:25:45,459 p=188387 u=kevin n=ansible | TASK [Installation de PostgreSQL] **********************************************
+2026-03-20 22:26:26,258 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:26:26,268 p=188387 u=kevin n=ansible | TASK [Installation de repmgr depuis les dépôts PostgreSQL] *********************
+2026-03-20 22:26:34,531 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:26:34,544 p=188387 u=kevin n=ansible | TASK [Initialisation du cluster PostgreSQL si nécessaire] **********************
+2026-03-20 22:26:35,170 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:26:35,183 p=188387 u=kevin n=ansible | TASK [Configuration du mot de passe postgres] **********************************
+2026-03-20 22:26:35,933 p=188387 u=kevin n=ansible | [WARNING]: Module remote_tmp /var/lib/********ql/.ansible/tmp did not exist and
+was created with a mode of 0700, this may cause issues when running as another
+user. To avoid this, create the remote_tmp dir with the correct permissions
+manually
+
+2026-03-20 22:26:35,933 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:26:35,943 p=188387 u=kevin n=ansible | TASK [Création de l'utilisateur repmgr avec droits étendus] ********************
+2026-03-20 22:26:36,390 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:26:36,398 p=188387 u=kevin n=ansible | TASK [Configuration de search_path pour repmgr] ********************************
+2026-03-20 22:26:36,946 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:26:36,957 p=188387 u=kevin n=ansible | TASK [Création de la base repmgr] **********************************************
+2026-03-20 22:26:37,603 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:26:37,613 p=188387 u=kevin n=ansible | TASK [Configuration de pg_hba.conf] ********************************************
+2026-03-20 22:26:38,778 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:26:38,790 p=188387 u=kevin n=ansible | TASK [Configuration de postgresql.conf (réplication)] **************************
+2026-03-20 22:26:39,256 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:26:39,264 p=188387 u=kevin n=ansible | TASK [Création du dossier d'archive WAL] ***************************************
+2026-03-20 22:26:39,746 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:26:39,756 p=188387 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour appliquer la configuration] ******************
+2026-03-20 22:26:43,324 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:26:43,332 p=188387 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt] ***************************************
+2026-03-20 22:26:48,774 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:26:48,784 p=188387 u=kevin n=ansible | TASK [Installation de l'extension repmgr] **************************************
+2026-03-20 22:26:49,413 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:26:49,420 p=188387 u=kevin n=ansible | TASK [Configuration des permissions repmgr] ************************************
+2026-03-20 22:26:49,867 p=188387 u=kevin n=ansible | changed: [master]
+2026-03-20 22:26:49,874 p=188387 u=kevin n=ansible | TASK [Affichage du statut PostgreSQL] ******************************************
+2026-03-20 22:26:49,894 p=188387 u=kevin n=ansible | ok: [master] => {
+    "msg": "🎉 PostgreSQL installé sur master !\n📍 IP: 192.168.56.21\n🔧 Version: 16\n👤 Utilisateur: postgres\n🗄️ Base repmgr: repmgr\n"
+}
+2026-03-20 22:26:49,920 p=188387 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-20 22:26:49,920 p=188387 u=kevin n=ansible | master                     : ok=18   changed=16   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-20 22:27:46,245 p=190987 u=kevin n=ansible | PLAY [Installation PostgreSQL] *************************************************
+2026-03-20 22:27:46,255 p=190987 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-20 22:27:59,510 p=190987 u=kevin n=ansible | ok: [replica]
+2026-03-20 22:27:59,534 p=190987 u=kevin n=ansible | TASK [Ajout de la clé GPG PostgreSQL] ******************************************
+2026-03-20 22:28:01,483 p=190987 u=kevin n=ansible | [WARNING]: Module remote_tmp /root/.ansible/tmp did not exist and was created
+with a mode of 0700, this may cause issues when running as another user. To
+avoid this, create the remote_tmp dir with the correct permissions manually
+
+2026-03-20 22:28:01,483 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:28:01,493 p=190987 u=kevin n=ansible | TASK [Ajout du dépôt PostgreSQL] ***********************************************
+2026-03-20 22:28:14,601 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:28:14,614 p=190987 u=kevin n=ansible | TASK [Installation de PostgreSQL] **********************************************
+2026-03-20 22:28:56,595 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:28:56,606 p=190987 u=kevin n=ansible | TASK [Installation de repmgr depuis les dépôts PostgreSQL] *********************
+2026-03-20 22:29:04,949 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:29:04,961 p=190987 u=kevin n=ansible | TASK [Initialisation du cluster PostgreSQL si nécessaire] **********************
+2026-03-20 22:29:05,470 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:29:05,485 p=190987 u=kevin n=ansible | TASK [Configuration du mot de passe postgres] **********************************
+2026-03-20 22:29:06,129 p=190987 u=kevin n=ansible | [WARNING]: Module remote_tmp /var/lib/********ql/.ansible/tmp did not exist and
+was created with a mode of 0700, this may cause issues when running as another
+user. To avoid this, create the remote_tmp dir with the correct permissions
+manually
+
+2026-03-20 22:29:06,130 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:29:06,138 p=190987 u=kevin n=ansible | TASK [Création de l'utilisateur repmgr avec droits étendus] ********************
+2026-03-20 22:29:06,614 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:29:06,624 p=190987 u=kevin n=ansible | TASK [Configuration de search_path pour repmgr] ********************************
+2026-03-20 22:29:07,186 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:29:07,198 p=190987 u=kevin n=ansible | TASK [Création de la base repmgr] **********************************************
+2026-03-20 22:29:07,861 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:29:07,871 p=190987 u=kevin n=ansible | TASK [Configuration de pg_hba.conf] ********************************************
+2026-03-20 22:29:08,984 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:29:08,993 p=190987 u=kevin n=ansible | TASK [Configuration de postgresql.conf (réplication)] **************************
+2026-03-20 22:29:09,525 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:29:09,535 p=190987 u=kevin n=ansible | TASK [Création du dossier d'archive WAL] ***************************************
+2026-03-20 22:29:10,037 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:29:10,052 p=190987 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour appliquer la configuration] ******************
+2026-03-20 22:29:13,635 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:29:13,651 p=190987 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt] ***************************************
+2026-03-20 22:29:19,082 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:29:19,092 p=190987 u=kevin n=ansible | TASK [Installation de l'extension repmgr] **************************************
+2026-03-20 22:29:19,751 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:29:19,759 p=190987 u=kevin n=ansible | TASK [Configuration des permissions repmgr] ************************************
+2026-03-20 22:29:20,212 p=190987 u=kevin n=ansible | changed: [replica]
+2026-03-20 22:29:20,224 p=190987 u=kevin n=ansible | TASK [Affichage du statut PostgreSQL] ******************************************
+2026-03-20 22:29:20,247 p=190987 u=kevin n=ansible | ok: [replica] => {
+    "msg": "🎉 PostgreSQL installé sur replica !\n📍 IP: 192.168.56.22\n🔧 Version: 16\n👤 Utilisateur: postgres\n🗄️ Base repmgr: repmgr\n"
+}
+2026-03-20 22:29:20,272 p=190987 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-20 22:29:20,272 p=190987 u=kevin n=ansible | replica                    : ok=18   changed=16   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-21 06:35:42,830 p=410373 u=kevin n=ansible | PLAY [Installation PostgreSQL] *************************************************
+2026-03-21 06:35:42,842 p=410373 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-21 06:35:56,382 p=410373 u=kevin n=ansible | ok: [master]
+2026-03-21 06:35:56,403 p=410373 u=kevin n=ansible | TASK [Ajout de la clé GPG PostgreSQL] ******************************************
+2026-03-21 06:35:57,449 p=410373 u=kevin n=ansible | [WARNING]: Module remote_tmp /root/.ansible/tmp did not exist and was created
+with a mode of 0700, this may cause issues when running as another user. To
+avoid this, create the remote_tmp dir with the correct permissions manually
+
+2026-03-21 06:35:57,450 p=410373 u=kevin n=ansible | fatal: [master]: FAILED! => {"changed": false, "msg": "Failed to download key at https://www.postgresql.org/media/keys/ACCC4CF8.asc: Request failed: <urlopen error [Errno -3] Temporary failure in name resolution>"}
+2026-03-21 06:35:57,451 p=410373 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-21 06:35:57,452 p=410373 u=kevin n=ansible | master                     : ok=1    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0   
+2026-03-21 06:37:29,503 p=412799 u=kevin n=ansible | PLAY [Installation PostgreSQL] *************************************************
+2026-03-21 06:37:29,513 p=412799 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-21 06:37:31,852 p=412799 u=kevin n=ansible | ok: [master]
+2026-03-21 06:37:31,872 p=412799 u=kevin n=ansible | TASK [Ajout de la clé GPG PostgreSQL] ******************************************
+2026-03-21 06:37:34,996 p=412799 u=kevin n=ansible | [WARNING]: Module remote_tmp /root/.ansible/tmp did not exist and was created
+with a mode of 0700, this may cause issues when running as another user. To
+avoid this, create the remote_tmp dir with the correct permissions manually
+
+2026-03-21 06:37:34,998 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:37:35,013 p=412799 u=kevin n=ansible | TASK [Ajout du dépôt PostgreSQL] ***********************************************
+2026-03-21 06:37:50,084 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:37:50,094 p=412799 u=kevin n=ansible | TASK [Installation de PostgreSQL] **********************************************
+2026-03-21 06:38:38,034 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:38:38,045 p=412799 u=kevin n=ansible | TASK [Installation de repmgr depuis les dépôts PostgreSQL] *********************
+2026-03-21 06:38:47,926 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:38:47,938 p=412799 u=kevin n=ansible | TASK [Initialisation du cluster PostgreSQL si nécessaire] **********************
+2026-03-21 06:38:48,556 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:38:48,564 p=412799 u=kevin n=ansible | TASK [Configuration du mot de passe postgres] **********************************
+2026-03-21 06:38:49,371 p=412799 u=kevin n=ansible | [WARNING]: Module remote_tmp /var/lib/********ql/.ansible/tmp did not exist and
+was created with a mode of 0700, this may cause issues when running as another
+user. To avoid this, create the remote_tmp dir with the correct permissions
+manually
+
+2026-03-21 06:38:49,372 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:38:49,385 p=412799 u=kevin n=ansible | TASK [Création de l'utilisateur repmgr avec droits étendus] ********************
+2026-03-21 06:38:49,938 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:38:49,949 p=412799 u=kevin n=ansible | TASK [Configuration de search_path pour repmgr] ********************************
+2026-03-21 06:38:50,633 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:38:50,649 p=412799 u=kevin n=ansible | TASK [Création de la base repmgr] **********************************************
+2026-03-21 06:38:51,415 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:38:51,425 p=412799 u=kevin n=ansible | TASK [Configuration de pg_hba.conf] ********************************************
+2026-03-21 06:38:52,836 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:38:52,846 p=412799 u=kevin n=ansible | TASK [Configuration de postgresql.conf (réplication)] **************************
+2026-03-21 06:38:53,415 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:38:53,426 p=412799 u=kevin n=ansible | TASK [Création du dossier d'archive WAL] ***************************************
+2026-03-21 06:38:54,028 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:38:54,037 p=412799 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour appliquer la configuration] ******************
+2026-03-21 06:38:58,021 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:38:58,033 p=412799 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt] ***************************************
+2026-03-21 06:39:03,621 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:39:03,631 p=412799 u=kevin n=ansible | TASK [Installation de l'extension repmgr] **************************************
+2026-03-21 06:39:04,461 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:39:04,473 p=412799 u=kevin n=ansible | TASK [Configuration des permissions repmgr] ************************************
+2026-03-21 06:39:04,997 p=412799 u=kevin n=ansible | changed: [master]
+2026-03-21 06:39:05,009 p=412799 u=kevin n=ansible | TASK [Affichage du statut PostgreSQL] ******************************************
+2026-03-21 06:39:05,031 p=412799 u=kevin n=ansible | ok: [master] => {
+    "msg": "🎉 PostgreSQL installé sur master !\n📍 IP: 192.168.56.21\n🔧 Version: 16\n👤 Utilisateur: postgres\n🗄️ Base repmgr: repmgr\n"
+}
+2026-03-21 06:39:05,062 p=412799 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-21 06:39:05,063 p=412799 u=kevin n=ansible | master                     : ok=18   changed=16   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-21 06:40:12,004 p=415611 u=kevin n=ansible | PLAY [Installation PostgreSQL] *************************************************
+2026-03-21 06:40:12,016 p=415611 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-21 06:40:25,665 p=415611 u=kevin n=ansible | ok: [replica]
+2026-03-21 06:40:25,691 p=415611 u=kevin n=ansible | TASK [Ajout de la clé GPG PostgreSQL] ******************************************
+2026-03-21 06:40:29,070 p=415611 u=kevin n=ansible | [WARNING]: Module remote_tmp /root/.ansible/tmp did not exist and was created
+with a mode of 0700, this may cause issues when running as another user. To
+avoid this, create the remote_tmp dir with the correct permissions manually
+
+2026-03-21 06:40:29,071 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:40:29,089 p=415611 u=kevin n=ansible | TASK [Ajout du dépôt PostgreSQL] ***********************************************
+2026-03-21 06:41:13,134 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:41:13,146 p=415611 u=kevin n=ansible | TASK [Installation de PostgreSQL] **********************************************
+2026-03-21 06:42:02,034 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:42:02,047 p=415611 u=kevin n=ansible | TASK [Installation de repmgr depuis les dépôts PostgreSQL] *********************
+2026-03-21 06:42:14,067 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:42:14,082 p=415611 u=kevin n=ansible | TASK [Initialisation du cluster PostgreSQL si nécessaire] **********************
+2026-03-21 06:42:14,899 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:42:14,911 p=415611 u=kevin n=ansible | TASK [Configuration du mot de passe postgres] **********************************
+2026-03-21 06:42:16,303 p=415611 u=kevin n=ansible | [WARNING]: Module remote_tmp /var/lib/********ql/.ansible/tmp did not exist and
+was created with a mode of 0700, this may cause issues when running as another
+user. To avoid this, create the remote_tmp dir with the correct permissions
+manually
+
+2026-03-21 06:42:16,304 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:42:16,317 p=415611 u=kevin n=ansible | TASK [Création de l'utilisateur repmgr avec droits étendus] ********************
+2026-03-21 06:42:17,622 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:42:17,639 p=415611 u=kevin n=ansible | TASK [Configuration de search_path pour repmgr] ********************************
+2026-03-21 06:42:18,866 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:42:18,882 p=415611 u=kevin n=ansible | TASK [Création de la base repmgr] **********************************************
+2026-03-21 06:42:19,696 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:42:19,708 p=415611 u=kevin n=ansible | TASK [Configuration de pg_hba.conf] ********************************************
+2026-03-21 06:42:21,099 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:42:21,113 p=415611 u=kevin n=ansible | TASK [Configuration de postgresql.conf (réplication)] **************************
+2026-03-21 06:42:21,725 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:42:21,737 p=415611 u=kevin n=ansible | TASK [Création du dossier d'archive WAL] ***************************************
+2026-03-21 06:42:22,360 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:42:22,372 p=415611 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour appliquer la configuration] ******************
+2026-03-21 06:42:26,672 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:42:26,681 p=415611 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt] ***************************************
+2026-03-21 06:42:32,215 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:42:32,227 p=415611 u=kevin n=ansible | TASK [Installation de l'extension repmgr] **************************************
+2026-03-21 06:42:33,069 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:42:33,079 p=415611 u=kevin n=ansible | TASK [Configuration des permissions repmgr] ************************************
+2026-03-21 06:42:33,727 p=415611 u=kevin n=ansible | changed: [replica]
+2026-03-21 06:42:33,741 p=415611 u=kevin n=ansible | TASK [Affichage du statut PostgreSQL] ******************************************
+2026-03-21 06:42:33,769 p=415611 u=kevin n=ansible | ok: [replica] => {
+    "msg": "🎉 PostgreSQL installé sur replica !\n📍 IP: 192.168.56.22\n🔧 Version: 16\n👤 Utilisateur: postgres\n🗄️ Base repmgr: repmgr\n"
+}
+2026-03-21 06:42:33,813 p=415611 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-21 06:42:33,813 p=415611 u=kevin n=ansible | replica                    : ok=18   changed=16   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-21 07:02:03,836 p=427472 u=kevin n=ansible | PLAY [Installation PostgreSQL] *************************************************
+2026-03-21 07:02:03,848 p=427472 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-21 07:02:18,276 p=427472 u=kevin n=ansible | ok: [master]
+2026-03-21 07:02:18,298 p=427472 u=kevin n=ansible | TASK [Ajout de la clé GPG PostgreSQL] ******************************************
+2026-03-21 07:02:20,661 p=427472 u=kevin n=ansible | [WARNING]: Module remote_tmp /root/.ansible/tmp did not exist and was created
+with a mode of 0700, this may cause issues when running as another user. To
+avoid this, create the remote_tmp dir with the correct permissions manually
+
+2026-03-21 07:02:20,662 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:02:20,674 p=427472 u=kevin n=ansible | TASK [Ajout du dépôt PostgreSQL] ***********************************************
+2026-03-21 07:02:36,026 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:02:36,035 p=427472 u=kevin n=ansible | TASK [Installation de PostgreSQL] **********************************************
+2026-03-21 07:03:25,159 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:03:25,170 p=427472 u=kevin n=ansible | TASK [Installation de repmgr depuis les dépôts PostgreSQL] *********************
+2026-03-21 07:03:35,400 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:03:35,413 p=427472 u=kevin n=ansible | TASK [Initialisation du cluster PostgreSQL si nécessaire] **********************
+2026-03-21 07:03:36,051 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:03:36,063 p=427472 u=kevin n=ansible | TASK [Configuration du mot de passe postgres] **********************************
+2026-03-21 07:03:36,900 p=427472 u=kevin n=ansible | [WARNING]: Module remote_tmp /var/lib/********ql/.ansible/tmp did not exist and
+was created with a mode of 0700, this may cause issues when running as another
+user. To avoid this, create the remote_tmp dir with the correct permissions
+manually
+
+2026-03-21 07:03:36,900 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:03:36,915 p=427472 u=kevin n=ansible | TASK [Création de l'utilisateur repmgr avec droits étendus] ********************
+2026-03-21 07:03:37,499 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:03:37,515 p=427472 u=kevin n=ansible | TASK [Configuration de search_path pour repmgr] ********************************
+2026-03-21 07:03:38,291 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:03:38,304 p=427472 u=kevin n=ansible | TASK [Création de la base repmgr] **********************************************
+2026-03-21 07:03:39,102 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:03:39,114 p=427472 u=kevin n=ansible | TASK [Configuration de pg_hba.conf] ********************************************
+2026-03-21 07:03:40,734 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:03:40,748 p=427472 u=kevin n=ansible | TASK [Configuration de postgresql.conf (réplication)] **************************
+2026-03-21 07:03:41,327 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:03:41,338 p=427472 u=kevin n=ansible | TASK [Création du dossier d'archive WAL] ***************************************
+2026-03-21 07:03:41,948 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:03:41,959 p=427472 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour appliquer la configuration] ******************
+2026-03-21 07:03:46,094 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:03:46,106 p=427472 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt] ***************************************
+2026-03-21 07:03:51,675 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:03:51,690 p=427472 u=kevin n=ansible | TASK [Installation de l'extension repmgr] **************************************
+2026-03-21 07:03:52,501 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:03:52,508 p=427472 u=kevin n=ansible | TASK [Configuration des permissions repmgr] ************************************
+2026-03-21 07:03:53,036 p=427472 u=kevin n=ansible | changed: [master]
+2026-03-21 07:03:53,047 p=427472 u=kevin n=ansible | TASK [Affichage du statut PostgreSQL] ******************************************
+2026-03-21 07:03:53,070 p=427472 u=kevin n=ansible | ok: [master] => {
+    "msg": "🎉 PostgreSQL installé sur master !\n📍 IP: 192.168.56.21\n🔧 Version: 16\n👤 Utilisateur: postgres\n🗄️ Base repmgr: repmgr\n"
+}
+2026-03-21 07:03:53,103 p=427472 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-21 07:03:53,103 p=427472 u=kevin n=ansible | master                     : ok=18   changed=16   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-21 07:04:58,481 p=430293 u=kevin n=ansible | PLAY [Installation PostgreSQL] *************************************************
+2026-03-21 07:04:58,492 p=430293 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-21 07:05:12,031 p=430293 u=kevin n=ansible | ok: [replica]
+2026-03-21 07:05:12,054 p=430293 u=kevin n=ansible | TASK [Ajout de la clé GPG PostgreSQL] ******************************************
+2026-03-21 07:05:15,253 p=430293 u=kevin n=ansible | [WARNING]: Module remote_tmp /root/.ansible/tmp did not exist and was created
+with a mode of 0700, this may cause issues when running as another user. To
+avoid this, create the remote_tmp dir with the correct permissions manually
+
+2026-03-21 07:05:15,254 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:05:15,267 p=430293 u=kevin n=ansible | TASK [Ajout du dépôt PostgreSQL] ***********************************************
+2026-03-21 07:05:31,721 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:05:31,737 p=430293 u=kevin n=ansible | TASK [Installation de PostgreSQL] **********************************************
+2026-03-21 07:06:21,366 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:06:21,379 p=430293 u=kevin n=ansible | TASK [Installation de repmgr depuis les dépôts PostgreSQL] *********************
+2026-03-21 07:06:32,039 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:06:32,051 p=430293 u=kevin n=ansible | TASK [Initialisation du cluster PostgreSQL si nécessaire] **********************
+2026-03-21 07:06:32,669 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:06:32,680 p=430293 u=kevin n=ansible | TASK [Configuration du mot de passe postgres] **********************************
+2026-03-21 07:06:33,483 p=430293 u=kevin n=ansible | [WARNING]: Module remote_tmp /var/lib/********ql/.ansible/tmp did not exist and
+was created with a mode of 0700, this may cause issues when running as another
+user. To avoid this, create the remote_tmp dir with the correct permissions
+manually
+
+2026-03-21 07:06:33,483 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:06:33,496 p=430293 u=kevin n=ansible | TASK [Création de l'utilisateur repmgr avec droits étendus] ********************
+2026-03-21 07:06:34,079 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:06:34,089 p=430293 u=kevin n=ansible | TASK [Configuration de search_path pour repmgr] ********************************
+2026-03-21 07:06:34,788 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:06:34,803 p=430293 u=kevin n=ansible | TASK [Création de la base repmgr] **********************************************
+2026-03-21 07:06:35,647 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:06:35,661 p=430293 u=kevin n=ansible | TASK [Configuration de pg_hba.conf] ********************************************
+2026-03-21 07:06:37,437 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:06:37,451 p=430293 u=kevin n=ansible | TASK [Configuration de postgresql.conf (réplication)] **************************
+2026-03-21 07:06:38,101 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:06:38,113 p=430293 u=kevin n=ansible | TASK [Création du dossier d'archive WAL] ***************************************
+2026-03-21 07:06:38,734 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:06:38,748 p=430293 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour appliquer la configuration] ******************
+2026-03-21 07:06:42,762 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:06:42,774 p=430293 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt] ***************************************
+2026-03-21 07:06:48,309 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:06:48,322 p=430293 u=kevin n=ansible | TASK [Installation de l'extension repmgr] **************************************
+2026-03-21 07:06:49,174 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:06:49,185 p=430293 u=kevin n=ansible | TASK [Configuration des permissions repmgr] ************************************
+2026-03-21 07:06:49,720 p=430293 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:06:49,732 p=430293 u=kevin n=ansible | TASK [Affichage du statut PostgreSQL] ******************************************
+2026-03-21 07:06:49,755 p=430293 u=kevin n=ansible | ok: [replica] => {
+    "msg": "🎉 PostgreSQL installé sur replica !\n📍 IP: 192.168.56.22\n🔧 Version: 16\n👤 Utilisateur: postgres\n🗄️ Base repmgr: repmgr\n"
+}
+2026-03-21 07:06:49,786 p=430293 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-21 07:06:49,786 p=430293 u=kevin n=ansible | replica                    : ok=18   changed=16   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-21 07:23:32,514 p=440586 u=kevin n=ansible | PLAY [Installation PostgreSQL] *************************************************
+2026-03-21 07:23:32,525 p=440586 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-21 07:23:45,615 p=440586 u=kevin n=ansible | ok: [master]
+2026-03-21 07:23:45,635 p=440586 u=kevin n=ansible | TASK [Ajout de la clé GPG PostgreSQL] ******************************************
+2026-03-21 07:23:47,791 p=440586 u=kevin n=ansible | [WARNING]: Module remote_tmp /root/.ansible/tmp did not exist and was created
+with a mode of 0700, this may cause issues when running as another user. To
+avoid this, create the remote_tmp dir with the correct permissions manually
+
+2026-03-21 07:23:47,792 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:23:47,801 p=440586 u=kevin n=ansible | TASK [Ajout du dépôt PostgreSQL] ***********************************************
+2026-03-21 07:24:00,408 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:24:00,417 p=440586 u=kevin n=ansible | TASK [Installation de PostgreSQL] **********************************************
+2026-03-21 07:24:40,580 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:24:40,590 p=440586 u=kevin n=ansible | TASK [Installation de repmgr depuis les dépôts PostgreSQL] *********************
+2026-03-21 07:24:48,575 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:24:48,584 p=440586 u=kevin n=ansible | TASK [Initialisation du cluster PostgreSQL si nécessaire] **********************
+2026-03-21 07:24:49,067 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:24:49,076 p=440586 u=kevin n=ansible | TASK [Configuration du mot de passe postgres] **********************************
+2026-03-21 07:24:49,731 p=440586 u=kevin n=ansible | [WARNING]: Module remote_tmp /var/lib/********ql/.ansible/tmp did not exist and
+was created with a mode of 0700, this may cause issues when running as another
+user. To avoid this, create the remote_tmp dir with the correct permissions
+manually
+
+2026-03-21 07:24:49,731 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:24:49,742 p=440586 u=kevin n=ansible | TASK [Création de l'utilisateur repmgr avec droits étendus] ********************
+2026-03-21 07:24:50,198 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:24:50,208 p=440586 u=kevin n=ansible | TASK [Configuration de search_path pour repmgr] ********************************
+2026-03-21 07:24:50,767 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:24:50,779 p=440586 u=kevin n=ansible | TASK [Création de la base repmgr] **********************************************
+2026-03-21 07:24:51,415 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:24:51,424 p=440586 u=kevin n=ansible | TASK [Configuration de pg_hba.conf] ********************************************
+2026-03-21 07:24:52,599 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:24:52,610 p=440586 u=kevin n=ansible | TASK [Configuration de postgresql.conf (réplication)] **************************
+2026-03-21 07:24:53,134 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:24:53,145 p=440586 u=kevin n=ansible | TASK [Création du dossier d'archive WAL] ***************************************
+2026-03-21 07:24:53,642 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:24:53,652 p=440586 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour appliquer la configuration] ******************
+2026-03-21 07:24:57,180 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:24:57,189 p=440586 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt] ***************************************
+2026-03-21 07:25:02,610 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:25:02,624 p=440586 u=kevin n=ansible | TASK [Installation de l'extension repmgr] **************************************
+2026-03-21 07:25:03,389 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:25:03,396 p=440586 u=kevin n=ansible | TASK [Configuration des permissions repmgr] ************************************
+2026-03-21 07:25:03,832 p=440586 u=kevin n=ansible | changed: [master]
+2026-03-21 07:25:03,841 p=440586 u=kevin n=ansible | TASK [Affichage du statut PostgreSQL] ******************************************
+2026-03-21 07:25:03,857 p=440586 u=kevin n=ansible | ok: [master] => {
+    "msg": "🎉 PostgreSQL installé sur master !\n📍 IP: 192.168.56.21\n🔧 Version: 16\n👤 Utilisateur: postgres\n🗄️ Base repmgr: repmgr\n"
+}
+2026-03-21 07:25:03,884 p=440586 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-21 07:25:03,884 p=440586 u=kevin n=ansible | master                     : ok=18   changed=16   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-21 07:26:00,811 p=443172 u=kevin n=ansible | PLAY [Installation PostgreSQL] *************************************************
+2026-03-21 07:26:00,821 p=443172 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-21 07:26:14,011 p=443172 u=kevin n=ansible | ok: [replica]
+2026-03-21 07:26:14,032 p=443172 u=kevin n=ansible | TASK [Ajout de la clé GPG PostgreSQL] ******************************************
+2026-03-21 07:26:15,971 p=443172 u=kevin n=ansible | [WARNING]: Module remote_tmp /root/.ansible/tmp did not exist and was created
+with a mode of 0700, this may cause issues when running as another user. To
+avoid this, create the remote_tmp dir with the correct permissions manually
+
+2026-03-21 07:26:15,973 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:26:15,985 p=443172 u=kevin n=ansible | TASK [Ajout du dépôt PostgreSQL] ***********************************************
+2026-03-21 07:26:30,076 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:26:30,086 p=443172 u=kevin n=ansible | TASK [Installation de PostgreSQL] **********************************************
+2026-03-21 07:27:10,954 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:27:10,970 p=443172 u=kevin n=ansible | TASK [Installation de repmgr depuis les dépôts PostgreSQL] *********************
+2026-03-21 07:27:19,783 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:27:19,791 p=443172 u=kevin n=ansible | TASK [Initialisation du cluster PostgreSQL si nécessaire] **********************
+2026-03-21 07:27:20,287 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:27:20,295 p=443172 u=kevin n=ansible | TASK [Configuration du mot de passe postgres] **********************************
+2026-03-21 07:27:20,949 p=443172 u=kevin n=ansible | [WARNING]: Module remote_tmp /var/lib/********ql/.ansible/tmp did not exist and
+was created with a mode of 0700, this may cause issues when running as another
+user. To avoid this, create the remote_tmp dir with the correct permissions
+manually
+
+2026-03-21 07:27:20,949 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:27:20,958 p=443172 u=kevin n=ansible | TASK [Création de l'utilisateur repmgr avec droits étendus] ********************
+2026-03-21 07:27:21,442 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:27:21,452 p=443172 u=kevin n=ansible | TASK [Configuration de search_path pour repmgr] ********************************
+2026-03-21 07:27:22,072 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:27:22,088 p=443172 u=kevin n=ansible | TASK [Création de la base repmgr] **********************************************
+2026-03-21 07:27:22,744 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:27:22,753 p=443172 u=kevin n=ansible | TASK [Configuration de pg_hba.conf] ********************************************
+2026-03-21 07:27:23,941 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:27:23,950 p=443172 u=kevin n=ansible | TASK [Configuration de postgresql.conf (réplication)] **************************
+2026-03-21 07:27:24,427 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:27:24,436 p=443172 u=kevin n=ansible | TASK [Création du dossier d'archive WAL] ***************************************
+2026-03-21 07:27:24,931 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:27:24,940 p=443172 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour appliquer la configuration] ******************
+2026-03-21 07:27:28,560 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:27:28,570 p=443172 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt] ***************************************
+2026-03-21 07:27:34,006 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:27:34,017 p=443172 u=kevin n=ansible | TASK [Installation de l'extension repmgr] **************************************
+2026-03-21 07:27:34,673 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:27:34,684 p=443172 u=kevin n=ansible | TASK [Configuration des permissions repmgr] ************************************
+2026-03-21 07:27:35,134 p=443172 u=kevin n=ansible | changed: [replica]
+2026-03-21 07:27:35,143 p=443172 u=kevin n=ansible | TASK [Affichage du statut PostgreSQL] ******************************************
+2026-03-21 07:27:35,162 p=443172 u=kevin n=ansible | ok: [replica] => {
+    "msg": "🎉 PostgreSQL installé sur replica !\n📍 IP: 192.168.56.22\n🔧 Version: 16\n👤 Utilisateur: postgres\n🗄️ Base repmgr: repmgr\n"
+}
+2026-03-21 07:27:35,187 p=443172 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-21 07:27:35,187 p=443172 u=kevin n=ansible | replica                    : ok=18   changed=16   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-21 07:46:42,697 p=454767 u=kevin n=ansible | PLAY [Installation PostgreSQL] *************************************************
+2026-03-21 07:46:42,713 p=454767 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-21 07:46:57,542 p=454767 u=kevin n=ansible | ok: [master]
+2026-03-21 07:46:57,567 p=454767 u=kevin n=ansible | TASK [Ajout de la clé GPG PostgreSQL] ******************************************
+2026-03-21 07:47:00,195 p=454767 u=kevin n=ansible | [WARNING]: Module remote_tmp /root/.ansible/tmp did not exist and was created
+with a mode of 0700, this may cause issues when running as another user. To
+avoid this, create the remote_tmp dir with the correct permissions manually
+
+2026-03-21 07:47:00,195 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:47:00,205 p=454767 u=kevin n=ansible | TASK [Ajout du dépôt PostgreSQL] ***********************************************
+2026-03-21 07:47:15,568 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:47:15,582 p=454767 u=kevin n=ansible | TASK [Installation de PostgreSQL] **********************************************
+2026-03-21 07:48:04,391 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:48:04,403 p=454767 u=kevin n=ansible | TASK [Installation de repmgr depuis les dépôts PostgreSQL] *********************
+2026-03-21 07:48:14,567 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:48:14,579 p=454767 u=kevin n=ansible | TASK [Initialisation du cluster PostgreSQL si nécessaire] **********************
+2026-03-21 07:48:15,183 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:48:15,193 p=454767 u=kevin n=ansible | TASK [Configuration du mot de passe postgres] **********************************
+2026-03-21 07:48:15,972 p=454767 u=kevin n=ansible | [WARNING]: Module remote_tmp /var/lib/********ql/.ansible/tmp did not exist and
+was created with a mode of 0700, this may cause issues when running as another
+user. To avoid this, create the remote_tmp dir with the correct permissions
+manually
+
+2026-03-21 07:48:15,975 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:48:15,985 p=454767 u=kevin n=ansible | TASK [Création de l'utilisateur repmgr avec droits étendus] ********************
+2026-03-21 07:48:16,545 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:48:16,556 p=454767 u=kevin n=ansible | TASK [Configuration de search_path pour repmgr] ********************************
+2026-03-21 07:48:17,230 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:48:17,245 p=454767 u=kevin n=ansible | TASK [Création de la base repmgr] **********************************************
+2026-03-21 07:48:18,029 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:48:18,042 p=454767 u=kevin n=ansible | TASK [Configuration de pg_hba.conf] ********************************************
+2026-03-21 07:48:19,572 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:48:19,588 p=454767 u=kevin n=ansible | TASK [Configuration de postgresql.conf (réplication)] **************************
+2026-03-21 07:48:20,191 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:48:20,203 p=454767 u=kevin n=ansible | TASK [Création du dossier d'archive WAL] ***************************************
+2026-03-21 07:48:20,882 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:48:20,895 p=454767 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour appliquer la configuration] ******************
+2026-03-21 07:48:24,860 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:48:24,871 p=454767 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt] ***************************************
+2026-03-21 07:48:30,415 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:48:30,427 p=454767 u=kevin n=ansible | TASK [Installation de l'extension repmgr] **************************************
+2026-03-21 07:48:31,338 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:48:31,355 p=454767 u=kevin n=ansible | TASK [Configuration des permissions repmgr] ************************************
+2026-03-21 07:48:31,929 p=454767 u=kevin n=ansible | changed: [master]
+2026-03-21 07:48:31,942 p=454767 u=kevin n=ansible | TASK [Affichage du statut PostgreSQL] ******************************************
+2026-03-21 07:48:31,966 p=454767 u=kevin n=ansible | ok: [master] => {
+    "msg": "🎉 PostgreSQL installé sur master !\n📍 IP: 192.168.56.21\n🔧 Version: 16\n👤 Utilisateur: postgres\n🗄️ Base repmgr: repmgr\n"
+}
+2026-03-21 07:48:32,002 p=454767 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-21 07:48:32,002 p=454767 u=kevin n=ansible | master                     : ok=18   changed=16   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-21 07:49:35,740 p=457579 u=kevin n=ansible | PLAY [Installation PostgreSQL] *************************************************
+2026-03-21 07:49:35,749 p=457579 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-21 07:49:49,423 p=457579 u=kevin n=ansible | ok: [replica]
+2026-03-21 07:49:49,449 p=457579 u=kevin n=ansible | TASK [Ajout de la clé GPG PostgreSQL] ******************************************
+2026-03-21 07:50:00,661 p=457579 u=kevin n=ansible | [WARNING]: Module remote_tmp /root/.ansible/tmp did not exist and was created
+with a mode of 0700, this may cause issues when running as another user. To
+avoid this, create the remote_tmp dir with the correct permissions manually
+
+2026-03-21 07:50:00,662 p=457579 u=kevin n=ansible | fatal: [replica]: FAILED! => {"changed": false, "msg": "Failed to download key at https://www.postgresql.org/media/keys/ACCC4CF8.asc: Request failed: <urlopen error _ssl.c:983: The handshake operation timed out>"}
+2026-03-21 07:50:00,663 p=457579 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-21 07:50:00,664 p=457579 u=kevin n=ansible | replica                    : ok=1    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0   
+2026-03-21 08:15:06,506 p=475506 u=kevin n=ansible | PLAY [Installation PostgreSQL robuste] *****************************************
+2026-03-21 08:15:06,519 p=475506 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-21 08:15:10,137 p=475506 u=kevin n=ansible | fatal: [newserver]: UNREACHABLE! => {"changed": false, "msg": "Data could not be sent to remote host \"192.168.56.23\". Make sure this host can be reached over ssh: ssh: connect to host 192.168.56.23 port 22: No route to host\r\n", "unreachable": true}
+2026-03-21 08:15:22,811 p=475506 u=kevin n=ansible | ok: [master]
+2026-03-21 08:15:23,244 p=475506 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:15:23,295 p=475506 u=kevin n=ansible | TASK [Importer le rôle postgresql] *********************************************
+2026-03-21 08:15:23,393 p=475506 u=kevin n=ansible | TASK [postgresql : Ajout de la clé GPG PostgreSQL] *****************************
+2026-03-21 08:15:26,934 p=475506 u=kevin n=ansible | [WARNING]: Module remote_tmp /root/.ansible/tmp did not exist and was created
+with a mode of 0700, this may cause issues when running as another user. To
+avoid this, create the remote_tmp dir with the correct permissions manually
+
+2026-03-21 08:15:26,935 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:15:27,163 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:15:27,183 p=475506 u=kevin n=ansible | TASK [postgresql : Ajout du dépôt PostgreSQL] **********************************
+2026-03-21 08:15:52,151 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:15:53,197 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:15:53,212 p=475506 u=kevin n=ansible | TASK [postgresql : Installation de PostgreSQL et repmgr] ***********************
+2026-03-21 08:17:08,176 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:13,544 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:13,558 p=475506 u=kevin n=ansible | TASK [postgresql : Initialisation du cluster PostgreSQL si nécessaire] *********
+2026-03-21 08:17:14,422 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:14,547 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:14,568 p=475506 u=kevin n=ansible | TASK [postgresql : Configuration du mot de passe postgres] *********************
+2026-03-21 08:17:15,997 p=475506 u=kevin n=ansible | [WARNING]: Module remote_tmp /var/lib/********ql/.ansible/tmp did not exist and
+was created with a mode of 0700, this may cause issues when running as another
+user. To avoid this, create the remote_tmp dir with the correct permissions
+manually
+
+2026-03-21 08:17:15,997 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:16,039 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:16,053 p=475506 u=kevin n=ansible | TASK [postgresql : Création de l'utilisateur repmgr avec droits étendus] *******
+2026-03-21 08:17:17,076 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:17,103 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:17,114 p=475506 u=kevin n=ansible | TASK [postgresql : Configuration de search_path pour repmgr] *******************
+2026-03-21 08:17:18,051 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:18,243 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:18,268 p=475506 u=kevin n=ansible | TASK [postgresql : Création de la base repmgr] *********************************
+2026-03-21 08:17:19,614 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:19,815 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:19,830 p=475506 u=kevin n=ansible | TASK [postgresql : Configuration de pg_hba.conf] *******************************
+2026-03-21 08:17:21,923 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:21,997 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:22,022 p=475506 u=kevin n=ansible | TASK [postgresql : Configuration de postgresql.conf (réplication)] *************
+2026-03-21 08:17:22,884 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:22,915 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:22,941 p=475506 u=kevin n=ansible | TASK [postgresql : Création du dossier d'archive WAL] **************************
+2026-03-21 08:17:23,804 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:23,973 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:23,988 p=475506 u=kevin n=ansible | TASK [postgresql : Redémarrage PostgreSQL pour appliquer la configuration] *****
+2026-03-21 08:17:28,848 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:28,889 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:28,907 p=475506 u=kevin n=ansible | TASK [postgresql : Attendre que PostgreSQL soit prêt] **************************
+2026-03-21 08:17:34,687 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:34,870 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:34,884 p=475506 u=kevin n=ansible | TASK [postgresql : Installation de l'extension repmgr] *************************
+2026-03-21 08:17:36,001 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:36,229 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:36,244 p=475506 u=kevin n=ansible | TASK [postgresql : Configuration des permissions repmgr] ***********************
+2026-03-21 08:17:37,046 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:37,127 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:37,238 p=475506 u=kevin n=ansible | PLAY [Configuration et enregistrement repmgr robuste] **************************
+2026-03-21 08:17:37,291 p=475506 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit complètement démarré] ***********************
+2026-03-21 08:17:37,310 p=475506 u=kevin n=ansible | Pausing for 10 seconds
+2026-03-21 08:17:47,318 p=475506 u=kevin n=ansible | ok: [master]
+2026-03-21 08:17:47,329 p=475506 u=kevin n=ansible | TASK [Vérification que PostgreSQL est accessible] ******************************
+2026-03-21 08:17:48,007 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:48,101 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:48,116 p=475506 u=kevin n=ansible | TASK [Création du dossier de configuration repmgr] *****************************
+2026-03-21 08:17:48,808 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:48,874 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:48,888 p=475506 u=kevin n=ansible | TASK [Configuration de repmgr.conf] ********************************************
+2026-03-21 08:17:50,374 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:50,463 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:50,477 p=475506 u=kevin n=ansible | TASK [Création du fichier .pgpass pour repmgr] *********************************
+2026-03-21 08:17:52,113 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:52,156 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:52,170 p=475506 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour réplication] *********************************
+2026-03-21 08:17:56,459 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:56,545 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:56,558 p=475506 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt après redémarrage] *********************
+2026-03-21 08:17:57,456 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:57,489 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:17:57,515 p=475506 u=kevin n=ansible | TASK [Enregistrement du master avec retry] *************************************
+2026-03-21 08:17:57,594 p=475506 u=kevin n=ansible | skipping: [replica]
+2026-03-21 08:17:58,403 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:17:58,429 p=475506 u=kevin n=ansible | TASK [Pause pour propagation] **************************************************
+2026-03-21 08:17:58,466 p=475506 u=kevin n=ansible | Pausing for 15 seconds
+2026-03-21 08:18:13,471 p=475506 u=kevin n=ansible | ok: [master]
+2026-03-21 08:18:13,489 p=475506 u=kevin n=ansible | TASK [Vérification que le master est enregistré] *******************************
+2026-03-21 08:18:13,558 p=475506 u=kevin n=ansible | skipping: [replica]
+2026-03-21 08:18:14,501 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:18:14,523 p=475506 u=kevin n=ansible | TASK [Arrêter PostgreSQL sur replica] ******************************************
+2026-03-21 08:18:14,578 p=475506 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:18:15,978 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:18:15,993 p=475506 u=kevin n=ansible | TASK [Nettoyer les données existantes] *****************************************
+2026-03-21 08:18:16,031 p=475506 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:18:16,682 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:18:16,696 p=475506 u=kevin n=ansible | TASK [Test de connexion au master avant clonage] *******************************
+2026-03-21 08:18:16,721 p=475506 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:18:17,391 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:18:17,402 p=475506 u=kevin n=ansible | TASK [Clonage depuis le master avec retry] *************************************
+2026-03-21 08:18:17,430 p=475506 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:18:22,590 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:18:22,607 p=475506 u=kevin n=ansible | TASK [Vérification que les données sont bien clonées] **************************
+2026-03-21 08:18:22,643 p=475506 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:18:23,262 p=475506 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:18:23,284 p=475506 u=kevin n=ansible | TASK [Échec du clonage si données manquantes] **********************************
+2026-03-21 08:18:23,310 p=475506 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:18:23,327 p=475506 u=kevin n=ansible | skipping: [replica]
+2026-03-21 08:18:23,340 p=475506 u=kevin n=ansible | TASK [Démarrage PostgreSQL replica] ********************************************
+2026-03-21 08:18:23,370 p=475506 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:18:27,662 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:18:27,677 p=475506 u=kevin n=ansible | TASK [Attendre que PostgreSQL replica soit prêt] *******************************
+2026-03-21 08:18:27,772 p=475506 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:18:28,372 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:18:28,386 p=475506 u=kevin n=ansible | TASK [Vérification que le replica est en mode recovery] ************************
+2026-03-21 08:18:28,418 p=475506 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:18:29,104 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:18:29,118 p=475506 u=kevin n=ansible | TASK [Échec si pas en mode recovery] *******************************************
+2026-03-21 08:18:29,148 p=475506 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:18:29,163 p=475506 u=kevin n=ansible | skipping: [replica]
+2026-03-21 08:18:29,178 p=475506 u=kevin n=ansible | TASK [Enregistrement du replica avec retry] ************************************
+2026-03-21 08:18:29,206 p=475506 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:18:30,030 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:18:30,040 p=475506 u=kevin n=ansible | TASK [Vérification finale du cluster] ******************************************
+2026-03-21 08:18:31,096 p=475506 u=kevin n=ansible | changed: [master]
+2026-03-21 08:18:31,172 p=475506 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:18:31,188 p=475506 u=kevin n=ansible | TASK [Affichage du statut final] ***********************************************
+2026-03-21 08:18:31,255 p=475506 u=kevin n=ansible | ok: [master] => {
+    "msg": "🎉 Cluster PostgreSQL repmgr configuré avec robustesse !\n📍 Nœud: master (Master)\n📊 Cluster:\n ID | Name  | Role    | Status    | Upstream | Location | Priority | Timeline | Connection string                                                                                \\n----+-------+---------+-----------+----------+----------+----------+----------+---------------------------------------------------------------------------------------------------\\n 1  | node1 | primary | * running |          | default  | 100      | 1        | host=192.168.56.21 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\\n 2  | node2 | standby |   running | node1    | default  | 100      | 1        | host=192.168.56.22 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\n"
+}
+2026-03-21 08:18:31,264 p=475506 u=kevin n=ansible | ok: [replica] => {
+    "msg": "🎉 Cluster PostgreSQL repmgr configuré avec robustesse !\n📍 Nœud: replica (Replica)\n📊 Cluster:\n ID | Name  | Role    | Status    | Upstream | Location | Priority | Timeline | Connection string                                                                                \\n----+-------+---------+-----------+----------+----------+----------+----------+---------------------------------------------------------------------------------------------------\\n 1  | node1 | primary | * running |          | default  | 100      | 1        | host=192.168.56.21 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\\n 2  | node2 | standby |   running | node1    | default  | 100      | 1        | host=192.168.56.22 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\n"
+}
+2026-03-21 08:18:31,345 p=475506 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-21 08:18:31,345 p=475506 u=kevin n=ansible | master                     : ok=28   changed=24   unreachable=0    failed=0    skipped=11   rescued=0    ignored=0   
+2026-03-21 08:18:31,345 p=475506 u=kevin n=ansible | newserver                  : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-21 08:18:31,346 p=475506 u=kevin n=ansible | replica                    : ok=33   changed=30   unreachable=0    failed=0    skipped=4    rescued=0    ignored=0   
+2026-03-21 08:20:10,409 p=481057 u=kevin n=ansible | PLAY [Installation PostgreSQL robuste] *****************************************
+2026-03-21 08:20:10,422 p=481057 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-21 08:20:14,029 p=481057 u=kevin n=ansible | fatal: [newserver]: UNREACHABLE! => {"changed": false, "msg": "Data could not be sent to remote host \"192.168.56.23\". Make sure this host can be reached over ssh: ssh: connect to host 192.168.56.23 port 22: No route to host\r\n", "unreachable": true}
+2026-03-21 08:20:15,667 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:20:16,088 p=481057 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:20:16,142 p=481057 u=kevin n=ansible | TASK [Importer le rôle postgresql] *********************************************
+2026-03-21 08:20:16,276 p=481057 u=kevin n=ansible | TASK [postgresql : Ajout de la clé GPG PostgreSQL] *****************************
+2026-03-21 08:20:18,610 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:20:18,752 p=481057 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:20:18,768 p=481057 u=kevin n=ansible | TASK [postgresql : Ajout du dépôt PostgreSQL] **********************************
+2026-03-21 08:20:20,341 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:20:20,417 p=481057 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:20:20,436 p=481057 u=kevin n=ansible | TASK [postgresql : Installation de PostgreSQL et repmgr] ***********************
+2026-03-21 08:20:28,400 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:20:28,977 p=481057 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:20:28,994 p=481057 u=kevin n=ansible | TASK [postgresql : Initialisation du cluster PostgreSQL si nécessaire] *********
+2026-03-21 08:20:29,885 p=481057 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:20:29,889 p=481057 u=kevin n=ansible | changed: [master]
+2026-03-21 08:20:29,911 p=481057 u=kevin n=ansible | TASK [postgresql : Configuration du mot de passe postgres] *********************
+2026-03-21 08:20:31,004 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:20:31,036 p=481057 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:20:31,049 p=481057 u=kevin n=ansible | TASK [postgresql : Création de l'utilisateur repmgr avec droits étendus] *******
+2026-03-21 08:20:31,862 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:20:31,917 p=481057 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:20:31,931 p=481057 u=kevin n=ansible | TASK [postgresql : Configuration de search_path pour repmgr] *******************
+2026-03-21 08:20:32,945 p=481057 u=kevin n=ansible | changed: [master]
+2026-03-21 08:20:33,029 p=481057 u=kevin n=ansible | fatal: [replica]: FAILED! => {"changed": false, "msg": "Cannot execute SQL 'ALTER USER repmgr SET search_path TO repmgr, \"\\$user\", public;' None: cannot execute ALTER ROLE in a read-only transaction\n, query list: ['ALTER USER repmgr SET search_path TO repmgr, \"\\\\$user\", public;']"}
+2026-03-21 08:20:33,044 p=481057 u=kevin n=ansible | TASK [postgresql : Création de la base repmgr] *********************************
+2026-03-21 08:20:33,943 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:20:33,964 p=481057 u=kevin n=ansible | TASK [postgresql : Configuration de pg_hba.conf] *******************************
+2026-03-21 08:20:35,816 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:20:35,831 p=481057 u=kevin n=ansible | TASK [postgresql : Configuration de postgresql.conf (réplication)] *************
+2026-03-21 08:20:36,664 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:20:36,678 p=481057 u=kevin n=ansible | TASK [postgresql : Création du dossier d'archive WAL] **************************
+2026-03-21 08:20:37,243 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:20:37,258 p=481057 u=kevin n=ansible | TASK [postgresql : Redémarrage PostgreSQL pour appliquer la configuration] *****
+2026-03-21 08:20:42,061 p=481057 u=kevin n=ansible | changed: [master]
+2026-03-21 08:20:42,078 p=481057 u=kevin n=ansible | TASK [postgresql : Attendre que PostgreSQL soit prêt] **************************
+2026-03-21 08:20:47,712 p=481057 u=kevin n=ansible | changed: [master]
+2026-03-21 08:20:47,729 p=481057 u=kevin n=ansible | TASK [postgresql : Installation de l'extension repmgr] *************************
+2026-03-21 08:20:48,606 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:20:48,621 p=481057 u=kevin n=ansible | TASK [postgresql : Configuration des permissions repmgr] ***********************
+2026-03-21 08:20:49,311 p=481057 u=kevin n=ansible | changed: [master]
+2026-03-21 08:20:49,384 p=481057 u=kevin n=ansible | PLAY [Configuration et enregistrement repmgr robuste] **************************
+2026-03-21 08:20:49,429 p=481057 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit complètement démarré] ***********************
+2026-03-21 08:20:49,454 p=481057 u=kevin n=ansible | Pausing for 10 seconds
+2026-03-21 08:20:59,464 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:20:59,480 p=481057 u=kevin n=ansible | TASK [Vérification que PostgreSQL est accessible] ******************************
+2026-03-21 08:21:00,074 p=481057 u=kevin n=ansible | changed: [master]
+2026-03-21 08:21:00,091 p=481057 u=kevin n=ansible | TASK [Création du dossier de configuration repmgr] *****************************
+2026-03-21 08:21:00,871 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:21:00,896 p=481057 u=kevin n=ansible | TASK [Configuration de repmgr.conf] ********************************************
+2026-03-21 08:21:02,190 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:21:02,205 p=481057 u=kevin n=ansible | TASK [Création du fichier .pgpass pour repmgr] *********************************
+2026-03-21 08:21:03,428 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:21:03,440 p=481057 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour réplication] *********************************
+2026-03-21 08:21:07,375 p=481057 u=kevin n=ansible | changed: [master]
+2026-03-21 08:21:07,387 p=481057 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt après redémarrage] *********************
+2026-03-21 08:21:08,006 p=481057 u=kevin n=ansible | changed: [master]
+2026-03-21 08:21:08,019 p=481057 u=kevin n=ansible | TASK [Enregistrement du master avec retry] *************************************
+2026-03-21 08:21:08,815 p=481057 u=kevin n=ansible | changed: [master]
+2026-03-21 08:21:08,827 p=481057 u=kevin n=ansible | TASK [Pause pour propagation] **************************************************
+2026-03-21 08:21:08,852 p=481057 u=kevin n=ansible | Pausing for 15 seconds
+2026-03-21 08:21:23,857 p=481057 u=kevin n=ansible | ok: [master]
+2026-03-21 08:21:23,871 p=481057 u=kevin n=ansible | TASK [Vérification que le master est enregistré] *******************************
+2026-03-21 08:21:24,793 p=481057 u=kevin n=ansible | changed: [master]
+2026-03-21 08:21:24,806 p=481057 u=kevin n=ansible | TASK [Arrêter PostgreSQL sur replica] ******************************************
+2026-03-21 08:21:24,832 p=481057 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:21:24,852 p=481057 u=kevin n=ansible | TASK [Nettoyer les données existantes] *****************************************
+2026-03-21 08:21:24,881 p=481057 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:21:24,903 p=481057 u=kevin n=ansible | TASK [Test de connexion au master avant clonage] *******************************
+2026-03-21 08:21:24,930 p=481057 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:21:24,952 p=481057 u=kevin n=ansible | TASK [Clonage depuis le master avec retry] *************************************
+2026-03-21 08:21:24,972 p=481057 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:21:24,984 p=481057 u=kevin n=ansible | TASK [Vérification que les données sont bien clonées] **************************
+2026-03-21 08:21:25,009 p=481057 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:21:25,027 p=481057 u=kevin n=ansible | TASK [Échec du clonage si données manquantes] **********************************
+2026-03-21 08:21:25,050 p=481057 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:21:25,065 p=481057 u=kevin n=ansible | TASK [Démarrage PostgreSQL replica] ********************************************
+2026-03-21 08:21:25,098 p=481057 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:21:25,117 p=481057 u=kevin n=ansible | TASK [Attendre que PostgreSQL replica soit prêt] *******************************
+2026-03-21 08:21:25,143 p=481057 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:21:25,165 p=481057 u=kevin n=ansible | TASK [Vérification que le replica est en mode recovery] ************************
+2026-03-21 08:21:25,189 p=481057 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:21:25,202 p=481057 u=kevin n=ansible | TASK [Échec si pas en mode recovery] *******************************************
+2026-03-21 08:21:25,225 p=481057 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:21:25,240 p=481057 u=kevin n=ansible | TASK [Enregistrement du replica avec retry] ************************************
+2026-03-21 08:21:25,268 p=481057 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:21:25,287 p=481057 u=kevin n=ansible | TASK [Vérification finale du cluster] ******************************************
+2026-03-21 08:21:26,371 p=481057 u=kevin n=ansible | changed: [master]
+2026-03-21 08:21:26,392 p=481057 u=kevin n=ansible | TASK [Affichage du statut final] ***********************************************
+2026-03-21 08:21:26,454 p=481057 u=kevin n=ansible | ok: [master] => {
+    "msg": "🎉 Cluster PostgreSQL repmgr configuré avec robustesse !\n📍 Nœud: master (Master)\n📊 Cluster:\n ID | Name  | Role    | Status    | Upstream | Location | Priority | Timeline | Connection string                                                                                \\n----+-------+---------+-----------+----------+----------+----------+----------+---------------------------------------------------------------------------------------------------\\n 1  | node1 | primary | * running |          | default  | 100      | 1        | host=192.168.56.21 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\\n 2  | node2 | standby |   running | node1    | default  | 100      | 1        | host=192.168.56.22 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\n"
+}
+2026-03-21 08:21:26,500 p=481057 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-21 08:21:26,501 p=481057 u=kevin n=ansible | master                     : ok=28   changed=11   unreachable=0    failed=0    skipped=11   rescued=0    ignored=0   
+2026-03-21 08:21:26,501 p=481057 u=kevin n=ansible | newserver                  : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-21 08:21:26,501 p=481057 u=kevin n=ansible | replica                    : ok=7    changed=1    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0   
+2026-03-21 08:23:04,681 p=485341 u=kevin n=ansible | PLAY [Installation PostgreSQL robuste] *****************************************
+2026-03-21 08:23:04,694 p=485341 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-21 08:23:08,305 p=485341 u=kevin n=ansible | fatal: [newserver]: UNREACHABLE! => {"changed": false, "msg": "Data could not be sent to remote host \"192.168.56.23\". Make sure this host can be reached over ssh: ssh: connect to host 192.168.56.23 port 22: No route to host\r\n", "unreachable": true}
+2026-03-21 08:23:09,388 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:23:10,669 p=485341 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:23:10,705 p=485341 u=kevin n=ansible | TASK [Importer le rôle postgresql] *********************************************
+2026-03-21 08:23:10,789 p=485341 u=kevin n=ansible | TASK [postgresql : Ajout de la clé GPG PostgreSQL] *****************************
+2026-03-21 08:23:13,752 p=485341 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:23:14,013 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:23:14,027 p=485341 u=kevin n=ansible | TASK [postgresql : Ajout du dépôt PostgreSQL] **********************************
+2026-03-21 08:23:15,468 p=485341 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:23:15,567 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:23:15,585 p=485341 u=kevin n=ansible | TASK [postgresql : Installation de PostgreSQL et repmgr] ***********************
+2026-03-21 08:23:23,508 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:23:24,043 p=485341 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:23:24,055 p=485341 u=kevin n=ansible | TASK [postgresql : Initialisation du cluster PostgreSQL si nécessaire] *********
+2026-03-21 08:23:25,158 p=485341 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:23:25,332 p=485341 u=kevin n=ansible | changed: [master]
+2026-03-21 08:23:25,360 p=485341 u=kevin n=ansible | TASK [postgresql : Configuration du mot de passe postgres] *********************
+2026-03-21 08:23:26,378 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:23:26,482 p=485341 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:23:26,497 p=485341 u=kevin n=ansible | TASK [postgresql : Création de l'utilisateur repmgr avec droits étendus] *******
+2026-03-21 08:23:27,252 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:23:27,306 p=485341 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:23:27,319 p=485341 u=kevin n=ansible | TASK [postgresql : Configuration de search_path pour repmgr] *******************
+2026-03-21 08:23:28,248 p=485341 u=kevin n=ansible | changed: [master]
+2026-03-21 08:23:28,304 p=485341 u=kevin n=ansible | fatal: [replica]: FAILED! => {"changed": false, "msg": "Cannot execute SQL 'ALTER USER repmgr SET search_path TO repmgr, \"\\$user\", public;' None: cannot execute ALTER ROLE in a read-only transaction\n, query list: ['ALTER USER repmgr SET search_path TO repmgr, \"\\\\$user\", public;']"}
+2026-03-21 08:23:28,318 p=485341 u=kevin n=ansible | TASK [postgresql : Création de la base repmgr] *********************************
+2026-03-21 08:23:29,185 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:23:29,207 p=485341 u=kevin n=ansible | TASK [postgresql : Configuration de pg_hba.conf] *******************************
+2026-03-21 08:23:30,809 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:23:30,827 p=485341 u=kevin n=ansible | TASK [postgresql : Configuration de postgresql.conf (réplication)] *************
+2026-03-21 08:23:31,644 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:23:31,659 p=485341 u=kevin n=ansible | TASK [postgresql : Création du dossier d'archive WAL] **************************
+2026-03-21 08:23:32,273 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:23:32,288 p=485341 u=kevin n=ansible | TASK [postgresql : Redémarrage PostgreSQL pour appliquer la configuration] *****
+2026-03-21 08:23:36,691 p=485341 u=kevin n=ansible | changed: [master]
+2026-03-21 08:23:36,704 p=485341 u=kevin n=ansible | TASK [postgresql : Attendre que PostgreSQL soit prêt] **************************
+2026-03-21 08:23:42,341 p=485341 u=kevin n=ansible | changed: [master]
+2026-03-21 08:23:42,357 p=485341 u=kevin n=ansible | TASK [postgresql : Installation de l'extension repmgr] *************************
+2026-03-21 08:23:43,178 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:23:43,189 p=485341 u=kevin n=ansible | TASK [postgresql : Configuration des permissions repmgr] ***********************
+2026-03-21 08:23:43,801 p=485341 u=kevin n=ansible | changed: [master]
+2026-03-21 08:23:43,847 p=485341 u=kevin n=ansible | PLAY [Configuration et enregistrement repmgr robuste] **************************
+2026-03-21 08:23:43,878 p=485341 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit complètement démarré] ***********************
+2026-03-21 08:23:43,900 p=485341 u=kevin n=ansible | Pausing for 10 seconds
+2026-03-21 08:23:53,906 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:23:53,916 p=485341 u=kevin n=ansible | TASK [Vérification que PostgreSQL est accessible] ******************************
+2026-03-21 08:23:54,540 p=485341 u=kevin n=ansible | changed: [master]
+2026-03-21 08:23:54,554 p=485341 u=kevin n=ansible | TASK [Création du dossier de configuration repmgr] *****************************
+2026-03-21 08:23:55,141 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:23:55,155 p=485341 u=kevin n=ansible | TASK [Configuration de repmgr.conf] ********************************************
+2026-03-21 08:23:56,341 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:23:56,358 p=485341 u=kevin n=ansible | TASK [Création du fichier .pgpass pour repmgr] *********************************
+2026-03-21 08:23:57,565 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:23:57,580 p=485341 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour réplication] *********************************
+2026-03-21 08:24:01,636 p=485341 u=kevin n=ansible | changed: [master]
+2026-03-21 08:24:01,647 p=485341 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt après redémarrage] *********************
+2026-03-21 08:24:02,225 p=485341 u=kevin n=ansible | changed: [master]
+2026-03-21 08:24:02,239 p=485341 u=kevin n=ansible | TASK [Enregistrement du master avec retry] *************************************
+2026-03-21 08:24:02,951 p=485341 u=kevin n=ansible | changed: [master]
+2026-03-21 08:24:02,961 p=485341 u=kevin n=ansible | TASK [Pause pour propagation] **************************************************
+2026-03-21 08:24:02,986 p=485341 u=kevin n=ansible | Pausing for 15 seconds
+2026-03-21 08:24:17,992 p=485341 u=kevin n=ansible | ok: [master]
+2026-03-21 08:24:18,005 p=485341 u=kevin n=ansible | TASK [Vérification que le master est enregistré] *******************************
+2026-03-21 08:24:18,837 p=485341 u=kevin n=ansible | changed: [master]
+2026-03-21 08:24:18,852 p=485341 u=kevin n=ansible | TASK [Arrêter PostgreSQL sur replica] ******************************************
+2026-03-21 08:24:18,871 p=485341 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:24:18,882 p=485341 u=kevin n=ansible | TASK [Nettoyer les données existantes] *****************************************
+2026-03-21 08:24:18,901 p=485341 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:24:18,912 p=485341 u=kevin n=ansible | TASK [Test de connexion au master avant clonage] *******************************
+2026-03-21 08:24:18,931 p=485341 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:24:18,944 p=485341 u=kevin n=ansible | TASK [Clonage depuis le master avec retry] *************************************
+2026-03-21 08:24:18,963 p=485341 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:24:18,978 p=485341 u=kevin n=ansible | TASK [Vérification que les données sont bien clonées] **************************
+2026-03-21 08:24:19,000 p=485341 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:24:19,021 p=485341 u=kevin n=ansible | TASK [Échec du clonage si données manquantes] **********************************
+2026-03-21 08:24:19,049 p=485341 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:24:19,069 p=485341 u=kevin n=ansible | TASK [Démarrage PostgreSQL replica] ********************************************
+2026-03-21 08:24:19,097 p=485341 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:24:19,109 p=485341 u=kevin n=ansible | TASK [Attendre que PostgreSQL replica soit prêt] *******************************
+2026-03-21 08:24:19,128 p=485341 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:24:19,139 p=485341 u=kevin n=ansible | TASK [Vérification que le replica est en mode recovery] ************************
+2026-03-21 08:24:19,157 p=485341 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:24:19,170 p=485341 u=kevin n=ansible | TASK [Échec si pas en mode recovery] *******************************************
+2026-03-21 08:24:19,193 p=485341 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:24:19,207 p=485341 u=kevin n=ansible | TASK [Enregistrement du replica avec retry] ************************************
+2026-03-21 08:24:19,240 p=485341 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:24:19,251 p=485341 u=kevin n=ansible | TASK [Vérification finale du cluster] ******************************************
+2026-03-21 08:24:20,329 p=485341 u=kevin n=ansible | changed: [master]
+2026-03-21 08:24:20,340 p=485341 u=kevin n=ansible | TASK [Affichage du statut final] ***********************************************
+2026-03-21 08:24:20,405 p=485341 u=kevin n=ansible | ok: [master] => {
+    "msg": "🎉 Cluster PostgreSQL repmgr configuré avec robustesse !\n📍 Nœud: master (Master)\n📊 Cluster:\n ID | Name  | Role    | Status    | Upstream | Location | Priority | Timeline | Connection string                                                                                \\n----+-------+---------+-----------+----------+----------+----------+----------+---------------------------------------------------------------------------------------------------\\n 1  | node1 | primary | * running |          | default  | 100      | 1        | host=192.168.56.21 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\\n 2  | node2 | standby |   running | node1    | default  | 100      | 1        | host=192.168.56.22 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\n"
+}
+2026-03-21 08:24:20,445 p=485341 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-21 08:24:20,445 p=485341 u=kevin n=ansible | master                     : ok=28   changed=11   unreachable=0    failed=0    skipped=11   rescued=0    ignored=0   
+2026-03-21 08:24:20,445 p=485341 u=kevin n=ansible | newserver                  : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-21 08:24:20,445 p=485341 u=kevin n=ansible | replica                    : ok=7    changed=1    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0   
+2026-03-21 08:38:58,143 p=495361 u=kevin n=ansible | PLAY [Installation PostgreSQL robuste] *****************************************
+2026-03-21 08:38:58,156 p=495361 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-21 08:39:01,830 p=495361 u=kevin n=ansible | fatal: [newserver]: UNREACHABLE! => {"changed": false, "msg": "Data could not be sent to remote host \"192.168.56.23\". Make sure this host can be reached over ssh: ssh: connect to host 192.168.56.23 port 22: No route to host\r\n", "unreachable": true}
+2026-03-21 08:39:03,311 p=495361 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:39:03,535 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:39:03,585 p=495361 u=kevin n=ansible | TASK [Importer le rôle postgresql] *********************************************
+2026-03-21 08:39:03,692 p=495361 u=kevin n=ansible | TASK [postgresql : Ajout de la clé GPG PostgreSQL] *****************************
+2026-03-21 08:39:06,128 p=495361 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:39:06,145 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:39:06,161 p=495361 u=kevin n=ansible | TASK [postgresql : Ajout du dépôt PostgreSQL] **********************************
+2026-03-21 08:39:07,468 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:39:07,751 p=495361 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:39:07,764 p=495361 u=kevin n=ansible | TASK [postgresql : Installation de PostgreSQL et repmgr] ***********************
+2026-03-21 08:39:15,922 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:39:16,500 p=495361 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:39:16,511 p=495361 u=kevin n=ansible | TASK [postgresql : Initialisation du cluster PostgreSQL si nécessaire] *********
+2026-03-21 08:39:17,410 p=495361 u=kevin n=ansible | changed: [master]
+2026-03-21 08:39:17,418 p=495361 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:39:17,432 p=495361 u=kevin n=ansible | TASK [postgresql : Configuration du mot de passe postgres] *********************
+2026-03-21 08:39:18,498 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:39:18,547 p=495361 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:39:18,561 p=495361 u=kevin n=ansible | TASK [postgresql : Création de l'utilisateur repmgr avec droits étendus] *******
+2026-03-21 08:39:19,398 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:39:19,437 p=495361 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:39:19,454 p=495361 u=kevin n=ansible | TASK [postgresql : Configuration de search_path pour repmgr (master seulement)] ***
+2026-03-21 08:39:19,505 p=495361 u=kevin n=ansible | skipping: [replica]
+2026-03-21 08:39:20,700 p=495361 u=kevin n=ansible | changed: [master]
+2026-03-21 08:39:20,713 p=495361 u=kevin n=ansible | TASK [postgresql : Création de la base repmgr (master seulement)] **************
+2026-03-21 08:39:20,772 p=495361 u=kevin n=ansible | skipping: [replica]
+2026-03-21 08:39:21,699 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:39:21,715 p=495361 u=kevin n=ansible | TASK [postgresql : Configuration de pg_hba.conf] *******************************
+2026-03-21 08:39:23,716 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:39:23,779 p=495361 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:39:23,798 p=495361 u=kevin n=ansible | TASK [postgresql : Configuration de postgresql.conf (réplication)] *************
+2026-03-21 08:39:24,658 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:39:24,714 p=495361 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:39:24,731 p=495361 u=kevin n=ansible | TASK [postgresql : Création du dossier d'archive WAL] **************************
+2026-03-21 08:39:25,465 p=495361 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:39:25,549 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:39:25,564 p=495361 u=kevin n=ansible | TASK [postgresql : Redémarrage PostgreSQL pour appliquer la configuration] *****
+2026-03-21 08:39:30,092 p=495361 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:39:30,155 p=495361 u=kevin n=ansible | changed: [master]
+2026-03-21 08:39:30,167 p=495361 u=kevin n=ansible | TASK [postgresql : Attendre que PostgreSQL soit prêt] **************************
+2026-03-21 08:39:35,987 p=495361 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:39:35,988 p=495361 u=kevin n=ansible | changed: [master]
+2026-03-21 08:39:36,003 p=495361 u=kevin n=ansible | TASK [postgresql : Installation de l'extension repmgr (master seulement)] ******
+2026-03-21 08:39:36,048 p=495361 u=kevin n=ansible | skipping: [replica]
+2026-03-21 08:39:36,951 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:39:36,964 p=495361 u=kevin n=ansible | TASK [postgresql : Configuration des permissions repmgr (master seulement)] ****
+2026-03-21 08:39:37,021 p=495361 u=kevin n=ansible | skipping: [replica]
+2026-03-21 08:39:37,711 p=495361 u=kevin n=ansible | changed: [master]
+2026-03-21 08:39:37,803 p=495361 u=kevin n=ansible | PLAY [Configuration et enregistrement repmgr robuste] **************************
+2026-03-21 08:39:37,865 p=495361 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit complètement démarré] ***********************
+2026-03-21 08:39:37,887 p=495361 u=kevin n=ansible | Pausing for 10 seconds
+2026-03-21 08:39:47,892 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:39:47,904 p=495361 u=kevin n=ansible | TASK [Vérification que PostgreSQL est accessible] ******************************
+2026-03-21 08:39:48,577 p=495361 u=kevin n=ansible | changed: [master]
+2026-03-21 08:39:48,691 p=495361 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:39:48,706 p=495361 u=kevin n=ansible | TASK [Création du dossier de configuration repmgr] *****************************
+2026-03-21 08:39:49,461 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:39:49,506 p=495361 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:39:49,519 p=495361 u=kevin n=ansible | TASK [Configuration de repmgr.conf] ********************************************
+2026-03-21 08:39:50,935 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:39:51,103 p=495361 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:39:51,117 p=495361 u=kevin n=ansible | TASK [Création du fichier .pgpass pour repmgr] *********************************
+2026-03-21 08:39:52,513 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:39:52,642 p=495361 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:39:52,656 p=495361 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour réplication] *********************************
+2026-03-21 08:39:56,871 p=495361 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:39:57,002 p=495361 u=kevin n=ansible | changed: [master]
+2026-03-21 08:39:57,016 p=495361 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt après redémarrage] *********************
+2026-03-21 08:39:57,713 p=495361 u=kevin n=ansible | changed: [master]
+2026-03-21 08:39:57,794 p=495361 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:39:57,805 p=495361 u=kevin n=ansible | TASK [Enregistrement du master avec retry] *************************************
+2026-03-21 08:39:57,849 p=495361 u=kevin n=ansible | skipping: [replica]
+2026-03-21 08:39:58,582 p=495361 u=kevin n=ansible | changed: [master]
+2026-03-21 08:39:58,594 p=495361 u=kevin n=ansible | TASK [Pause pour propagation] **************************************************
+2026-03-21 08:39:58,619 p=495361 u=kevin n=ansible | Pausing for 15 seconds
+2026-03-21 08:40:13,624 p=495361 u=kevin n=ansible | ok: [master]
+2026-03-21 08:40:13,641 p=495361 u=kevin n=ansible | TASK [Vérification que le master est enregistré] *******************************
+2026-03-21 08:40:13,687 p=495361 u=kevin n=ansible | skipping: [replica]
+2026-03-21 08:40:14,603 p=495361 u=kevin n=ansible | changed: [master]
+2026-03-21 08:40:14,619 p=495361 u=kevin n=ansible | TASK [Arrêter PostgreSQL sur replica] ******************************************
+2026-03-21 08:40:14,654 p=495361 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:40:16,349 p=495361 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:40:16,365 p=495361 u=kevin n=ansible | TASK [Nettoyer les données existantes] *****************************************
+2026-03-21 08:40:16,404 p=495361 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:40:17,166 p=495361 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:40:17,180 p=495361 u=kevin n=ansible | TASK [Test de connexion au master avant clonage] *******************************
+2026-03-21 08:40:17,206 p=495361 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:40:17,951 p=495361 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:40:17,961 p=495361 u=kevin n=ansible | TASK [Clonage depuis le master avec retry] *************************************
+2026-03-21 08:40:17,988 p=495361 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:40:21,450 p=495361 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:40:21,465 p=495361 u=kevin n=ansible | TASK [Vérification que les données sont bien clonées] **************************
+2026-03-21 08:40:21,501 p=495361 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:40:22,127 p=495361 u=kevin n=ansible | ok: [replica]
+2026-03-21 08:40:22,138 p=495361 u=kevin n=ansible | TASK [Échec du clonage si données manquantes] **********************************
+2026-03-21 08:40:22,168 p=495361 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:40:22,184 p=495361 u=kevin n=ansible | skipping: [replica]
+2026-03-21 08:40:22,196 p=495361 u=kevin n=ansible | TASK [Démarrage PostgreSQL replica] ********************************************
+2026-03-21 08:40:22,221 p=495361 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:40:26,415 p=495361 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:40:26,439 p=495361 u=kevin n=ansible | TASK [Attendre que PostgreSQL replica soit prêt] *******************************
+2026-03-21 08:40:26,547 p=495361 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:40:27,360 p=495361 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:40:27,372 p=495361 u=kevin n=ansible | TASK [Vérification que le replica est en mode recovery] ************************
+2026-03-21 08:40:27,399 p=495361 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:40:28,082 p=495361 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:40:28,095 p=495361 u=kevin n=ansible | TASK [Échec si pas en mode recovery] *******************************************
+2026-03-21 08:40:28,122 p=495361 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:40:28,140 p=495361 u=kevin n=ansible | skipping: [replica]
+2026-03-21 08:40:28,154 p=495361 u=kevin n=ansible | TASK [Enregistrement du replica avec retry] ************************************
+2026-03-21 08:40:28,180 p=495361 u=kevin n=ansible | skipping: [master]
+2026-03-21 08:40:28,945 p=495361 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:40:28,961 p=495361 u=kevin n=ansible | TASK [Vérification finale du cluster] ******************************************
+2026-03-21 08:40:30,011 p=495361 u=kevin n=ansible | changed: [replica]
+2026-03-21 08:40:30,090 p=495361 u=kevin n=ansible | changed: [master]
+2026-03-21 08:40:30,105 p=495361 u=kevin n=ansible | TASK [Affichage du statut final] ***********************************************
+2026-03-21 08:40:30,167 p=495361 u=kevin n=ansible | ok: [master] => {
+    "msg": "🎉 Cluster PostgreSQL repmgr configuré avec robustesse !\n📍 Nœud: master (Master)\n📊 Cluster:\n ID | Name  | Role    | Status    | Upstream | Location | Priority | Timeline | Connection string                                                                                \\n----+-------+---------+-----------+----------+----------+----------+----------+---------------------------------------------------------------------------------------------------\\n 1  | node1 | primary | * running |          | default  | 100      | 1        | host=192.168.56.21 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\\n 2  | node2 | standby |   running | node1    | default  | 100      | 1        | host=192.168.56.22 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\n"
+}
+2026-03-21 08:40:30,186 p=495361 u=kevin n=ansible | ok: [replica] => {
+    "msg": "🎉 Cluster PostgreSQL repmgr configuré avec robustesse !\n📍 Nœud: replica (Replica)\n📊 Cluster:\n ID | Name  | Role    | Status    | Upstream | Location | Priority | Timeline | Connection string                                                                                \\n----+-------+---------+-----------+----------+----------+----------+----------+---------------------------------------------------------------------------------------------------\\n 1  | node1 | primary | * running |          | default  | 100      | 1        | host=192.168.56.21 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\\n 2  | node2 | standby |   running | node1    | default  | 100      | 1        | host=192.168.56.22 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\n"
+}
+2026-03-21 08:40:30,265 p=495361 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-21 08:40:30,266 p=495361 u=kevin n=ansible | master                     : ok=28   changed=11   unreachable=0    failed=0    skipped=11   rescued=0    ignored=0   
+2026-03-21 08:40:30,266 p=495361 u=kevin n=ansible | newserver                  : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-21 08:40:30,266 p=495361 u=kevin n=ansible | replica                    : ok=29   changed=15   unreachable=0    failed=0    skipped=8    rescued=0    ignored=0   
+2026-03-23 11:01:39,754 p=1543938 u=kevin n=ansible | PLAY [Installation PostgreSQL robuste] *****************************************
+2026-03-23 11:01:39,771 p=1543938 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-23 11:01:43,274 p=1543938 u=kevin n=ansible | fatal: [newserver]: UNREACHABLE! => {"changed": false, "msg": "Data could not be sent to remote host \"192.168.56.23\". Make sure this host can be reached over ssh: ssh: connect to host 192.168.56.23 port 22: No route to host\r\n", "unreachable": true}
+2026-03-23 11:01:55,238 p=1543938 u=kevin n=ansible | ok: [master]
+2026-03-23 11:01:55,243 p=1543938 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:01:55,272 p=1543938 u=kevin n=ansible | TASK [Importer le rôle postgresql] *********************************************
+2026-03-23 11:01:55,350 p=1543938 u=kevin n=ansible | TASK [postgresql : Ajout de la clé GPG PostgreSQL] *****************************
+2026-03-23 11:01:57,926 p=1543938 u=kevin n=ansible | [WARNING]: Module remote_tmp /root/.ansible/tmp did not exist and was created
+with a mode of 0700, this may cause issues when running as another user. To
+avoid this, create the remote_tmp dir with the correct permissions manually
+
+2026-03-23 11:01:57,926 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:01:57,937 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:01:57,945 p=1543938 u=kevin n=ansible | TASK [postgresql : Ajout du dépôt PostgreSQL] **********************************
+2026-03-23 11:02:18,326 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:02:18,735 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:02:18,749 p=1543938 u=kevin n=ansible | TASK [postgresql : Installation de PostgreSQL et repmgr] ***********************
+2026-03-23 11:03:17,587 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:22,256 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:03:22,270 p=1543938 u=kevin n=ansible | TASK [postgresql : Initialisation du cluster PostgreSQL si nécessaire] *********
+2026-03-23 11:03:23,165 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:03:23,179 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:23,196 p=1543938 u=kevin n=ansible | TASK [postgresql : Configuration du mot de passe postgres] *********************
+2026-03-23 11:03:24,310 p=1543938 u=kevin n=ansible | [WARNING]: Module remote_tmp /var/lib/********ql/.ansible/tmp did not exist and
+was created with a mode of 0700, this may cause issues when running as another
+user. To avoid this, create the remote_tmp dir with the correct permissions
+manually
+
+2026-03-23 11:03:24,310 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:03:24,351 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:24,364 p=1543938 u=kevin n=ansible | TASK [postgresql : Création de l'utilisateur repmgr avec droits étendus] *******
+2026-03-23 11:03:25,012 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:25,036 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:03:25,047 p=1543938 u=kevin n=ansible | TASK [postgresql : Configuration de search_path pour repmgr (master seulement)] ***
+2026-03-23 11:03:25,080 p=1543938 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:03:25,738 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:25,752 p=1543938 u=kevin n=ansible | TASK [postgresql : Création de la base repmgr (master seulement)] **************
+2026-03-23 11:03:25,781 p=1543938 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:03:26,730 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:26,741 p=1543938 u=kevin n=ansible | TASK [postgresql : Configuration de pg_hba.conf] *******************************
+2026-03-23 11:03:28,215 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:28,228 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:03:28,238 p=1543938 u=kevin n=ansible | TASK [postgresql : Configuration de postgresql.conf (réplication)] *************
+2026-03-23 11:03:29,066 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:29,110 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:03:29,123 p=1543938 u=kevin n=ansible | TASK [postgresql : Création du dossier d'archive WAL] **************************
+2026-03-23 11:03:29,787 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:03:29,825 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:29,838 p=1543938 u=kevin n=ansible | TASK [postgresql : Redémarrage PostgreSQL pour appliquer la configuration] *****
+2026-03-23 11:03:33,745 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:03:33,962 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:33,977 p=1543938 u=kevin n=ansible | TASK [postgresql : Attendre que PostgreSQL soit prêt] **************************
+2026-03-23 11:03:39,794 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:03:39,846 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:39,866 p=1543938 u=kevin n=ansible | TASK [postgresql : Installation de l'extension repmgr (master seulement)] ******
+2026-03-23 11:03:39,931 p=1543938 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:03:40,791 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:40,807 p=1543938 u=kevin n=ansible | TASK [postgresql : Configuration des permissions repmgr (master seulement)] ****
+2026-03-23 11:03:40,854 p=1543938 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:03:41,395 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:41,471 p=1543938 u=kevin n=ansible | PLAY [Configuration et enregistrement repmgr robuste] **************************
+2026-03-23 11:03:41,514 p=1543938 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit complètement démarré] ***********************
+2026-03-23 11:03:41,530 p=1543938 u=kevin n=ansible | Pausing for 10 seconds
+2026-03-23 11:03:51,540 p=1543938 u=kevin n=ansible | ok: [master]
+2026-03-23 11:03:51,577 p=1543938 u=kevin n=ansible | TASK [Vérification que PostgreSQL est accessible] ******************************
+2026-03-23 11:03:52,142 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:03:52,154 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:52,166 p=1543938 u=kevin n=ansible | TASK [Création du dossier de configuration repmgr] *****************************
+2026-03-23 11:03:52,676 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:03:52,683 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:52,692 p=1543938 u=kevin n=ansible | TASK [Configuration de repmgr.conf] ********************************************
+2026-03-23 11:03:53,720 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:03:53,776 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:53,787 p=1543938 u=kevin n=ansible | TASK [Création du fichier .pgpass pour repmgr] *********************************
+2026-03-23 11:03:54,801 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:03:54,829 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:54,838 p=1543938 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour réplication] *********************************
+2026-03-23 11:03:58,470 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:03:58,485 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:58,498 p=1543938 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt après redémarrage] *********************
+2026-03-23 11:03:59,235 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:03:59,331 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:03:59,345 p=1543938 u=kevin n=ansible | TASK [Enregistrement du master avec retry] *************************************
+2026-03-23 11:03:59,385 p=1543938 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:04:00,063 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:04:00,074 p=1543938 u=kevin n=ansible | TASK [Pause pour propagation] **************************************************
+2026-03-23 11:04:00,097 p=1543938 u=kevin n=ansible | Pausing for 15 seconds
+2026-03-23 11:04:15,101 p=1543938 u=kevin n=ansible | ok: [master]
+2026-03-23 11:04:15,111 p=1543938 u=kevin n=ansible | TASK [Vérification que le master est enregistré] *******************************
+2026-03-23 11:04:15,142 p=1543938 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:04:15,720 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:04:15,730 p=1543938 u=kevin n=ansible | TASK [Arrêter PostgreSQL sur replica] ******************************************
+2026-03-23 11:04:15,748 p=1543938 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:04:16,846 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:04:16,853 p=1543938 u=kevin n=ansible | TASK [Nettoyer les données existantes] *****************************************
+2026-03-23 11:04:16,877 p=1543938 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:04:17,336 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:04:17,344 p=1543938 u=kevin n=ansible | TASK [Test de connexion au master avant clonage] *******************************
+2026-03-23 11:04:17,362 p=1543938 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:04:17,873 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:04:17,886 p=1543938 u=kevin n=ansible | TASK [Clonage depuis le master avec retry] *************************************
+2026-03-23 11:04:17,904 p=1543938 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:04:23,391 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:04:23,408 p=1543938 u=kevin n=ansible | TASK [Vérification que les données sont bien clonées] **************************
+2026-03-23 11:04:23,435 p=1543938 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:04:23,899 p=1543938 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:04:23,919 p=1543938 u=kevin n=ansible | TASK [Échec du clonage si données manquantes] **********************************
+2026-03-23 11:04:23,944 p=1543938 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:04:23,957 p=1543938 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:04:23,969 p=1543938 u=kevin n=ansible | TASK [Démarrage PostgreSQL replica] ********************************************
+2026-03-23 11:04:23,995 p=1543938 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:04:27,675 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:04:27,692 p=1543938 u=kevin n=ansible | TASK [Attendre que PostgreSQL replica soit prêt] *******************************
+2026-03-23 11:04:27,768 p=1543938 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:04:28,368 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:04:28,377 p=1543938 u=kevin n=ansible | TASK [Vérification que le replica est en mode recovery] ************************
+2026-03-23 11:04:28,405 p=1543938 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:04:28,998 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:04:29,009 p=1543938 u=kevin n=ansible | TASK [Échec si pas en mode recovery] *******************************************
+2026-03-23 11:04:29,030 p=1543938 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:04:29,043 p=1543938 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:04:29,055 p=1543938 u=kevin n=ansible | TASK [Enregistrement du replica avec retry] ************************************
+2026-03-23 11:04:29,079 p=1543938 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:04:29,901 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:04:29,910 p=1543938 u=kevin n=ansible | TASK [Vérification finale du cluster] ******************************************
+2026-03-23 11:04:30,625 p=1543938 u=kevin n=ansible | changed: [master]
+2026-03-23 11:04:30,682 p=1543938 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:04:30,692 p=1543938 u=kevin n=ansible | TASK [Affichage du statut final] ***********************************************
+2026-03-23 11:04:30,738 p=1543938 u=kevin n=ansible | ok: [master] => {
+    "msg": "🎉 Cluster PostgreSQL repmgr configuré avec robustesse !\n📍 Nœud: master (Master)\n📊 Cluster:\n ID | Name  | Role    | Status    | Upstream | Location | Priority | Timeline | Connection string                                                                                \\n----+-------+---------+-----------+----------+----------+----------+----------+---------------------------------------------------------------------------------------------------\\n 1  | node1 | primary | * running |          | default  | 100      | 1        | host=192.168.56.21 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\\n 2  | node2 | standby |   running | node1    | default  | 100      | 1        | host=192.168.56.22 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\n"
+}
+2026-03-23 11:04:30,740 p=1543938 u=kevin n=ansible | ok: [replica] => {
+    "msg": "🎉 Cluster PostgreSQL repmgr configuré avec robustesse !\n📍 Nœud: replica (Replica)\n📊 Cluster:\n ID | Name  | Role    | Status    | Upstream | Location | Priority | Timeline | Connection string                                                                                \\n----+-------+---------+-----------+----------+----------+----------+----------+---------------------------------------------------------------------------------------------------\\n 1  | node1 | primary | * running |          | default  | 100      | 1        | host=192.168.56.21 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\\n 2  | node2 | standby |   running | node1    | default  | 100      | 1        | host=192.168.56.22 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\n"
+}
+2026-03-23 11:04:30,788 p=1543938 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-23 11:04:30,788 p=1543938 u=kevin n=ansible | master                     : ok=28   changed=24   unreachable=0    failed=0    skipped=11   rescued=0    ignored=0   
+2026-03-23 11:04:30,788 p=1543938 u=kevin n=ansible | newserver                  : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-23 11:04:30,789 p=1543938 u=kevin n=ansible | replica                    : ok=29   changed=26   unreachable=0    failed=0    skipped=8    rescued=0    ignored=0   
+2026-03-23 11:05:56,953 p=1548977 u=kevin n=ansible | PLAY [Installation PostgreSQL robuste] *****************************************
+2026-03-23 11:05:56,965 p=1548977 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-23 11:06:00,417 p=1548977 u=kevin n=ansible | fatal: [newserver]: UNREACHABLE! => {"changed": false, "msg": "Data could not be sent to remote host \"192.168.56.23\". Make sure this host can be reached over ssh: ssh: connect to host 192.168.56.23 port 22: No route to host\r\n", "unreachable": true}
+2026-03-23 11:06:00,879 p=1548977 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:06:00,907 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:06:00,948 p=1548977 u=kevin n=ansible | TASK [Importer le rôle postgresql] *********************************************
+2026-03-23 11:06:01,074 p=1548977 u=kevin n=ansible | TASK [postgresql : Ajout de la clé GPG PostgreSQL] *****************************
+2026-03-23 11:06:03,659 p=1548977 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:06:03,901 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:06:03,910 p=1548977 u=kevin n=ansible | TASK [postgresql : Ajout du dépôt PostgreSQL] **********************************
+2026-03-23 11:06:04,953 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:06:04,965 p=1548977 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:06:04,975 p=1548977 u=kevin n=ansible | TASK [postgresql : Installation de PostgreSQL et repmgr] ***********************
+2026-03-23 11:06:11,039 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:06:11,094 p=1548977 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:06:11,106 p=1548977 u=kevin n=ansible | TASK [postgresql : Initialisation du cluster PostgreSQL si nécessaire] *********
+2026-03-23 11:06:11,878 p=1548977 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:06:11,901 p=1548977 u=kevin n=ansible | changed: [master]
+2026-03-23 11:06:11,913 p=1548977 u=kevin n=ansible | TASK [postgresql : Configuration du mot de passe postgres] *********************
+2026-03-23 11:06:12,866 p=1548977 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:06:12,927 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:06:12,938 p=1548977 u=kevin n=ansible | TASK [postgresql : Création de l'utilisateur repmgr avec droits étendus] *******
+2026-03-23 11:06:13,562 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:06:13,567 p=1548977 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:06:13,576 p=1548977 u=kevin n=ansible | TASK [postgresql : Configuration de search_path pour repmgr (master seulement)] ***
+2026-03-23 11:06:13,607 p=1548977 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:06:14,258 p=1548977 u=kevin n=ansible | changed: [master]
+2026-03-23 11:06:14,269 p=1548977 u=kevin n=ansible | TASK [postgresql : Création de la base repmgr (master seulement)] **************
+2026-03-23 11:06:14,300 p=1548977 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:06:14,978 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:06:14,988 p=1548977 u=kevin n=ansible | TASK [postgresql : Configuration de pg_hba.conf] *******************************
+2026-03-23 11:06:16,292 p=1548977 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:06:16,323 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:06:16,334 p=1548977 u=kevin n=ansible | TASK [postgresql : Configuration de postgresql.conf (réplication)] *************
+2026-03-23 11:06:16,923 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:06:16,939 p=1548977 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:06:16,950 p=1548977 u=kevin n=ansible | TASK [postgresql : Création du dossier d'archive WAL] **************************
+2026-03-23 11:06:17,414 p=1548977 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:06:17,415 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:06:17,425 p=1548977 u=kevin n=ansible | TASK [postgresql : Redémarrage PostgreSQL pour appliquer la configuration] *****
+2026-03-23 11:06:21,285 p=1548977 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:06:21,295 p=1548977 u=kevin n=ansible | changed: [master]
+2026-03-23 11:06:21,305 p=1548977 u=kevin n=ansible | TASK [postgresql : Attendre que PostgreSQL soit prêt] **************************
+2026-03-23 11:06:26,885 p=1548977 u=kevin n=ansible | changed: [master]
+2026-03-23 11:06:26,962 p=1548977 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:06:26,978 p=1548977 u=kevin n=ansible | TASK [postgresql : Installation de l'extension repmgr (master seulement)] ******
+2026-03-23 11:06:27,022 p=1548977 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:06:27,782 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:06:27,794 p=1548977 u=kevin n=ansible | TASK [postgresql : Configuration des permissions repmgr (master seulement)] ****
+2026-03-23 11:06:27,824 p=1548977 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:06:28,300 p=1548977 u=kevin n=ansible | changed: [master]
+2026-03-23 11:06:28,369 p=1548977 u=kevin n=ansible | PLAY [Configuration et enregistrement repmgr robuste] **************************
+2026-03-23 11:06:28,426 p=1548977 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit complètement démarré] ***********************
+2026-03-23 11:06:28,447 p=1548977 u=kevin n=ansible | Pausing for 10 seconds
+2026-03-23 11:06:38,460 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:06:38,489 p=1548977 u=kevin n=ansible | TASK [Vérification que PostgreSQL est accessible] ******************************
+2026-03-23 11:06:39,007 p=1548977 u=kevin n=ansible | changed: [master]
+2026-03-23 11:06:39,021 p=1548977 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:06:39,031 p=1548977 u=kevin n=ansible | TASK [Création du dossier de configuration repmgr] *****************************
+2026-03-23 11:06:39,565 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:06:39,581 p=1548977 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:06:39,593 p=1548977 u=kevin n=ansible | TASK [Configuration de repmgr.conf] ********************************************
+2026-03-23 11:06:40,576 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:06:40,632 p=1548977 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:06:40,642 p=1548977 u=kevin n=ansible | TASK [Création du fichier .pgpass pour repmgr] *********************************
+2026-03-23 11:06:41,668 p=1548977 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:06:41,710 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:06:41,718 p=1548977 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour réplication] *********************************
+2026-03-23 11:06:45,097 p=1548977 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:06:45,210 p=1548977 u=kevin n=ansible | changed: [master]
+2026-03-23 11:06:45,219 p=1548977 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt après redémarrage] *********************
+2026-03-23 11:06:45,933 p=1548977 u=kevin n=ansible | changed: [master]
+2026-03-23 11:06:46,113 p=1548977 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:06:46,136 p=1548977 u=kevin n=ansible | TASK [Enregistrement du master avec retry] *************************************
+2026-03-23 11:06:46,374 p=1548977 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:06:46,877 p=1548977 u=kevin n=ansible | changed: [master]
+2026-03-23 11:06:46,891 p=1548977 u=kevin n=ansible | TASK [Pause pour propagation] **************************************************
+2026-03-23 11:06:46,912 p=1548977 u=kevin n=ansible | Pausing for 15 seconds
+2026-03-23 11:07:01,922 p=1548977 u=kevin n=ansible | ok: [master]
+2026-03-23 11:07:01,947 p=1548977 u=kevin n=ansible | TASK [Vérification que le master est enregistré] *******************************
+2026-03-23 11:07:01,984 p=1548977 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:07:02,652 p=1548977 u=kevin n=ansible | changed: [master]
+2026-03-23 11:07:02,662 p=1548977 u=kevin n=ansible | TASK [Arrêter PostgreSQL sur replica] ******************************************
+2026-03-23 11:07:02,681 p=1548977 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:07:03,927 p=1548977 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:07:03,937 p=1548977 u=kevin n=ansible | TASK [Nettoyer les données existantes] *****************************************
+2026-03-23 11:07:03,966 p=1548977 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:07:04,446 p=1548977 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:07:04,458 p=1548977 u=kevin n=ansible | TASK [Test de connexion au master avant clonage] *******************************
+2026-03-23 11:07:04,486 p=1548977 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:07:05,123 p=1548977 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:07:05,140 p=1548977 u=kevin n=ansible | TASK [Clonage depuis le master avec retry] *************************************
+2026-03-23 11:07:05,176 p=1548977 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:07:07,970 p=1548977 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:07:07,982 p=1548977 u=kevin n=ansible | TASK [Vérification que les données sont bien clonées] **************************
+2026-03-23 11:07:08,007 p=1548977 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:07:08,450 p=1548977 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:07:08,467 p=1548977 u=kevin n=ansible | TASK [Échec du clonage si données manquantes] **********************************
+2026-03-23 11:07:08,494 p=1548977 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:07:08,507 p=1548977 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:07:08,523 p=1548977 u=kevin n=ansible | TASK [Démarrage PostgreSQL replica] ********************************************
+2026-03-23 11:07:08,549 p=1548977 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:07:12,450 p=1548977 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:07:12,461 p=1548977 u=kevin n=ansible | TASK [Attendre que PostgreSQL replica soit prêt] *******************************
+2026-03-23 11:07:12,526 p=1548977 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:07:13,129 p=1548977 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:07:13,143 p=1548977 u=kevin n=ansible | TASK [Vérification que le replica est en mode recovery] ************************
+2026-03-23 11:07:13,173 p=1548977 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:07:13,791 p=1548977 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:07:13,801 p=1548977 u=kevin n=ansible | TASK [Échec si pas en mode recovery] *******************************************
+2026-03-23 11:07:13,824 p=1548977 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:07:13,836 p=1548977 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:07:13,847 p=1548977 u=kevin n=ansible | TASK [Enregistrement du replica avec retry] ************************************
+2026-03-23 11:07:13,878 p=1548977 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:07:14,562 p=1548977 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:07:14,572 p=1548977 u=kevin n=ansible | TASK [Vérification finale du cluster] ******************************************
+2026-03-23 11:07:15,530 p=1548977 u=kevin n=ansible | changed: [master]
+2026-03-23 11:07:15,549 p=1548977 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:07:15,558 p=1548977 u=kevin n=ansible | TASK [Affichage du statut final] ***********************************************
+2026-03-23 11:07:15,599 p=1548977 u=kevin n=ansible | ok: [master] => {
+    "msg": "🎉 Cluster PostgreSQL repmgr configuré avec robustesse !\n📍 Nœud: master (Master)\n📊 Cluster:\n ID | Name  | Role    | Status    | Upstream | Location | Priority | Timeline | Connection string                                                                                \\n----+-------+---------+-----------+----------+----------+----------+----------+---------------------------------------------------------------------------------------------------\\n 1  | node1 | primary | * running |          | default  | 100      | 1        | host=192.168.56.21 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\\n 2  | node2 | standby |   running | node1    | default  | 100      | 1        | host=192.168.56.22 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\n"
+}
+2026-03-23 11:07:15,603 p=1548977 u=kevin n=ansible | ok: [replica] => {
+    "msg": "🎉 Cluster PostgreSQL repmgr configuré avec robustesse !\n📍 Nœud: replica (Replica)\n📊 Cluster:\n ID | Name  | Role    | Status    | Upstream | Location | Priority | Timeline | Connection string                                                                                \\n----+-------+---------+-----------+----------+----------+----------+----------+---------------------------------------------------------------------------------------------------\\n 1  | node1 | primary | * running |          | default  | 100      | 1        | host=192.168.56.21 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\\n 2  | node2 | standby |   running | node1    | default  | 100      | 1        | host=192.168.56.22 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\n"
+}
+2026-03-23 11:07:15,648 p=1548977 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-23 11:07:15,648 p=1548977 u=kevin n=ansible | master                     : ok=28   changed=11   unreachable=0    failed=0    skipped=11   rescued=0    ignored=0   
+2026-03-23 11:07:15,648 p=1548977 u=kevin n=ansible | newserver                  : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-23 11:07:15,648 p=1548977 u=kevin n=ansible | replica                    : ok=29   changed=15   unreachable=0    failed=0    skipped=8    rescued=0    ignored=0   
+2026-03-23 11:08:51,127 p=1553627 u=kevin n=ansible | PLAY [Installation PostgreSQL robuste] *****************************************
+2026-03-23 11:08:51,136 p=1553627 u=kevin n=ansible | TASK [Gathering Facts] *********************************************************
+2026-03-23 11:08:54,633 p=1553627 u=kevin n=ansible | fatal: [newserver]: UNREACHABLE! => {"changed": false, "msg": "Data could not be sent to remote host \"192.168.56.23\". Make sure this host can be reached over ssh: ssh: connect to host 192.168.56.23 port 22: No route to host\r\n", "unreachable": true}
+2026-03-23 11:08:55,630 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:08:55,655 p=1553627 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:08:55,691 p=1553627 u=kevin n=ansible | TASK [Importer le rôle postgresql] *********************************************
+2026-03-23 11:08:55,792 p=1553627 u=kevin n=ansible | TASK [postgresql : Ajout de la clé GPG PostgreSQL] *****************************
+2026-03-23 11:08:58,957 p=1553627 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:08:59,029 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:08:59,046 p=1553627 u=kevin n=ansible | TASK [postgresql : Ajout du dépôt PostgreSQL] **********************************
+2026-03-23 11:09:00,383 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:09:00,729 p=1553627 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:09:00,743 p=1553627 u=kevin n=ansible | TASK [postgresql : Installation de PostgreSQL et repmgr] ***********************
+2026-03-23 11:09:09,008 p=1553627 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:09:09,224 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:09:09,235 p=1553627 u=kevin n=ansible | TASK [postgresql : Initialisation du cluster PostgreSQL si nécessaire] *********
+2026-03-23 11:09:10,134 p=1553627 u=kevin n=ansible | changed: [master]
+2026-03-23 11:09:10,206 p=1553627 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:09:10,220 p=1553627 u=kevin n=ansible | TASK [postgresql : Configuration du mot de passe postgres] *********************
+2026-03-23 11:09:11,097 p=1553627 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:09:11,227 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:09:11,238 p=1553627 u=kevin n=ansible | TASK [postgresql : Création de l'utilisateur repmgr avec droits étendus] *******
+2026-03-23 11:09:11,974 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:09:12,052 p=1553627 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:09:12,061 p=1553627 u=kevin n=ansible | TASK [postgresql : Configuration de search_path pour repmgr (master seulement)] ***
+2026-03-23 11:09:12,122 p=1553627 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:09:12,963 p=1553627 u=kevin n=ansible | changed: [master]
+2026-03-23 11:09:12,976 p=1553627 u=kevin n=ansible | TASK [postgresql : Création de la base repmgr (master seulement)] **************
+2026-03-23 11:09:13,015 p=1553627 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:09:14,204 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:09:14,226 p=1553627 u=kevin n=ansible | TASK [postgresql : Configuration de pg_hba.conf] *******************************
+2026-03-23 11:09:16,005 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:09:16,009 p=1553627 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:09:16,021 p=1553627 u=kevin n=ansible | TASK [postgresql : Configuration de postgresql.conf (réplication)] *************
+2026-03-23 11:09:16,741 p=1553627 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:09:16,748 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:09:16,761 p=1553627 u=kevin n=ansible | TASK [postgresql : Création du dossier d'archive WAL] **************************
+2026-03-23 11:09:17,348 p=1553627 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:09:17,381 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:09:17,397 p=1553627 u=kevin n=ansible | TASK [postgresql : Redémarrage PostgreSQL pour appliquer la configuration] *****
+2026-03-23 11:09:22,245 p=1553627 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:09:22,492 p=1553627 u=kevin n=ansible | changed: [master]
+2026-03-23 11:09:22,507 p=1553627 u=kevin n=ansible | TASK [postgresql : Attendre que PostgreSQL soit prêt] **************************
+2026-03-23 11:09:28,428 p=1553627 u=kevin n=ansible | changed: [master]
+2026-03-23 11:09:28,482 p=1553627 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:09:28,496 p=1553627 u=kevin n=ansible | TASK [postgresql : Installation de l'extension repmgr (master seulement)] ******
+2026-03-23 11:09:28,540 p=1553627 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:09:29,304 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:09:29,316 p=1553627 u=kevin n=ansible | TASK [postgresql : Configuration des permissions repmgr (master seulement)] ****
+2026-03-23 11:09:29,353 p=1553627 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:09:29,849 p=1553627 u=kevin n=ansible | changed: [master]
+2026-03-23 11:09:29,946 p=1553627 u=kevin n=ansible | PLAY [Configuration et enregistrement repmgr robuste] **************************
+2026-03-23 11:09:29,989 p=1553627 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit complètement démarré] ***********************
+2026-03-23 11:09:30,007 p=1553627 u=kevin n=ansible | Pausing for 10 seconds
+2026-03-23 11:09:40,013 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:09:40,037 p=1553627 u=kevin n=ansible | TASK [Vérification que PostgreSQL est accessible] ******************************
+2026-03-23 11:09:40,676 p=1553627 u=kevin n=ansible | changed: [master]
+2026-03-23 11:09:40,695 p=1553627 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:09:40,708 p=1553627 u=kevin n=ansible | TASK [Création du dossier de configuration repmgr] *****************************
+2026-03-23 11:09:41,524 p=1553627 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:09:41,612 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:09:41,623 p=1553627 u=kevin n=ansible | TASK [Configuration de repmgr.conf] ********************************************
+2026-03-23 11:09:42,768 p=1553627 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:09:42,818 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:09:42,828 p=1553627 u=kevin n=ansible | TASK [Création du fichier .pgpass pour repmgr] *********************************
+2026-03-23 11:09:44,142 p=1553627 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:09:44,196 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:09:44,211 p=1553627 u=kevin n=ansible | TASK [Redémarrage PostgreSQL pour réplication] *********************************
+2026-03-23 11:09:47,809 p=1553627 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:09:47,939 p=1553627 u=kevin n=ansible | changed: [master]
+2026-03-23 11:09:47,951 p=1553627 u=kevin n=ansible | TASK [Attendre que PostgreSQL soit prêt après redémarrage] *********************
+2026-03-23 11:09:48,858 p=1553627 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:09:48,921 p=1553627 u=kevin n=ansible | changed: [master]
+2026-03-23 11:09:48,934 p=1553627 u=kevin n=ansible | TASK [Enregistrement du master avec retry] *************************************
+2026-03-23 11:09:48,978 p=1553627 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:09:49,661 p=1553627 u=kevin n=ansible | changed: [master]
+2026-03-23 11:09:49,672 p=1553627 u=kevin n=ansible | TASK [Pause pour propagation] **************************************************
+2026-03-23 11:09:49,696 p=1553627 u=kevin n=ansible | Pausing for 15 seconds
+2026-03-23 11:10:04,707 p=1553627 u=kevin n=ansible | ok: [master]
+2026-03-23 11:10:04,734 p=1553627 u=kevin n=ansible | TASK [Vérification que le master est enregistré] *******************************
+2026-03-23 11:10:04,796 p=1553627 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:10:05,573 p=1553627 u=kevin n=ansible | changed: [master]
+2026-03-23 11:10:05,588 p=1553627 u=kevin n=ansible | TASK [Arrêter PostgreSQL sur replica] ******************************************
+2026-03-23 11:10:05,619 p=1553627 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:10:06,782 p=1553627 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:10:06,790 p=1553627 u=kevin n=ansible | TASK [Nettoyer les données existantes] *****************************************
+2026-03-23 11:10:06,829 p=1553627 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:10:07,365 p=1553627 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:10:07,374 p=1553627 u=kevin n=ansible | TASK [Test de connexion au master avant clonage] *******************************
+2026-03-23 11:10:07,401 p=1553627 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:10:07,968 p=1553627 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:10:07,977 p=1553627 u=kevin n=ansible | TASK [Clonage depuis le master avec retry] *************************************
+2026-03-23 11:10:07,995 p=1553627 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:10:11,178 p=1553627 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:10:11,189 p=1553627 u=kevin n=ansible | TASK [Vérification que les données sont bien clonées] **************************
+2026-03-23 11:10:11,214 p=1553627 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:10:11,762 p=1553627 u=kevin n=ansible | ok: [replica]
+2026-03-23 11:10:11,779 p=1553627 u=kevin n=ansible | TASK [Échec du clonage si données manquantes] **********************************
+2026-03-23 11:10:11,811 p=1553627 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:10:11,841 p=1553627 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:10:11,858 p=1553627 u=kevin n=ansible | TASK [Démarrage PostgreSQL replica] ********************************************
+2026-03-23 11:10:11,889 p=1553627 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:10:16,741 p=1553627 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:10:16,757 p=1553627 u=kevin n=ansible | TASK [Attendre que PostgreSQL replica soit prêt] *******************************
+2026-03-23 11:10:16,904 p=1553627 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:10:17,579 p=1553627 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:10:17,597 p=1553627 u=kevin n=ansible | TASK [Vérification que le replica est en mode recovery] ************************
+2026-03-23 11:10:17,635 p=1553627 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:10:18,346 p=1553627 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:10:18,361 p=1553627 u=kevin n=ansible | TASK [Échec si pas en mode recovery] *******************************************
+2026-03-23 11:10:18,387 p=1553627 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:10:18,405 p=1553627 u=kevin n=ansible | skipping: [replica]
+2026-03-23 11:10:18,417 p=1553627 u=kevin n=ansible | TASK [Enregistrement du replica avec retry] ************************************
+2026-03-23 11:10:18,445 p=1553627 u=kevin n=ansible | skipping: [master]
+2026-03-23 11:10:19,379 p=1553627 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:10:19,393 p=1553627 u=kevin n=ansible | TASK [Vérification finale du cluster] ******************************************
+2026-03-23 11:10:20,512 p=1553627 u=kevin n=ansible | changed: [master]
+2026-03-23 11:10:20,578 p=1553627 u=kevin n=ansible | changed: [replica]
+2026-03-23 11:10:20,595 p=1553627 u=kevin n=ansible | TASK [Affichage du statut final] ***********************************************
+2026-03-23 11:10:20,674 p=1553627 u=kevin n=ansible | ok: [master] => {
+    "msg": "🎉 Cluster PostgreSQL repmgr configuré avec robustesse !\n📍 Nœud: master (Master)\n📊 Cluster:\n ID | Name  | Role    | Status    | Upstream | Location | Priority | Timeline | Connection string                                                                                \\n----+-------+---------+-----------+----------+----------+----------+----------+---------------------------------------------------------------------------------------------------\\n 1  | node1 | primary | * running |          | default  | 100      | 1        | host=192.168.56.21 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\\n 2  | node2 | standby |   running | node1    | default  | 100      | 1        | host=192.168.56.22 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\n"
+}
+2026-03-23 11:10:20,693 p=1553627 u=kevin n=ansible | ok: [replica] => {
+    "msg": "🎉 Cluster PostgreSQL repmgr configuré avec robustesse !\n📍 Nœud: replica (Replica)\n📊 Cluster:\n ID | Name  | Role    | Status    | Upstream | Location | Priority | Timeline | Connection string                                                                                \\n----+-------+---------+-----------+----------+----------+----------+----------+---------------------------------------------------------------------------------------------------\\n 1  | node1 | primary | * running |          | default  | 100      | 1        | host=192.168.56.21 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\\n 2  | node2 | standby |   running | node1    | default  | 100      | 1        | host=192.168.56.22 port=5432 user=repmgr dbname=repmgr connect_timeout=2 password=repmgr_password\n"
+}
+2026-03-23 11:10:20,772 p=1553627 u=kevin n=ansible | PLAY RECAP *********************************************************************
+2026-03-23 11:10:20,772 p=1553627 u=kevin n=ansible | master                     : ok=28   changed=11   unreachable=0    failed=0    skipped=11   rescued=0    ignored=0   
+2026-03-23 11:10:20,773 p=1553627 u=kevin n=ansible | newserver                  : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0   
+2026-03-23 11:10:20,773 p=1553627 u=kevin n=ansible | replica                    : ok=29   changed=15   unreachable=0    failed=0    skipped=8    rescued=0    ignored=0   

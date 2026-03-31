@@ -1,0 +1,21 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-24.04"
+
+  config.vm.network :private_network, ip: "192.168.56.22"
+  # Nom de la VM
+  config.vm.hostname = "postgres-vm"
+
+  # Redirection du port PostgreSQL vers la machine hôte
+  config.vm.network "forwarded_port", guest: 5432, host: 5432
+
+  # Provisionnement
+  config.vm.provision "shell", path: "provision.sh"
+
+  # Ressources (optionnel)
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "postgres-vm"
+    vb.memory = "1024"
+    vb.cpus = 1
+  end
+end
+

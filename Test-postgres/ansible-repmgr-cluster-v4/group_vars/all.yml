@@ -1,0 +1,54 @@
+---
+# Variables globales pour le cluster PostgreSQL repmgr
+postgresql_version: 16
+postgres_user: postgres
+repmgr_user: repmgr
+repmgr_database: repmgr
+repmgr_password: repmgr_password
+postgres_password: postgres
+
+# Configuration réseau
+master_ip: 192.168.56.21
+replica_ip: 192.168.56.22
+new_server_ip: 192.168.56.23
+
+# Configuration PostgreSQL
+postgresql_config:
+  listen_addresses: "'*'"
+  port: 5432
+  max_connections: 100
+  shared_buffers: 256MB
+  effective_cache_size: 1GB
+  work_mem: 4MB
+  maintenance_work_mem: 64MB
+  
+  # Configuration réplication
+  wal_level: replica
+  max_wal_senders: 10
+  max_replication_slots: 10
+  wal_keep_size: 2GB
+  archive_mode: on
+  archive_command: "'test ! -f /var/lib/postgresql/wal_archive/%f && cp %p /var/lib/postgresql/wal_archive/%f'"
+  shared_preload_libraries: "'repmgr'"
+
+# Configuration repmgr
+repmgr_config:
+  use_replication_slots: true
+  monitoring_history: true
+  monitor_interval_secs: 2
+  reconnect_attempts: 6
+  reconnect_interval: 5
+  failover: automatic
+
+# Configuration monitoring
+monitoring:
+  check_interval: 30
+  alert_email: admin@company.com
+  log_retention_days: 30
+
+# Configuration Vagrant
+vagrant:
+  box: "ubuntu/focal64"
+  memory: 2048
+  cpus: 2
+  network_type: private_network

@@ -1,0 +1,94 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile pour cluster PostgreSQL repmgr V4
+# ==========================================
+# - Provisionnement direct depuis l'hôte
+# - Une seule commande: vagrant up
+# - Pas de VM temporaire
+# - Monitoring et auto-récupération
+
+# Variables globales
+POSTGRES_PASSWORD = ENV['POSTGRES_PASSWORD'] || "postgres"
+REPMGR_PASSWORD = ENV['REPMGR_PASSWORD'] || "repmgr_password"
+MASTER_IP = "192.168.56.21"
+REPLICA_IP = "192.168.56.22"
+NEW_SERVER_IP = "192.168.56.23"
+
+# Configuration des VMs
+NODES = {
+  'master' => {
+    'ip' => MASTER_IP,
+    'port' => 2201,
+    'memory' => 2048,
+    'cpus' => 2
+  },
+  'replica' => {
+    'ip' => REPLICA_IP,
+    'port' => 2202,
+    'memory' => 2048,
+    'cpus' => 2
+  },
+  'newserver' => {
+    'ip' => NEW_SERVER_IP,
+    'port' => 2203,
+    'memory' => 2048,
+    'cpus' => 2
+  }
+}
+
+Vagrant.configure("2") do |config|
+  # Configuration globale
+  config.vm.box = "bento/ubuntu-24.04"
+  config.vm.boot_timeout = 600  # 10 minutes timeout
+  
+  # Configuration SSH
+  config.ssh.insert_key = false
+  config.ssh.private_key_path = ["~/.vagrant.d/insecure_private_key"]
+  
+  NODES.each do |node_name, config_node|
+    config.vm.define node_name do |node|
+      # Configuration VM
+      node.vm.hostname = node_name
+      node.vm.network "private_network", ip: config_node['ip'], type: "static"
+      node.vm.network "forwarded_port", guest: 22, host: config_node['port'], id: "ssh"
+      
+      # Configuration hardware
+      node.vm.provider "virtualbox" do |vb|
+        vb.name = "postgres-#{node_name}-v3"
+        vb.memory = config_node['memory']
+        vb.cpus = config_node['cpus']
+        vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+        vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+      end
+      
+      # Variables pour Ansible
+      node.vm.provision "shell", inline: <<-SHELL
+        echo "export POSTGRES_PASSWORD=#{POSTGRES_PASSWORD}" >> /etc/environment
+        echo "export REPMGR_PASSWORD=#{REPMGR_PASSWORD}" >> /etc/environment
+        echo "export MASTER_IP=#{MASTER_IP}" >> /etc/environment
+        echo "export REPLICA_IP=#{REPLICA_IP}" >> /etc/environment
+        echo "export NEW_SERVER_IP=#{NEW_SERVER_IP}" >> /etc/environment
+      SHELL
+      
+      # Provisionnement PostgreSQL avec le rôle
+      node.vm.provision "ansible" do |ansible|
+        ansible.playbook = "playbooks/deploy_cluster_robuste.yml"
+        ansible.inventory_path = "inventory/production.ini"
+        ansible.extra_vars = {
+          'postgres_password' => POSTGRES_PASSWORD,
+          'repmgr_password' => REPMGR_PASSWORD,
+          'postgresql_version' => 16,
+          'postgres_user' => 'postgres',
+          'repmgr_user' => 'repmgr',
+          'repmgr_database' => 'repmgr',
+          'master_ip' => MASTER_IP,
+          'replica_ip' => REPLICA_IP,
+          'new_server_ip' => NEW_SERVER_IP
+        }
+        ansible.become = true
+        ansible.limit = node_name
+      end
+    end
+  end
+end

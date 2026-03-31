@@ -1,0 +1,1 @@
+{"virtualbox":{"/vagrant":{"guestpath":"/vagrant","hostpath":"/home/kevin/Test-postgres/ansible-repmgr-cluster-v4","disabled":false,"__vagrantfile":true}}}
