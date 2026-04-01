@@ -1,0 +1,21 @@
+fusiondirectory_image_name: fusiondirectory-custom
+fusiondirectory_container_name: fusiondirectory
+
+fusiondirectory_ldap_server: "ldap://192.168.56.5"
+#fusiondirectory_ldap_server: "ldaps://192.168.56.5"
+fusiondirectory_base_dn: "dc=lab,dc=local"
+
+# ⚠️ format DN correct pour AD
+#fusiondirectory_bind_dn: "CN=Administrator,CN=Users,DC=lab,DC=local"
+fusiondirectory_bind_dn: "Administrator@lab.local"
+fusiondirectory_bind_password: "SuperPassword"
+
+fusiondirectory_port: 8080
+
+fusiondirectory_restart_policy: "always"
+
+fusiondirectory_volumes:
+  - fusiondirectory_config:/etc/fusiondirectory
+  - fusiondirectory_cache:/var/cache/fusiondirectory
+
+fusiondirectory_network: "bridge"

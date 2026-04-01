@@ -1,0 +1,58 @@
+FROM debian:12-slim
+
+# Install required packages
+RUN apt-get update && apt-get install -y \
+    php8.2-cli \
+    php8.2-fpm \
+    php8.2-ldap \
+    php8.2-mbstring \
+    php8.2-xml \
+    php8.2-curl \
+    php8.2-gd \
+    php8.2-intl \
+    php8.2-zip \
+    php8.2-bcmath \
+    php8.2-gmp \
+    nginx \
+    wget \
+    curl \
+    ldap-utils \
+    unzip \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+# Configure PHP-FPM
+RUN sed -i 's/listen = \/run\/php\/php8.2-fpm.sock/listen = 127.0.0.1:9000/' /etc/php/8.2/fpm/pool.d/www.conf
+
+# Configure Nginx
+RUN rm /etc/nginx/sites-enabled/default
+
+# Download FusionDirectory
+ENV FD_VERSION=1.4
+RUN wget -O fusiondirectory.tar.gz "https://github.com/fusiondirectory/fusiondirectory/releases/download/${FD_VERSION}/fusiondirectory-${FD_VERSION}.tar.gz" \
+    && tar -xzf fusiondirectory.tar.gz -C /tmp/ \
+    && mv /tmp/fusiondirectory-${FD_VERSION}/* /var/www/html/ \
+    && rm -rf fusiondirectory.tar.gz /tmp/fusiondirectory-${FD_VERSION} \
+    && chown -R www-data:www-data /var/www/html
+
+# Create FusionDirectory config directory
+RUN mkdir -p /etc/fusiondirectory \
+    && chown www-data:www-data /etc/fusiondirectory
+
+# Copy Nginx config
+COPY nginx.conf /etc/nginx/sites-available/fusiondirectory
+RUN ln -s /etc/nginx/sites-available/fusiondirectory /etc/nginx/sites-enabled/
+
+# Copy supervisor config
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Copy configuration template
+COPY fusiondirectory.conf.j2 /etc/fusiondirectory/fusiondirectory.conf
+
+# Set permissions
+RUN chmod 644 /etc/fusiondirectory/fusiondirectory.conf \
+    && chown www-data:www-data /etc/fusiondirectory/fusiondirectory.conf
+
+EXPOSE 80
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

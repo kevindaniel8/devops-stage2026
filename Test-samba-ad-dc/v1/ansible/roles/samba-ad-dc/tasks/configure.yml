@@ -1,0 +1,28 @@
+---
+- name: Create backup directory
+  file:
+    path: /home/vagrant/old_conf_smb
+    state: directory
+    mode: '0755'
+
+- name: Backup existing smb.conf
+  command: mv /etc/samba/smb.conf /home/vagrant/old_conf_smb/smb.conf
+  args:
+    removes: /etc/samba/smb.conf
+  ignore_errors: yes
+
+- name: Disable systemd-resolved
+  systemd:
+    name: systemd-resolved
+    state: stopped
+    enabled: no
+
+- name: Remove resolv.conf symlink
+  file:
+    path: /etc/resolv.conf
+    state: absent
+
+- name: Configure resolv.conf
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf

@@ -1,0 +1,8 @@
+---
+- hosts: dc
+  become: yes
+  roles:
+    - docker
+    - samba-ad-dc
+    - lam
+    #- fusiondirectory

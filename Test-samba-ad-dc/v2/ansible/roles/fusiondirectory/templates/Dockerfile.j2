@@ -1,0 +1,52 @@
+FROM debian:bookworm-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    apache2 \
+    php \
+    php-cas \
+    php-curl \
+    php-gd \
+    php-imagick \
+    php-imap \
+    php-mbstring \
+    php-ldap \
+    php-xml \
+    php-zip \
+    php-intl \
+    smarty4 \
+    gettext \
+    curl \
+    ldap-utils \
+    ca-certificates \
+    wget \
+    unzip \
+    git \
+ && rm -rf /var/lib/apt/lists/*
+
+# Installer FusionDirectory (branche php8)
+WORKDIR /var/www/html
+
+RUN rm -rf /var/www/html/* \
+    && git clone --depth 1 -b php8 https://gitlab.fusiondirectory.org/fusiondirectory/fd.git /var/www/fd \
+    && cd /var/www/fd/html \
+    && cp -r * /var/www/html/ \
+    && rm -rf /var/www/fd
+
+
+# Dossiers nécessaires
+RUN mkdir -p /var/cache/fusiondirectory /etc/fusiondirectory \
+    && chown -R www-data:www-data /var/cache/fusiondirectory /etc/fusiondirectory /var/www/html
+
+# Apache config
+RUN a2enmod rewrite
+
+# Entrypoint
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+EXPOSE 80
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["apachectl", "-D", "FOREGROUND"]

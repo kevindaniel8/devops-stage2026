@@ -1,0 +1,34 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-24.04"
+
+  config.vm.network :private_network, ip: "192.168.56.5"
+  # Nom de la VM
+  config.vm.hostname = "samba-ad-dc"
+
+  # Redirection du port PostgreSQL vers la machine hôte
+  #config.vm.network "forwarded_port", guest: 5432, host: 5432
+
+  # Configuration DNS pour éviter les problèmes de résolution
+  config.vm.provision "shell", inline: <<-SHELL
+    # Configurer le DNS forwarder avant le provisionnement Samba
+    echo "nameserver 8.8.8.8" > /etc/resolv.conf
+    echo "nameserver 8.8.4.4" >> /etc/resolv.conf
+  SHELL
+
+  # Provisionnement Ansible
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "ansible/playbooks/playbook.yml"
+    ansible.inventory_path = "ansible/inventories/dev/hosts.yml"
+    ansible.limit = "all"
+    ansible.groups = {
+      "dc" => ["samba-ad-dc"]
+    }
+  end
+
+  # Ressources (optionnel)
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "samba-ad-dc"
+    vb.memory = "2048" # 4096 en prod 
+    vb.cpus = 2 # 2 en prod
+  end
+end

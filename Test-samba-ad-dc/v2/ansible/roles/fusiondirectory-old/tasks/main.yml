@@ -1,0 +1,80 @@
+---
+# Rôle pour le déploiement de FusionDirectory avec Docker Compose
+# Connexion au domaine Samba AD existant
+# Dépend du rôle Docker
+
+- name: Créer le répertoire FusionDirectory
+  file:
+    path: /opt/fusiondirectory
+    state: directory
+    mode: '0755'
+
+- name: Créer le fichier docker-compose.yml pour FusionDirectory
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/fusiondirectory/docker-compose.yml
+    mode: '0644'
+  notify: restart fusiondirectory
+
+- name: Copier le Dockerfile personnalisé
+  template:
+    src: Dockerfile.j2
+    dest: /opt/fusiondirectory/Dockerfile.j2
+    mode: '0644'
+
+- name: Copier la configuration FusionDirectory
+  template:
+    src: fusiondirectory.conf.j2
+    dest: /opt/fusiondirectory/fusiondirectory.conf.j2
+    mode: '0644'
+
+- name: Copier la configuration Nginx
+  template:
+    src: nginx.conf
+    dest: /opt/fusiondirectory/nginx.conf
+    mode: '0644'
+
+- name: Copier la configuration Supervisor
+  template:
+    src: supervisord.conf
+    dest: /opt/fusiondirectory/supervisord.conf
+    mode: '0644'
+
+- name: Démarrer FusionDirectory avec Docker Compose
+  shell: |
+    cd /opt/fusiondirectory
+    docker compose down
+    docker compose up -d
+
+- name: Attendre que FusionDirectory soit prêt
+  wait_for:
+    port: "{{ fusiondirectory_port }}"
+    host: localhost
+    timeout: 90
+
+- name: Vérifier que FusionDirectory est en cours d'exécution
+  uri:
+    url: http://localhost:{{ fusiondirectory_port }}/fd/
+    method: GET
+    status_code: 200
+  register: fusiondirectory_check
+  retries: 5
+  delay: 10
+
+- name: Afficher l'URL de FusionDirectory
+  debug:
+    msg: "FusionDirectory accessible à: http://{{ ansible_default_ipv4.address }}:{{ fusiondirectory_port }}/fd/"
+
+- name: Afficher les identifiants d'accès
+  debug:
+    msg: |
+      FusionDirectory déployé avec succès !
+      URL: http://{{ ansible_default_ipv4.address }}:{{ fusiondirectory_port }}/fd/
+      Domaine Samba AD: {{ ldap_domain }}
+      Admin Samba AD: {{ ldap_admin_user }}
+      Bind DN: {{ ldap_bind_dn }}
+      Mot de passe admin Samba AD: {{ ldap_admin_password }}
+      Login FusionDirectory: fd-admin
+      Mot de passe admin FusionDirectory: {{ fd_admin_password }}
+      
+      Note: FusionDirectory utilise le domaine Samba AD existant sur {{ ldap_host }}:{{ ldap_port }}

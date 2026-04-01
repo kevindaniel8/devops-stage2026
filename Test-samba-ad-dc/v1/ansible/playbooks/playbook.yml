@@ -1,0 +1,4 @@
+- hosts: dc
+  become: yes
+  roles:
+    - samba-ad-dc

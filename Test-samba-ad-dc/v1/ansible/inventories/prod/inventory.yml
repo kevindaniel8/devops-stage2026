@@ -1,0 +1,8 @@
+all:
+  children:
+    dc:
+      hosts:
+        samba-ad-dc:
+          ansible_host: 192.168.56.5
+          ansible_user: ubuntu
+          ansible_become: true

@@ -1,0 +1,74 @@
+#!/bin/bash
+# Script de vérification du service FusionDirectory
+
+set -e
+
+# Variables
+FUSIONDIRECTORY_PORT="{{ fusiondirectory_port }}"
+FUSIONDIRECTORY_CONTAINER="{{ fusiondirectory_container_name }}"
+LDAP_HOST="{{ ldap_host }}"
+LDAP_PORT="{{ ldap_port }}"
+LDAP_DOMAIN="{{ ldap_domain }}"
+LDAP_ADMIN_USER="{{ ldap_admin_user }}"
+LDAP_ADMIN_PASSWORD="{{ ldap_admin_password }}"
+LDAP_BIND_DN="{{ ldap_bind_dn }}"
+
+# Couleurs pour l'affichage
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Fonction d'affichage
+log_info() {
+    echo -e "${GREEN}[INFO]${NC} $1"
+}
+
+log_warn() {
+    echo -e "${YELLOW}[WARN]${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Vérification des services FusionDirectory
+echo "=== Vérification FusionDirectory - $(date) ==="
+
+# 1. Vérifier si le conteneur FusionDirectory est en cours d'exécution
+echo "1. Vérification du conteneur FusionDirectory:"
+if docker ps --format "table {{.Names}}" | grep -q "^${FUSIONDIRECTORY_CONTAINER}$"; then
+    log_info "Conteneur FusionDirectory: ACTIF"
+    docker ps --filter "name=${FUSIONDIRECTORY_CONTAINER}" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+else
+    log_error "Conteneur FusionDirectory: INACTIF"
+    docker ps -a --filter "name=${FUSIONDIRECTORY_CONTAINER}" --format "table {{.Names}}\t{{.Status}}"
+fi
+
+# 2. Vérifier si le service web répond
+echo -e "\n2. Vérification du service web:"
+if curl -f -s "http://localhost:${FUSIONDIRECTORY_PORT}" >/dev/null; then
+    log_info "Service web FusionDirectory: RÉPONDANT"
+else
+    log_error "Service web FusionDirectory: NON RÉPONDANT"
+    curl -v "http://localhost:${FUSIONDIRECTORY_PORT}" 2>&1 | head -10
+fi
+
+# 3. Vérifier la connectivité au domaine Samba AD
+echo -e "\n3. Vérification de la connectivité au domaine Samba AD:"
+if ldapsearch -x -H ldap://${LDAP_HOST}:${LDAP_PORT} -D "${LDAP_BIND_DN}" -w "${LDAP_ADMIN_PASSWORD}" -b "${LDAP_BIND_DN}" "(objectClass=*)" dn >/dev/null 2>&1; then
+    log_info "Connexion au domaine Samba AD: OPÉRATIONNELLE"
+else
+    log_error "Connexion au domaine Samba AD: NON OPÉRATIONNELLE"
+    log_warn "Vérifiez que le domaine Samba AD est accessible sur ${LDAP_HOST}:${LDAP_PORT}"
+fi
+
+# 4. Vérifier les logs du conteneur
+echo -e "\n4. Derniers logs du conteneur FusionDirectory:"
+docker logs "${FUSIONDIRECTORY_CONTAINER}" --tail 5 2>/dev/null || log_warn "Impossible d'obtenir les logs FusionDirectory"
+
+# 5. Vérifier l'utilisation des ressources
+echo -e "\n5. Utilisation des ressources:"
+docker stats "${FUSIONDIRECTORY_CONTAINER}" --no-stream --format "table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}" 2>/dev/null || log_warn "Impossible d'obtenir les stats FusionDirectory"
+
+echo -e "\n=== Fin de vérification ==="

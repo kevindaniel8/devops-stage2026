@@ -1,0 +1,36 @@
+version: '{{ docker_compose_version }}'
+
+services:
+  fusiondirectory:
+    restart: {{ fusiondirectory_restart_policy }}
+    image: {{ fusiondirectory_image }}
+    container_name: {{ fusiondirectory_container_name }}
+    ports:
+      - "{{ fusiondirectory_port }}:80"
+    environment:
+      - LDAP_HOST={{ ldap_host }}
+      - LDAP_PORT={{ ldap_port }}
+      - LDAP_DOMAIN={{ ldap_domain }}
+      - LDAP_ADMIN_USER={{ ldap_bind_dn }}
+      - LDAP_ADMIN_PASSWORD={{ ldap_admin_password }}
+      - LDAP_ADMIN_DN={{ ldap_bind_dn }}
+      - LDAP_ENCRYPTION={{ ldap_encryption }}
+      - FD_ADMIN_PASSWORD={{ fd_admin_password }}
+      - TZ={{ fusiondirectory_timezone }}
+      - FUSIONDIRECTORY_LANGUAGE={{ fusiondirectory_language }}
+    volumes:
+{% for volume in fusiondirectory_volumes %}
+      - {{ volume }}
+{% endfor %}
+    networks:
+      - {{ fusiondirectory_network }}
+
+volumes:
+{% for volume in fusiondirectory_volumes %}
+  {{ volume.split(':')[0] }}:
+    driver: local
+{% endfor %}
+
+networks:
+  {{ fusiondirectory_network }}:
+    driver: bridge

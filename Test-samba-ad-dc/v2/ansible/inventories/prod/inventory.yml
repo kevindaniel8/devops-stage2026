@@ -1,0 +1,9 @@
+all:
+  children:
+    dc:
+      hosts:
+        samba-ad-dc:
+          ansible_host: 192.168.56.5
+          ansible_private_key_file: ~/.vagrant.d/insecure_private_key
+          ansible_user: vagrant
+          ansible_become: true

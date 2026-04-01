@@ -1,0 +1,45 @@
+- name: Créer dossier build
+  file:
+    path: /opt/fusiondirectory
+    state: directory
+
+- name: Copier Dockerfile
+  template:
+    src: Dockerfile.j2
+    dest: /opt/fusiondirectory/Dockerfile
+
+- name: Copier entrypoint script
+  template:
+    src: entrypoint.sh
+    dest: /opt/fusiondirectory/entrypoint.sh
+    mode: '0755'
+
+- name: Build image Docker
+  community.docker.docker_image:
+    name: "{{ fusiondirectory_image_name }}"
+    build:
+      path: /opt/fusiondirectory
+    source: build
+
+- name: Lancer container FusionDirectory
+  community.docker.docker_container:
+    name: "{{ fusiondirectory_container_name }}"
+    image: "{{ fusiondirectory_image_name }}"
+    state: started
+    recreate: true   # 🔥 important
+    restart_policy: "{{ fusiondirectory_restart_policy }}"
+    ports:
+      - "{{ fusiondirectory_port }}:80"
+    volumes: "{{ fusiondirectory_volumes }}"
+    networks:
+      - name: "{{ fusiondirectory_network }}"
+    env:
+      LDAP_SERVER: "{{ fusiondirectory_ldap_server }}"
+      LDAP_BASE_DN: "{{ fusiondirectory_base_dn }}"
+      LDAP_BIND_DN: "{{ fusiondirectory_bind_dn }}"
+      LDAP_BIND_PASSWORD: "{{ fusiondirectory_bind_password }}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

@@ -1,0 +1,17 @@
+---
+# Handlers pour le rôle FusionDirectory
+
+- name: restart fusiondirectory
+  shell: |
+    cd /opt/fusiondirectory
+    docker compose restart
+
+- name: stop fusiondirectory
+  shell: |
+    cd /opt/fusiondirectory
+    docker compose down
+
+- name: start fusiondirectory
+  shell: |
+    cd /opt/fusiondirectory
+    docker compose up -d

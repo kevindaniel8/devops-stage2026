@@ -1,0 +1,8 @@
+---
+# Handlers pour le rôle LAM
+
+- name: restart lam
+  docker_compose:
+    project_src: /opt/lam
+    state: present
+    restarted: yes

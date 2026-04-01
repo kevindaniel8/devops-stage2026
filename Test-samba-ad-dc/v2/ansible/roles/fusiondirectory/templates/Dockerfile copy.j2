@@ -1,0 +1,49 @@
+FROM debian:bookworm-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    apache2 \
+    php \
+    php-ldap \
+    php-mbstring \
+    php-xml \
+    php-curl \
+    php-imagick \
+    gettext \
+    curl \
+    ldap-utils \
+    ca-certificates \
+    wget \
+    unzip \
+    git \
+    composer \
+ && rm -rf /var/lib/apt/lists/*
+
+# Cloner FusionDirectory depuis GitHub
+RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
+RUN rm -rf /var/www/html/* \
+    && git clone --depth 1 https://github.com/fusiondirectory/fusiondirectory.git /tmp/fusiondirectory \
+    && cp -r /tmp/fusiondirectory/* /var/www/ \
+    && rm -rf /tmp/fusiondirectory
+
+# Corriger le DocumentRoot d'Apache
+RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html|' /etc/apache2/sites-available/000-default.conf \
+    && sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html|' /etc/apache2/sites-enabled/000-default.conf
+
+# Créer le répertoire de configuration
+#RUN mkdir -p /etc/fusiondirectory # avant test
+# Créer les répertoires de cache et config avec les bonnes permissions
+RUN mkdir -p /var/cache/fusiondirectory /etc/fusiondirectory \
+    && chown -R www-data:www-data /var/cache/fusiondirectory /etc/fusiondirectory
+
+# Script de démarrage pour configurer FusionDirectory avec les variables d'environnement
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+RUN chown -R www-data:www-data /var/www/html
+
+EXPOSE 80
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["apachectl", "-D", "FOREGROUND"]

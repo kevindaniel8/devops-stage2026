@@ -1,0 +1,36 @@
+---
+# Variables pour FusionDirectory
+# Déploiement avec Docker Compose connecté au domaine Samba AD existant
+
+# Configuration FusionDirectory
+fusiondirectory_image: "ghcr.io/fusiondirectory/fusiondirectory:1.4"
+fusiondirectory_container_name: "fusiondirectory"
+fusiondirectory_port: 8080
+fusiondirectory_language: "fr_FR"
+
+# Configuration LDAP pour connexion au domaine Samba AD existant
+# Samba AD nécessite une connexion chiffrée (StartTLS)
+ldap_host: "192.168.56.5"  # IP de la VM Samba AD
+ldap_port: 389  # Port LDAP avec StartTLS
+ldap_domain: "lab.local"
+ldap_base_dn: "DC=lab,DC=local"
+ldap_admin_user: "Administrator"
+ldap_admin_password: "ChangeMe123!"  # Mot de passe admin Samba AD
+ldap_bind_dn: "Administrator@LAB.LOCAL" # "cn=Administrator,cn=Users,dc=lab,dc=local"
+ldap_encryption: "none"  # Connexion non chiffrée pour tests
+
+# Configuration FusionDirectory
+fd_admin_password: "FdAdminPass123!"
+fusiondirectory_timezone: "Europe/Paris"
+
+# Configuration Docker Compose
+fusiondirectory_restart_policy: "always"
+docker_compose_version: "3.8"
+
+# Configuration des volumes
+fusiondirectory_volumes:
+  - fusiondirectory_data:/var/www/html/fusiondirectory
+  - fusiondirectory_config:/etc/fusiondirectory
+
+# Configuration réseau
+fusiondirectory_network: "bridge"  # Utiliser le réseau bridge pour accéder à l'hôte

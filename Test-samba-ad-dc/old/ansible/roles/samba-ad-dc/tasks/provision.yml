@@ -1,0 +1,26 @@
+---
+- name: Provision Samba AD domain
+  command: >
+    samba-tool domain provision
+    --domain {{ samba_domain }}
+    --realm {{ samba_realm }}
+    --adminpass '{{ samba_admin_password }}'
+    --server-role=dc
+    --use-rfc2307
+    --dns-backend=SAMBA_INTERNAL
+  args:
+    creates: /var/lib/samba/private/sam.ldb
+
+- name: Configure DNS forwarder in smb.conf
+  lineinfile:
+    path: /etc/samba/smb.conf
+    regexp: '^\\s*dns forwarder'
+    line: '        dns forwarder = 8.8.8.8'
+    insertafter: '\\[global\\]'
+  notify: restart samba
+
+- name: Copy kerberos config
+  copy:
+    src: /var/lib/samba/private/krb5.conf
+    dest: /etc/krb5.conf
+    remote_src: yes

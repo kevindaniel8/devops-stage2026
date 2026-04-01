@@ -1,0 +1,29 @@
+---
+# Handlers pour le rôle FusionDirectory
+
+- name: restart fusiondirectory
+  community.docker.docker_container:
+    name: "{{ fusiondirectory_container_name }}"
+    state: started
+    restart: true
+
+- name: stop fusiondirectory
+  community.docker.docker_container:
+    name: "{{ fusiondirectory_container_name }}"
+    state: absent
+
+- name: start fusiondirectory
+  community.docker.docker_container:
+    name: "{{ fusiondirectory_container_name }}"
+    image: "{{ fusiondirectory_image_name }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ fusiondirectory_port }}:80"
+    env:
+      LDAP_SERVER: "{{ fusiondirectory_ldap_server }}"
+      LDAP_BASE_DN: "{{ fusiondirectory_base_dn }}"
+      LDAP_BIND_DN: "{{ fusiondirectory_bind_dn }}"
+      LDAP_BIND_PASSWORD: "{{ fusiondirectory_bind_password }}"
+
+
