@@ -1,0 +1,30 @@
+
+services:
+  beszel-server:
+    image: henrygd/beszel:0.18.4
+    container_name: beszel-server
+    ports:
+      - "8090:8090"
+    volumes:
+      - /opt/beszel/data:/data
+    environment:
+      - BESZEL_PORT=8090
+    restart: unless-stopped
+
+  beszel-agent:
+    image: henrygd/beszel-agent:0.18.4
+    container_name: beszel-agent
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/host:ro
+      - ./beszel_agent_data:/var/lib/beszel-agent
+    environment:
+      SERVER: "http://127.0.0.1:8090"
+      LISTEN: 45876
+      KEY: ""
+      TOKEN: "UNIVERSAL_TOKEN_PLACEHOLDER"
+      HUB_URL: "http://127.0.0.1:8090"
+

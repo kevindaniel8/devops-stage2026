@@ -1,0 +1,46 @@
+# Docker Compose pour l'agent Beszel avec monitoring PostgreSQL distant
+# Configuration optimisée pour surveillance de serveurs externes
+
+services:
+  beszel-agent:
+    image: henrygd/beszel-agent
+    container_name: beszel-agent
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    
+    # Volumes pour la surveillance système et Docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Socket Docker (read-only)
+      - /:/host:ro                                    # Système hôte (read-only)
+      - ./beszel_agent_data:/var/lib/beszel-agent    # Données persistantes de l'agent
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro  # Socket D-Bus pour services systemd
+      - /var/run/systemd/private:/var/run/systemd/private:ro               # Socket systemd privé
+      - /opt/beszel/postgres-health.sh:/opt/beszel/postgres-health.sh:ro   # Script health check PostgreSQL
+    
+    # Variables d'environnement pour la connexion au hub Beszel
+    environment:
+      SERVER: "http://192.168.56.13:8090"             # URL du serveur Beszel (HUB)
+      LISTEN: "45876"                                # Port d'écoute de l'agent
+      KEY: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGhua0oPuoh61+OvxNaHEdL8219CURhZBFETX/tZHxxx"  # Clé SSH publique (générée par Beszel)
+      TOKEN: "15b26e51-d552-4d63-a329-e9992a8ccdb0"  # 🔑 TOKEN UNIVERSEL PERMANENT - À REMPLACER
+      HUB_URL: "http://192.168.56.13:8090"            # URL du hub pour connexion WebSocket (HUB)
+      # Variables pour monitoring PostgreSQL distant
+      POSTGRES_HOST: "localhost"                      # IP du serveur PostgreSQL (LOCAL sur cette VM)
+      POSTGRES_PORT: "5432"                           # Port PostgreSQL
+      POSTGRES_USER: "postgres"                       # Utilisateur PostgreSQL
+      POSTGRES_DB: "postgres"                         # Base de données à surveiller
+      SYSTEM_NAME: "PostgreSQL-Server"                # 🏷️ NOM PERSONNALISÉ POUR L'AGENT
+
+# 📝 INSTRUCTIONS POUR DÉPLOYER SUR LA VM POSTGRESQL (192.168.56.22) :
+# 1. Copiez ce fichier sur la VM PostgreSQL : scp docker-compose-agent-remote.yml user@192.168.56.22:/opt/beszel/docker-compose-agent.yml
+# 2. Modifiez SERVER="http://192.168.56.13:8090" pour pointer vers votre hub Beszel
+# 3. Modifiez TOKEN avec votre token universel permanent
+# 4. Créez le script de health check PostgreSQL (voir postgres-monitoring.md)
+# 5. Démarrez l'agent : cd /opt/beszel && docker compose -f docker-compose-agent.yml up -d
+
+# 🎯 AVANTAGES :
+# - Surveillance locale de PostgreSQL (métriques précises)
+# - Monitoring du service systemd PostgreSQL
+# - Accès aux logs et fichiers de configuration
+# - Métriques CPU/mémoire/IO du processus PostgreSQL
