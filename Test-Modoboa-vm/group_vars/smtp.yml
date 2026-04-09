@@ -1,0 +1,27 @@
+# Domaine principal
+modoboa_hostname: "mail.lab.local"
+domain: "mail.lab.local"
+
+# Certificat Let's Encrypt
+letsencrypt_email: "admin@lab.local"
+
+# MySQL (non utilisé mais requis par le template)
+mysql_root_password: "unused"
+
+# Secrets génériques
+rspamd_password: "rspamd"
+dovecot_oauth_secret: "secret"
+radicale_oauth_secret: "secret"
+
+# Adresse du serveur PostgreSQL
+modoboa_db_host: "192.168.56.21"
+
+# Comptes internes Modoboa
+modoboa_db_password: "modoboa"
+amavis_db_password: "amavis"
+spamassassin_db_password: "spamassassin"
+opendkim_db_password: "opendkim"
+
+postgres_password: "postgres"
+
+

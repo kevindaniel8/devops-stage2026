@@ -1,0 +1,12 @@
+---
+# Handlers pour redémarrer les services Modoboa
+
+- name: Restart services
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+  loop:
+    - nginx
+    - uwsgi
+  become: yes
+

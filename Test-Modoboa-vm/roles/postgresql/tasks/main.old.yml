@@ -1,0 +1,64 @@
+###############################################################################
+# 1. Vérifier que PostgreSQL est installé
+###############################################################################
+- name: 1 - Vérifier que psql est disponible
+  command: which psql
+  register: psql_check
+  failed_when: psql_check.rc != 0
+  changed_when: false
+
+
+###############################################################################
+# 2. Vérifier si la base modoboa existe
+###############################################################################
+- name: Vérifier si la base modoboa existe
+  become: true
+  command: sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='modoboa';"
+  register: db_exists
+  changed_when: false
+  failed_when: false
+
+
+###############################################################################
+# 3. Créer la base modoboa si elle n'existe pas
+###############################################################################
+- name: 2 - Créer la base modoboa
+  become: true
+  command: sudo -u postgres psql -c "CREATE DATABASE modoboa;"
+  when: db_exists.stdout != "1"
+
+
+###############################################################################
+# 4. Définir le mot de passe de postgres (idempotent)
+###############################################################################
+- name: Vérifier le mot de passe actuel de postgres
+  become: true
+  command: sudo -u postgres psql -tAc "SELECT 1 FROM pg_shadow WHERE usename='postgres' AND passwd IS NOT NULL;"
+  register: pw_exists
+  changed_when: false
+  failed_when: false
+
+- name: 3 - Définir le mot de passe de postgres
+  become: true
+  command: sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD '{{ postgres_password }}';"
+  when: pw_exists.stdout != "1"
+
+
+###############################################################################
+# 5. Donner les droits sur la base (idempotent)
+###############################################################################
+- name: Vérifier si postgres a déjà les droits sur modoboa
+  become: true
+  command: sudo -u postgres psql -tAc "SELECT has_database_privilege('postgres', 'modoboa', 'CONNECT');"
+  register: grant_exists
+  changed_when: false
+  failed_when: false
+
+- name: 4 - Donner les droits à postgres sur modoboa
+  become: true
+  command: sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE modoboa TO postgres;"
+  when: grant_exists.stdout != "t"
+  
+
+
+

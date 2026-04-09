@@ -1,0 +1,137 @@
+[general]
+hostname = mail.%(domain)s
+
+[antispam]
+enabled = true
+type = amavis
+
+[certificate]
+type = self-signed
+tls_cert_file_path = 
+tls_key_file_path = 
+
+[letsencrypt]
+email = {{ letsencrypt_email }}
+
+[database]
+engine = postgres
+host = {{ modoboa_db_host }}
+install = false
+
+[postgres]
+user = postgres
+password = {{ postgres_password }}
+
+[mysql]
+user = 
+password = 
+charset = utf8
+collation = utf8_general_ci
+
+
+[fail2ban]
+enabled = true
+config_dir = /etc/fail2ban
+max_retry = 20
+ban_time = 3600
+find_time = 30
+
+[modoboa]
+user = modoboa
+home_dir = /srv/modoboa
+venv_path = %(home_dir)s/env
+instance_path = %(home_dir)s/instance
+timezone = Europe/Paris
+dbname = modoboa
+dbuser = modoboa
+dbpassword = {{ modoboa_db_password }}
+cron_error_recipient = root
+extensions = 
+devmode = false
+
+[rspamd]
+enabled = false
+user = _rspamd
+password = {{ rspamd_password }}
+dnsbl = true
+dkim_keys_storage_dir = /var/lib/dkim
+key_map_path = /var/lib/dkim/keys.path.map
+selector_map_path = /var/lib/dkim/selectors.path.map
+greylisting = true
+whitelist_auth = true
+whitelist_auth_weigth = -5
+
+[amavis]
+enabled = true
+user = amavis
+max_servers = 2
+dbname = amavis
+dbuser = amavis
+dbpassword = {{ amavis_db_password }}
+
+[clamav]
+enabled = true
+user = clamav
+
+[dovecot]
+enabled = true
+config_dir = /etc/dovecot
+user = dovecot
+home_dir = /srv/vmail
+mailboxes_owner = vmail
+extra_protocols = 
+postmaster_address = postmaster@%(domain)s
+radicale_auth_socket_path = /var/run/dovecot/auth-radicale
+move_spam_to_junk = true
+oauth2_client_secret = {{ dovecot_oauth_secret }}
+
+[nginx]
+enabled = true
+config_dir = /etc/nginx
+
+[razor]
+enabled = false
+config_dir = /etc/razor
+
+[postfix]
+enabled = true
+config_dir = /etc/postfix
+message_size_limit = 11534336
+dhe_group = 4096
+
+[postwhite]
+enabled = true
+config_dir = /etc
+
+[spamassassin]
+enabled = true
+config_dir = /etc/mail/spamassassin
+dbname = spamassassin
+dbuser = spamassassin
+dbpassword = {{ spamassassin_db_password }}
+
+[uwsgi]
+enabled = true
+config_dir = /etc/uwsgi
+nb_processes = 4
+
+[radicale]
+enabled = true
+user = radicale
+config_dir = /etc/radicale
+home_dir = /srv/radicale
+venv_path = %(home_dir)s/env
+oauth2_client_secret = {{ radicale_oauth_secret }}
+
+[opendkim]
+enabled = true
+user = opendkim
+config_dir = /etc
+port = 12345
+keys_storage_dir = /var/lib/dkim
+dbuser = opendkim
+dbpassword = {{ opendkim_db_password }}
+
+[backup]
+default_path = ./modoboa_backup/
+

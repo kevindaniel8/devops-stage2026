@@ -1,0 +1,81 @@
+###############################################################################
+# 1. Installer dépendances système
+###############################################################################
+- name: 1 - Installer dépendances système
+  apt:
+    name:
+      - git
+      - python3
+      - python3-venv
+      - sudo
+    state: present
+    update_cache: yes
+
+###############################################################################
+# 2. Cloner modoboa-installer
+###############################################################################
+- name: 2 - Cloner modoboa-installer
+  git:
+    repo: "https://github.com/modoboa/modoboa-installer.git"
+    dest: "/srv/modoboa-installer"
+    version: master
+
+###############################################################################
+# 3. Déployer le fichier de configuration
+###############################################################################
+- name: 3 - Déployer le fichier de configuration Modoboa
+  template:
+    src: installer.cfg.j2
+    dest: /srv/modoboa-installer/installer.cfg
+    owner: root
+    group: root
+    mode: '0644'
+
+###############################################################################
+# 4. Vérifier le fichier de configuration
+###############################################################################
+- name: 4 - Vérifier le fichier de configuration Modoboa
+  shell: |
+    ./run.py --force --stop-after-configfile-check --config installer.cfg {{ modoboa_hostname }}
+  args:
+    chdir: /srv/modoboa-installer
+  register: config_check
+  failed_when: config_check.rc != 0
+  changed_when: false
+
+- name: Afficher l'erreur de configuration si échec
+  debug:
+    msg: "{{ config_check.stderr }}"
+  when: config_check.rc != 0
+
+
+###############################################################################
+# 5. Installer Modoboa
+###############################################################################
+- name: 5 - Installer Modoboa
+  shell: |
+    ./run.py --force --config installer.cfg {{ modoboa_hostname }} | tee /var/log/modoboa-install.log
+  args:
+    chdir: /srv/modoboa-installer
+  async: 3600
+  poll: 10
+  register: modoboa_output
+
+###############################################################################
+# 6. Configurer CORS pour le frontend
+###############################################################################
+- name: 6 - Configurer CORS pour le frontend
+  lineinfile:
+    path: /srv/modoboa/instance/instance/settings.py
+    regexp: '^#CORS_ORIGIN_ALLOW_ALL = False'
+    line: 'CORS_ORIGIN_ALLOW_ALL = True'
+    backup: yes
+  notify: Restart services
+
+###############################################################################
+# 7. Afficher la sortie
+###############################################################################
+- name: 7 - Afficher la sortie de l'installation
+  debug:
+    var: modoboa_output.stdout_lines
+
