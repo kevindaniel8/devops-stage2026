@@ -32,7 +32,7 @@ jobs:
 
       - name: 3. Build Docker image
         run: |
-          IMAGE=ghcr.io/kevindaniel8/node-demo-app:latest
+          IMAGE=ghcr.io/${{ github.repository }}/node-demo-app:latest
           docker build -t $IMAGE .
 
       - name: 3.Trivy – 3.1 Scan code (FS)
@@ -44,11 +44,11 @@ jobs:
       - name: 3.Trivy – 3.2 Scan Docker image
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ghcr.io/kevindaniel8/node-demo-app:latest
+          image-ref: ghcr.io/${{ github.repository }}/node-demo-app:latest
 
       - name: 4. Push Docker image
         run: |
-          IMAGE=ghcr.io/kevindaniel8/node-demo-app:latest
+          IMAGE=ghcr.io/${{ github.repository }}/node-demo-app:latest
           docker push $IMAGE
 
       - name: 5. Deploy container on server
@@ -59,7 +59,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            IMAGE=ghcr.io/kevindaniel8/node-demo-app:latest
+            IMAGE=ghcr.io/${{ github.repository }}/node-demo-app:latest
             docker pull $IMAGE
             docker stop node-demo-app || true
             docker rm node-demo-app || true
