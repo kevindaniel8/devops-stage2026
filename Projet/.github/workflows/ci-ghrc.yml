@@ -2,7 +2,7 @@ name: CI-CD Docker GHCR
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main/Projet" ]
   pull_request:
 
 jobs:
