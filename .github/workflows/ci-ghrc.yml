@@ -52,7 +52,7 @@ jobs:
           docker push $IMAGE
 
       - name: 5. Deploy container on server
-        if: ${{ github.event_name != 'workflow_dispatch' }}   # Pas de déploiement en mode test
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_IP }}
