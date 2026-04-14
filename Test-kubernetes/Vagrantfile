@@ -1,0 +1,62 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Configuration du cluster K3s avec Vagrant
+# Ce fichier crée 3 VMs: 1 Manager K3s, 2 Workers K3s
+# Simple création des machines, provisionnement séparé
+
+Vagrant.configure("2") do |config|
+  
+  # Configuration globale
+  config.vm.box = "bento/ubuntu-24.04"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  
+  # Configuration SSH
+  config.ssh.insert_key = false
+  config.ssh.forward_agent = true
+  
+  # Provisionnement commun via script externe
+  config.vm.provision "shell", path: "provision.sh"
+  
+  # Machine K3s Manager
+  config.vm.define "k3s-manager" do |manager|
+    manager.vm.hostname = "k3s-manager"
+    manager.vm.network "private_network", ip: "192.168.56.250"
+    
+    manager.vm.provider "virtualbox" do |vb|
+      vb.name = "k3s-manager"
+      vb.memory = "2048"
+      vb.cpus = "1"
+    end
+    
+    # Ports pour l'accès au cluster Kubernetes
+    manager.vm.network "forwarded_port", guest: 6443, host: 6443, auto_correct: true
+    manager.vm.network "forwarded_port", guest: 80, host: 8080, auto_correct: true
+    manager.vm.network "forwarded_port", guest: 443, host: 8443, auto_correct: true
+  end
+  
+  # Machine K3s Worker 1
+  config.vm.define "k3s-worker1" do |worker1|
+    worker1.vm.hostname = "k3s-worker1"
+    worker1.vm.network "private_network", ip: "192.168.56.251"
+    
+    worker1.vm.provider "virtualbox" do |vb|
+      vb.name = "k3s-worker1"
+      vb.memory = "2048"
+      vb.cpus = "1"
+    end
+  end
+  
+  # Machine K3s Worker 2
+  config.vm.define "k3s-worker2" do |worker2|
+    worker2.vm.hostname = "k3s-worker2"
+    worker2.vm.network "private_network", ip: "192.168.56.252"
+    
+    worker2.vm.provider "virtualbox" do |vb|
+      vb.name = "k3s-worker2"
+      vb.memory = "2048"
+      vb.cpus = "1"
+    end
+  end
+  
+end

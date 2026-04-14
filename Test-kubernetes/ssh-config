@@ -1,0 +1,45 @@
+Host k3s-manager
+  HostName 127.0.0.1
+  User vagrant
+  Port 2222
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentityFile /home/kevin/.vagrant.d/insecure_private_keys/vagrant.key.ed25519
+  IdentityFile /home/kevin/.vagrant.d/insecure_private_keys/vagrant.key.rsa
+  IdentitiesOnly yes
+  LogLevel FATAL
+  ForwardAgent yes
+  PubkeyAcceptedKeyTypes +ssh-rsa
+  HostKeyAlgorithms +ssh-rsa
+
+Host k3s-worker1
+  HostName 127.0.0.1
+  User vagrant
+  Port 2201
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentityFile /home/kevin/.vagrant.d/insecure_private_keys/vagrant.key.ed25519
+  IdentityFile /home/kevin/.vagrant.d/insecure_private_keys/vagrant.key.rsa
+  IdentitiesOnly yes
+  LogLevel FATAL
+  ForwardAgent yes
+  PubkeyAcceptedKeyTypes +ssh-rsa
+  HostKeyAlgorithms +ssh-rsa
+
+Host k3s-worker2
+  HostName 127.0.0.1
+  User vagrant
+  Port 2202
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentityFile /home/kevin/.vagrant.d/insecure_private_keys/vagrant.key.ed25519
+  IdentityFile /home/kevin/.vagrant.d/insecure_private_keys/vagrant.key.rsa
+  IdentitiesOnly yes
+  LogLevel FATAL
+  ForwardAgent yes
+  PubkeyAcceptedKeyTypes +ssh-rsa
+  HostKeyAlgorithms +ssh-rsa
+

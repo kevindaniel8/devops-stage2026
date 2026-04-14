@@ -1,0 +1,32 @@
+---
+# Inventaire Ansible pour le cluster K3s
+# Infrastructure Kubernetes K3s
+
+all:
+  children:
+    k3s_cluster:
+      children:
+        k3s_manager:
+          hosts:
+            k3s-manager:
+              ansible_host: 192.168.56.250
+              ansible_user: vagrant
+              k3s_role: server
+              k3s_token: "changeme"
+        
+        k3s_workers:
+          hosts:
+            k3s-worker1:
+              ansible_host: 192.168.56.251
+              ansible_user: vagrant
+              k3s_role: agent
+            
+            k3s-worker2:
+              ansible_host: 192.168.56.252
+              ansible_user: vagrant
+              k3s_role: agent
+
+  vars:
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+    k3s_version: "v1.35.0+k3s1"
+    k3s_server_url: "https://192.168.56.250:6443"
