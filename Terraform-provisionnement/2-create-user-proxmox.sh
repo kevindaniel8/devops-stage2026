@@ -58,6 +58,7 @@ create_user_and_role() {
         VM.Config.Cloudinit VM.Config.Disk VM.Config.HWType VM.Config.Memory
         VM.Config.Network VM.Config.Options VM.Console VM.PowerMgmt
         Datastore.Allocate Datastore.AllocateSpace Datastore.Audit
+        Sys.Modify SDN.Use
     "
 
     log "2.3" "Attribution du rôle à l'utilisateur"
