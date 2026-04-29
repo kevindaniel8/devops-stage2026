@@ -4,7 +4,7 @@ set -euo pipefail
 USER_ID="terraform"
 REALM="pve"
 ROLE_ID="TerraformRole"
-TOKEN_ID="terraform-token"
+TOKEN_ID="tokenTerraform"
 PERMISSION_PATH="/"
 COMMENT="Terraform automation user"
 
