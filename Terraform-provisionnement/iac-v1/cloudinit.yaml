@@ -1,0 +1,18 @@
+#cloud-config
+
+# --- Configuration locale ---
+locale: fr_FR.UTF-8
+timezone: Europe/Paris
+keyboard:
+  layout: fr
+  variant: oss
+
+# --- Authentification SSH ---
+ssh_pwauth: ${ssh_pwauth}
+
+# Désactive le compte root (sécurité)
+# disable_root: true
+
+# Empêche cloud-init de régénérer les clés SSH du système
+#ssh_deletekeys: false
+ssh_genkeytypes: [rsa, ecdsa, ed25519]
