@@ -183,8 +183,7 @@ create_template() {
     qm set $VM_ID \
         --ide2 $STORAGE:cloudinit \
         --boot order=scsi0 \
-        --serial0 socket \
-        --vga serial0
+        --vga std
     
     # =====================
     # RESIZE DISK

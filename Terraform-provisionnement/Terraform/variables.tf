@@ -28,22 +28,26 @@ variable "template_id" {
 variable "disk_storage" {
   description = "Datastore used for VM disks"
   type        = string
+  default     = "local-lvm" # Exemple de stockage courant
 }
 
 variable "net_bridge" {
   description = "Network bridge used for VM network interfaces"
   type        = string
+  default     = "vmbr0" # Valeur par défaut standard sur Proxmox
 }
 
 variable "ssh_user" {
   description = "Default SSH username for VM initialization"
   type        = string
+  default     = "debian" # Valeur par défaut courante pour Debian
 }
 
 variable "vm_password" {
   description = "Password for the VM user (used only in DEV mode)"
   type        = string
   sensitive   = true
+  default     = "ubuntu"
 }
 
 variable "ssh_public_key" {
@@ -65,7 +69,7 @@ variable "mode" {
 variable "vmid_start" {
   description = "Starting VMID for automatic VMID assignment"
   type        = number
-  default     = 551
+  default     = 200
 }
 
 variable "vm_definitions" {
