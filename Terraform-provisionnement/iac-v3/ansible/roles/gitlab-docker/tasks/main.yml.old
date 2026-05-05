@@ -1,0 +1,21 @@
+- name: Charger le rôle Docker
+  include_role:
+    name: docker
+  tags:
+    - always
+
+- name: Installation GitLab
+  import_tasks: gitlab.yml
+  tags:
+    - gitlab
+
+- name: Installation GitLab Runner principal
+  import_tasks: runner.yml
+  tags:
+    - runner
+
+- name: Ajouter un runner supplémentaire
+  import_tasks: add_runner.yml
+  tags:
+    - add_runner
+

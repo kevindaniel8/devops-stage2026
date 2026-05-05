@@ -1,0 +1,35 @@
+- name: Créer le dossier docker-compose
+  file:
+    path: "{{ gitlab_compose_path }}"
+    state: directory
+    mode: '0755'
+
+- name: Déployer le docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ gitlab_compose_path }}/docker-compose.yml"
+  notify: Restart GitLab stack
+
+- name: Lancer la stack GitLab
+  community.docker.docker_compose_v2:
+    project_src: "{{ gitlab_compose_path }}"
+    state: present
+
+# Nouvelle étape : attendre que GitLab démarre
+
+- name: Vérifier que le conteneur GitLab existe
+  community.docker.docker_container_info:
+    name: gitlab
+  register: gitlab_info
+  retries: 10
+  delay: 6
+  until: gitlab_info.exists
+
+- name: Attendre que GitLab écoute sur le port HTTP
+  wait_for:
+    host: "127.0.0.1"
+    port: "{{ gitlab_http_port }}"
+    delay: 5
+    timeout: 600
+  when: gitlab_info.exists
+

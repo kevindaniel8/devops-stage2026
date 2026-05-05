@@ -1,0 +1,5 @@
+---
+argocd_namespace: argocd
+argocd_manifest_url: https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+reverse_proxy_domain: "kevin.lan"
+#kubeconfig_path: "/etc/rancher/k3s/k3s.yaml"

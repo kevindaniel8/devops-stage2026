@@ -1,0 +1,6 @@
+---
+- name: Déploiement GitLab + runners Docker sur la même machine
+  hosts: gitlab
+  become: yes
+  roles:
+    - gitlab-runner-docker

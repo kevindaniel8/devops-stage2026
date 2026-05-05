@@ -1,0 +1,57 @@
+---
+- name: Créer le namespace ArgoCD
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: "{{ argocd_namespace }}"
+    state: present
+
+- name: Télécharger le manifest ArgoCD
+  get_url:
+    url: "{{ argocd_manifest_url }}"
+    dest: "/tmp/argocd-install.yaml"
+
+- name: Installer ArgoCD
+  kubernetes.core.k8s:
+    state: present
+    src: "/tmp/argocd-install.yaml"
+    namespace: "{{ argocd_namespace }}"
+
+# 👉 AJOUTER ICI
+- name: Désactiver le HTTPS forcé d'ArgoCD
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ argocd_namespace }}"
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: argocd-cmd-params-cm
+      data:
+        server.insecure: "true"
+
+# 👉 Puis ton Ingress
+- name: Déployer l'Ingress ArgoCD
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ argocd_namespace }}"
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: argocd-server-ingress
+        annotations:
+          kubernetes.io/ingress.class: traefik
+      spec:
+        rules:
+        - host: "argocd.{{ reverse_proxy_domain }}"
+          http:
+            paths:
+            - path: /
+              pathType: Prefix
+              backend:
+                service:
+                  name: argocd-server
+                  port:
+                    number: 80
+

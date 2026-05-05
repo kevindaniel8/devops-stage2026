@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+
+  gitlab:
+    image: gitlab/gitlab-ce:{{ gitlab_version }}
+    container_name: gitlab
+    restart: unless-stopped
+
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://{{ gitlab_hostname }}:{{ gitlab_http_port }}'
+        gitlab_rails['gitlab_shell_ssh_port'] = {{ gitlab_ssh_port }}
+
+    ports:
+      - "{{ gitlab_http_port }}:80"
+      - "{{ gitlab_ssh_port }}:22"
+
+    volumes:
+      - "{{ gitlab_compose_path }}/gitlab/config:/etc/gitlab"
+      - "{{ gitlab_compose_path }}/gitlab/logs:/var/log/gitlab"
+      - "{{ gitlab_compose_path }}/gitlab/data:/var/opt/gitlab"
+
+      # CA interne pour GitLab (correct)
+      #- "/usr/local/share/ca-certificates/kevin-ca.crt:/etc/gitlab/trusted-certs/kevin-ca.crt:ro"
+
+    networks:
+      - gitlab-network
+
+networks:
+  gitlab-network:
+    external: false

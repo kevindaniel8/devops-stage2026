@@ -1,0 +1,4 @@
+- hosts: gitlab
+  become: yes
+  roles:
+    - gitlab-docker

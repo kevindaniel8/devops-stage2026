@@ -1,0 +1,41 @@
+---
+# ma version avec volumes
+services:
+
+  gitlab:
+    #hostname : gitlab.kevin.lan
+    image: gitlab/gitlab-ce:{{ gitlab_version }}
+    container_name: gitlab
+    restart: unless-stopped  # restart: always
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://{{ gitlab_hostname }}:{{ gitlab_http_port }}'
+        gitlab_rails['gitlab_shell_ssh_port'] = {{ gitlab_ssh_port }}
+    ports:
+      - "{{ gitlab_http_port }}:80"
+      - "{{ gitlab_ssh_port }}:22"
+    volumes:
+      - ./gitlab/config:/etc/gitlab
+      - ./gitlab/logs:/var/log/gitlab
+      - ./gitlab/data:/var/opt/gitlab
+    networks:
+      - gitlab-network
+
+  gitlab-runner:
+    restart: unless-stopped
+    image: gitlab/gitlab-runner:{{ gitlab_runner_version }}
+    container_name: gitlab-runner
+    restart: always
+    #hostname: gitlab-runner1
+    #depends_on:
+    #  - gitlab
+    volumes:
+      - ./config/gitlab-runner:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - gitlab-network
+
+networks:
+  gitlab-network:
+    name: gitlab-network
+

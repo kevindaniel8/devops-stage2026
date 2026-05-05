@@ -1,0 +1,4 @@
+- name: Démarrer le runner principal via docker-compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ gitlab_compose_path }}"
+    state: present

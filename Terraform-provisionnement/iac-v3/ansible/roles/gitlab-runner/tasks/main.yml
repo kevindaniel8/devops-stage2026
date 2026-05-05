@@ -1,0 +1,36 @@
+---
+- name: Installer dépendances
+  apt:
+    name:
+      - curl
+      - ca-certificates
+    state: present
+    update_cache: yes
+
+- name: Ajouter le dépôt GitLab Runner
+  shell: |
+    curl -s {{ gitlab_runner_repo_script }} | bash
+  args:
+    creates: /etc/apt/sources.list.d/runner_gitlab-runner.list
+
+- name: Installer GitLab Runner
+  apt:
+    name: "{{ gitlab_runner_package }}"
+    state: present
+
+- name: Enregistrer le runner
+  command: >
+    gitlab-runner register
+    --non-interactive
+    --url {{ gitlab_runner_coordinator_url }}
+    --registration-token {{ gitlab_runner_registration_token }}
+    --executor {{ gitlab_runner_executor }}
+    --description "{{ gitlab_runner_description }}"
+  args:
+    creates: /etc/gitlab-runner/config.toml
+
+- name: Activer et démarrer le service GitLab Runner
+  service:
+    name: gitlab-runner
+    state: started
+    enabled: yes

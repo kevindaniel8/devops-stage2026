@@ -1,0 +1,29 @@
+---
+# 1. Installation de Docker (toujours nécessaire)
+- name: Charger le rôle Docker
+  include_role:
+    name: docker
+  tags:
+    - always
+
+# 2. Installation de GitLab CE/EE
+- name: Installation GitLab
+  import_tasks: gitlab.yml
+  tags:
+    - gitlab
+
+# 3. Installation du runner principal (gitlab-runner-docker)
+- name: Installation GitLab Runner principal
+  include_role:
+    name: gitlab-runner-docker
+  vars:
+    gitlab_runner_name: "gitlab-runner"
+  tags:
+    - runner
+
+# 4. Ajouter un runner supplémentaire (optionnel)
+- name: Ajouter un runner supplémentaire
+  import_tasks: add_runner.yml
+  when: gitlab_additional_runner | default(false)
+  tags:
+    - add_runner

@@ -1,0 +1,30 @@
+---
+gitlab_runner_compose_dir: /opt/gitlab-runner
+gitlab_runner_project_name: gitlab_runner
+#gitlab_runner_image: gitlab/gitlab-runner:latest
+
+gitlab_runner_url_scheme: "http"
+gitlab_runner_url_host: "{{ gitlab_host | default(inventory_hostname) }}"
+gitlab_runner_url: "{{ gitlab_runner_url_scheme }}://{{ gitlab_runner_url_host }}"
+
+gitlab_runner_registration_enabled: false
+gitlab_runner_registration_token: ""
+
+gitlab_runner_executor: "docker"
+gitlab_runner_description: "docker-runner"
+gitlab_runner_tags: "docker"
+#gitlab_runner_prepare_config: true
+
+gitlab_runner_base_dir: /opt/gitlab-runner
+#gitlab_runner_name: gitlab-runner
+gitlab_runner_image: gitlab/gitlab-runner:latest
+gitlab_runner_prepare_config: true
+gitlab_runner_gitlab_url: "https://gitlab.kevin.lan"
+
+################ ici ##########
+
+gitlab_runner_version: "latest"
+
+gitlab_runner_name: "gitlab-runner"
+gitlab_runner_base_path: "/opt/gitlab-runner"
+gitlab_runner_path: "{{ gitlab_runner_base_path }}/{{ gitlab_runner_name }}"

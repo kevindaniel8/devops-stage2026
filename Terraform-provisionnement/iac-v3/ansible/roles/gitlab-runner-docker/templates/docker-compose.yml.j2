@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  {{ gitlab_runner_name }}:
+    image: {{ gitlab_runner_image }}
+    container_name: {{ gitlab_runner_name }}
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - {{ gitlab_runner_base_dir }}/{{ gitlab_runner_name }}/config:/etc/gitlab-runner
+

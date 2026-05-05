@@ -1,0 +1,11 @@
+---
+galaxy_info:
+  author: Kevin DANIEL
+  description: "Installation robuste et idempotente de Docker Engine (méthode officielle Docker 2025)"
+  license: MIT
+  min_ansible_version: 2.12
+  platforms:
+    - name: Ubuntu
+      versions:
+        - noble
+dependencies: []

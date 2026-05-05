@@ -1,0 +1,11 @@
+---
+galaxy_info:
+  author: "kevin"
+  description: "Installation de Docker CE + GitLab Runner via Docker Compose"
+  license: MIT
+  min_ansible_version: 2.12
+  platforms:
+    - name: Ubuntu
+      versions:
+        - noble
+dependencies: []

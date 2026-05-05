@@ -1,0 +1,47 @@
+---
+# 1. Créer le dossier du runner
+- name: Créer le dossier du runner
+  file:
+    path: "{{ gitlab_runner_base_dir }}/{{ gitlab_runner_name }}/config"
+    state: directory
+    mode: '0755'
+    recurse: true
+
+# 2. Déployer docker-compose.yml
+- name: Déployer docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ gitlab_runner_base_dir }}/{{ gitlab_runner_name }}/docker-compose.yml"
+    mode: '0644'
+
+# 3. Démarrer le runner
+- name: Démarrer GitLab Runner
+  community.docker.docker_compose_v2:
+    project_src: "{{ gitlab_runner_base_dir }}/{{ gitlab_runner_name }}"
+    state: present
+
+# 4. Préparer config.toml minimal (sans enregistrement)
+- name: Déployer config.toml minimal
+  copy:
+    dest: "{{ gitlab_runner_base_dir }}/{{ gitlab_runner_name }}/config/config.toml"
+    mode: '0644'
+    content: |
+      concurrent = 1
+      check_interval = 0
+
+      [[runners]]
+        name = "{{ gitlab_runner_name }}"
+        url = "{{ gitlab_runner_gitlab_url }}"
+        token = ""
+        executor = "docker"
+        tls_skip_verify = true
+  when: gitlab_runner_prepare_config
+
+# 5. Corriger les permissions
+- name: Corriger les permissions du volume
+  file:
+    path: "{{ gitlab_runner_base_dir }}/{{ gitlab_runner_name }}/config"
+    owner: 1000
+    group: 1000
+    recurse: true
+

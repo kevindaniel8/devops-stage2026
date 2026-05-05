@@ -1,0 +1,13 @@
+- name: Créer un volume pour le runner supplémentaire
+  community.docker.docker_volume:
+    name: "runner-{{ runner_id }}"
+    state: present
+
+- name: Créer un nouveau conteneur GitLab Runner
+  community.docker.docker_container:
+    name: "gitlab-runner-{{ runner_id }}"
+    image: "gitlab/gitlab-runner:{{ gitlab_runner_version }}"
+    restart_policy: unless-stopped
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "runner-{{ runner_id }}:/etc/gitlab-runner"

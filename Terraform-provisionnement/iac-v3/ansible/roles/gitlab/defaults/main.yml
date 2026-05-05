@@ -1,0 +1,3 @@
+gitlab_external_url: "http://{{ ansible_default_ipv4.address }}"
+gitlab_package: "gitlab-ce"
+gitlab_repo_script: "https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh"

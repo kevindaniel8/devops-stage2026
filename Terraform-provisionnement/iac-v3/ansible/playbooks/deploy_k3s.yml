@@ -1,0 +1,21 @@
+---
+- import_playbook: k3s-manager.yml
+
+- name: Préparer la configuration globale K3s
+  hosts: k3s_manager
+  gather_facts: yes
+  vars:
+    # doit être cohérent avec roles/k3s-manager/defaults/main.yml
+    k3s_token: "changeme"
+  tasks:
+    - name: Construire l'URL du serveur K3s
+      set_fact:
+        k3s_server_url: "https://{{ ansible_host }}:6443"
+
+    - name: Publier la config globale pour les workers
+      add_host:
+        name: "global_k3s_config"
+        k3s_server_url: "{{ k3s_server_url }}"
+        k3s_token: "{{ k3s_token }}"
+
+- import_playbook: k3s-worker.yml
