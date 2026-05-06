@@ -1,5 +1,0 @@
----
-- hosts: runners
-  become: yes
-  roles:
-    - gitlab-runner

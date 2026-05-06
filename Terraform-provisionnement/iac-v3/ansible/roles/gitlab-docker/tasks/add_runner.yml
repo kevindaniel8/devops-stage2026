@@ -1,9 +1,0 @@
----
-- name: Ajouter un runner supplémentaire
-  include_role:
-    name: gitlab-runner-docker
-  vars:
-    gitlab_runner_name: "gitlab-runner-{{ runner_id }}"
-    gitlab_runner_id: "{{ runner_id }}"
-    gitlab_runner_path: "/opt/gitlab-runner/gitlab-runner-{{ runner_id }}"
-

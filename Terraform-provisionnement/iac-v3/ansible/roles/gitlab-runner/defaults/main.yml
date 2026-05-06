@@ -1,8 +1,0 @@
-gitlab_runner_package: gitlab-runner
-gitlab_runner_repo_script: "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh"
-
-# Token d’enregistrement (à récupérer dans GitLab)
-gitlab_runner_registration_token: ""
-gitlab_runner_coordinator_url: "https://gitlab.com/"
-gitlab_runner_executor: "shell"
-gitlab_runner_description: "ansible-runner"

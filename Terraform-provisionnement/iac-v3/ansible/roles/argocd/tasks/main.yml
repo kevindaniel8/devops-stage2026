@@ -30,8 +30,8 @@
       data:
         server.insecure: "true"
 
-# 👉 Puis ton Ingress
-- name: Déployer l'Ingress ArgoCD
+# 👉 Ingress pour accès par nom de domaine (production)
+- name: Déployer l'Ingress ArgoCD (domaine)
   kubernetes.core.k8s:
     state: present
     namespace: "{{ argocd_namespace }}"
@@ -44,7 +44,7 @@
           kubernetes.io/ingress.class: traefik
       spec:
         rules:
-        - host: "argocd.{{ reverse_proxy_domain }}"
+        - host: "{{ argocd_domain }}"
           http:
             paths:
             - path: /
@@ -54,4 +54,24 @@
                   name: argocd-server
                   port:
                     number: 80
+
+# 👉 Service NodePort pour accès direct par IP (développement - sans DNS)
+# Permet d'accéder à ArgoCD via http://IP:30092 (plage NodePort: 30000-32767)
+- name: Créer le Service NodePort pour accès direct par IP
+  kubernetes.core.k8s:
+    state: patched
+    namespace: "{{ argocd_namespace }}"
+    name: argocd-server
+    api_version: v1
+    kind: Service
+    definition:
+      spec:
+        type: NodePort
+        ports:
+        - port: 80
+          targetPort: 8080
+          nodePort: 30080
+          protocol: TCP
+          name: http
+  when: argocd_enable_ip_access | bool
 

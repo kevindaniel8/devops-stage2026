@@ -1,26 +1,5 @@
-# =============================================================================
-# VARIABLES DYNAMIQUES - Générées automatiquement depuis env.conf
-# =============================================================================
-# NE PAS MODIFIER MANUELLEMENT - Utiliser env.conf à la place
-# Script: scripts/generate_ansible_vars.py
-# =============================================================================
-
 cert_store_dir: "{{ playbook_dir }}/../files/certificat_temp"
 reverse_proxy_domain: "greencontracts.org"
-domain: "greencontracts.org"
-subnet: "192.168.20"
-
-# IPs du cluster PostgreSQL (calculées depuis SUBNET)
-master_ip: 192.168.20.20
-replica_ip: 192.168.20.21
-new_server_ip: 192.168.20.22
-
-# =============================================================================
-# FIN DES VARIABLES DYNAMIQUES
-# =============================================================================
-
-#cert_store_dir: "{{ playbook_dir }}/../files/certificat_temp"
-#reverse_proxy_domain: "greencontracts.org"
 
 ############################### cluster postgres ###########################
 
@@ -34,9 +13,9 @@ repmgr_password: repmgr_secure_password
 postgres_password: postgres_secure_password
 
 # Configuration réseau
-#master_ip: 192.168.20.20
-#replica_ip: 192.168.20.21
-#new_server_ip: 192.168.20.22
+master_ip: 192.168.20.20
+replica_ip: 192.168.20.21
+new_server_ip: 192.168.20.22
 
 # Configuration PostgreSQL
 postgresql_config:

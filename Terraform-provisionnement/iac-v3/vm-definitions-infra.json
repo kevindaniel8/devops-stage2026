@@ -102,13 +102,13 @@
       "description": "Github Action CI/Jenkins Runner - Pipeline de build et déploiement"
     },
     {
-      "name": "harbor-registry (optionnel)",
+      "name": "harbor-registry",
       "ip_suffix": 205,
       "cores": 1,
       "socket": 1,
       "memory": 2048,
       "disk": 100,
-      "description": "Harbor - Registry Docker privé avec scan de vulnérabilités"
+      "description": "Harbor - Registry Docker privé avec scan de vulnérabilités  (optionnel)"
     },
     {
       "name": "loadbalancer-k8s (optinnel)",

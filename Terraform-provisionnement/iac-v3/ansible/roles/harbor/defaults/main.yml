@@ -1,7 +1,7 @@
 ---
 harbor_version: "v2.14.2"
 
-harbor_data_dir: "/data"
+harbor_data_dir: "/data/harbor"
 
 harbor_db_password: "root123"
 harbor_redis_password: "redis123"
@@ -22,7 +22,6 @@ cert_path: "/etc/nginx/certs/wildcard.kevin.lan.crt"
 key_path: "/etc/nginx/certs/wildcard.kevin.lan.key"
 
 harbor_admin_password: "Harbor12345"
-harbor_data_dir: "/data/harbor"
 
 enable_trivy: true
 enable_notary: false

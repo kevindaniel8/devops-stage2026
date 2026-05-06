@@ -1,5 +1,0 @@
----
-- name: 1. Redémarrer Docker
-  service:
-    name: docker
-    state: restarted

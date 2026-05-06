@@ -1,11 +1,37 @@
 ---
+# =============================================================================
+# PLAYBOOK K3s - Déploiement Cluster Kubernetes
+# =============================================================================
+# NOTE PRODUCTION:
+# Pour la production, remplacer le token fixe ci-dessous par la récupération
+# automatique du token depuis le manager existant (Option C).
+# Le token fixe "changeme" est utilisé pour le développement car il est
+# prévisible et facilite le débogage.
+#
+# OPTION C - Token dynamique (à décommenter pour production):
+#   - name: Vérifier si K3s existe déjà sur le manager
+#     stat:
+#       path: /var/lib/rancher/k3s/server/node-token
+#     register: k3s_token_file
+#
+#   - name: Récupérer le token existant
+#     command: cat /var/lib/rancher/k3s/server/node-token
+#     register: existing_token
+#     when: k3s_token_file.stat.exists
+#
+#   - name: Utiliser token existant ou générer nouveau
+#     set_fact:
+#       k3s_token: "{{ existing_token.stdout | default(lookup('password', '/dev/null chars=ascii_letters,digits length=32')) }}"
+# =============================================================================
+
 - import_playbook: k3s-manager.yml
 
 - name: Préparer la configuration globale K3s
   hosts: k3s_manager
   gather_facts: yes
   vars:
-    # doit être cohérent avec roles/k3s-manager/defaults/main.yml
+    # DEV: Token fixe pour le développement (prévisible, facile à déboguer)
+    # PROD: Remplacer par génération/récupération automatique (voir NOTE PRODUCTION ci-dessus)
     k3s_token: "changeme"
   tasks:
     - name: Construire l'URL du serveur K3s
@@ -17,5 +43,22 @@
         name: "global_k3s_config"
         k3s_server_url: "{{ k3s_server_url }}"
         k3s_token: "{{ k3s_token }}"
+
+    - name: Attendre que l'API K3s soit prête
+      wait_for:
+        host: "{{ ansible_host }}"
+        port: 6443
+        delay: 5
+        timeout: 120
+        state: started
+      become: no
+      delegate_to: localhost
+
+    - name: Vérifier que kubectl fonctionne
+      command: k3s kubectl get nodes
+      register: kubectl_check
+      until: kubectl_check.rc == 0
+      retries: 10
+      delay: 5
 
 - import_playbook: k3s-worker.yml
