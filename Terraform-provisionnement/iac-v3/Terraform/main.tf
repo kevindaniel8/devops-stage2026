@@ -14,7 +14,7 @@ provider "proxmox" {
 }
 
 locals {
-  vm_list = keys(var.vm_definitions)
+  vm_list    = keys(var.vm_definitions)
   ssh_pwauth = var.mode == "dev" ? true : false
 }
 

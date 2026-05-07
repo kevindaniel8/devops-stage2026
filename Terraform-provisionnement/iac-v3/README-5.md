@@ -5,6 +5,7 @@
 Ce script génère automatiquement le fichier `terraform.tfvars` à partir :
 - Des credentials Proxmox récupérés depuis le serveur
 - D'un fichier de configuration JSON externe (`vm-definitions.json`)
+- Des **paramètres réseau définis dans `env.conf`** (gateway, dns_server, subnet, net_bridge)
 - Des clés SSH générées précédemment
 
 ## 🎯 Objectif
@@ -16,7 +17,8 @@ Permettre à un utilisateur de configurer ses VMs **sans modifier le script**, e
 | Fichier | Description |
 |---------|-------------|
 | `5-generate-terraform-config.sh` | Script principal |
-| `vm-definitions.json` | **Configuration utilisateur** - Définition des VMs |
+| `env.conf` | **Configuration réseau** - Gateway, DNS, Subnet, Bridge (PRIORITAIRE) |
+| `vm-definitions.json` | **Configuration VMs** - Définition des VMs uniquement (pas de réseau) |
 | `Terraform/terraform.tfvars` | Fichier généré (sortie) |
 | `~/.ssh/id_ed25519_terraform-proxmox.pub` | Clé SSH publique |
 | `/home/kevin-stage-devops/terraform-config.txt` | Tokens API sur Proxmox |
@@ -25,6 +27,15 @@ Permettre à un utilisateur de configurer ses VMs **sans modifier le script**, e
 
 ### Variables d'environnement (optionnel)
 
+**Configuration réseau (depuis `env.conf` - PRIORITAIRE) :**
+```bash
+export NET_BRIDGE="vmbr1"           # Bridge réseau
+export GATEWAY="192.168.20.1"       # Gateway par défaut
+export DNS_SERVER="8.8.8.8"         # Serveur DNS
+export SUBNET="192.168.20"          # Sous-réseau (pour calcul des IPs)
+```
+
+**Configuration Proxmox et VMs :**
 ```bash
 export PM_HOST="192.168.0.1"        # IP Proxmox
 export PROXMOX_NODE="pve"            # Nom du node
@@ -35,14 +46,15 @@ export VM_CONFIG_FILE="/chemin/vers/vm-definitions.json"  # Fichier de config VM
 
 ### Structure du fichier JSON
 
+⚠️ **IMPORTANT : La configuration réseau a été déplacée dans `env.conf`**
+
+Le fichier `vm-definitions.json` ne contient plus la section `network`. 
+Les paramètres réseau (gateway, dns_server, subnet) sont désormais définis **uniquement** dans `env.conf`.
+
 ```json
 {
   "_comment": "Fichier de configuration des VMs",
-  "network": {
-    "gateway": "192.168.20.1",
-    "dns_server": "8.8.8.8",
-    "subnet": "192.168.20"
-  },
+  "_network_config": "⚠️ Config réseau dans env.conf UNIQUEMENT",
   "vmid_start": 200,
   "vms": [
     {
@@ -157,6 +169,10 @@ Prochaines étapes:
 | `PROXMOX_NODE` | `pve` | Nom du node Proxmox | ✅ Oui |
 | `SSH_USER` | `terraform` | Utilisateur SSH pour les VMs | ✅ Oui |
 | `TEMPLATE_ID` | `9001` | ID du template (9001=Debian, 9002=Ubuntu24, 9003=Ubuntu26) | ✅ Oui |
+| `NET_BRIDGE` | `vmbr1` | Bridge réseau Proxmox | ✅ Oui (dans env.conf) |
+| `GATEWAY` | `192.168.20.1` | Gateway par défaut des VMs | ✅ Oui (dans env.conf) |
+| `DNS_SERVER` | `8.8.8.8` | Serveur DNS des VMs | ✅ Oui (dans env.conf) |
+| `SUBNET` | `192.168.20` | Sous-réseau pour calcul des IPs | ✅ Oui (dans env.conf) |
 | `VM_CONFIG_FILE` | `vm-definitions.json` | Chemin fichier config VMs | ❌ Non (défaut: vm-definitions.json) |
 | `VMID_START` | `200` | Premier VMID | ❌ Non (défaut: 200) |
 
@@ -227,10 +243,35 @@ sudo apt-get install jq
 ## 📝 Notes
 
 - Le script **écrase toujours** `terraform.tfvars` lors de l'exécution
-- Modifiez uniquement `vm-definitions.json` pour changer les VMs
+- **⚠️ Changement majeur :** La configuration réseau ne se fait plus dans `vm-definitions.json` mais **uniquement** dans `env.conf`
+- Modifiez `env.conf` pour changer le réseau (gateway, dns, subnet, bridge)
+- Modifiez uniquement `vm-definitions.json` pour changer les VMs (structure, ressources)
 - Le token secret est récupéré automatiquement depuis le serveur Proxmox
 - En mode `dev`, un mot de passe est configuré (à changer pour la production)
 - En mode `prod`, seule la clé SSH est utilisée
+
+### ⚠️ Migration depuis l'ancienne version
+
+Si vous aviez une section `network` dans `vm-definitions.json` :
+```json
+// AVANT (dans vm-definitions.json)
+{
+  "network": {
+    "gateway": "192.168.20.1",
+    "dns_server": "8.8.8.8",
+    "subnet": "192.168.20"
+  }
+}
+```
+
+**Déplacez ces valeurs dans `env.conf` :**
+```bash
+# APRÈS (dans env.conf)
+NET_BRIDGE="vmbr1"
+GATEWAY="192.168.20.1"
+DNS_SERVER="8.8.8.8"
+SUBNET="192.168.20"
+```
 
 ## 🔗 Intégration Pipeline
 

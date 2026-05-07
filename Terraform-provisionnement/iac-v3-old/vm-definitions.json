@@ -1,0 +1,48 @@
+{
+  "_comment": "Fichier de configuration des VMs - Modifiez les valeurs selon vos besoins",
+  "_note": "Ce fichier est lu par 5-generate-terraform-config.sh pour générer terraform.tfvars",
+  "network": {
+    "gateway": "192.168.20.1",
+    "dns_server": "8.8.8.8",
+    "subnet": "192.168.20"
+  },
+  "vmid_start": 200,
+  "vms": [
+    {
+      "name": "harbor-registry",
+      "ip_suffix": 205,
+      "cores": 1,
+      "socket": 1,
+      "memory": 2048,
+      "disk": 100,
+      "description": "Harbor - Registry Docker privé avec scan de vulnérabilités  (optionnel)"
+    },
+    {
+      "name": "k8s-master",
+      "ip_suffix": 220,
+      "cores": 2,
+      "socket": 1,
+      "memory": 4096,
+      "disk": 30,
+      "description": "Kubernetes Control Plane - API Server, etcd, Scheduler"
+    },
+    {
+      "name": "k8s-worker1",
+      "ip_suffix": 221,
+      "cores": 1,
+      "socket": 1,
+      "memory": 2048,
+      "disk": 30,
+      "description": "Kubernetes Worker Node #1 - Workloads conteneurisés"
+    },
+    {
+      "name": "k8s-worker2",
+      "ip_suffix": 222,
+      "cores": 1,
+      "socket": 1,
+      "memory": 2048,
+      "disk": 30,
+      "description": "Kubernetes Worker Node #2 - Workloads conteneurisés"
+    }
+  ]
+}

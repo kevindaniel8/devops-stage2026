@@ -1,8 +1,8 @@
 ---
-- import_playbook: deploy_reverse_proxy.yml
-- import_playbook: deploy_dns.yml
-- import_playbook: deploy_snmp.yml
-- import_playbook: deploy_wikijs.yml
-- import_playbook: deploy_gitlab.yml
-- import_playbook: deploy_harbor.yml
-- import_playbook: deploy_k3s.yml
+#- import_playbook: deploy_dns.yml
+- import_playbook: pipeline_cd.yml
+- import_playbook: deploy-cluster-db.yml
+#- import_playbook: deploy_wikijs.yml
+#- import_playbook: deploy_reverse_proxy.yml
+#- import_playbook: deploy_snmp.yml
+

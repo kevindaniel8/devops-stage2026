@@ -1,0 +1,35 @@
+---
+reverse_proxy_domain: "kevin.lan"
+
+# Port par défaut
+reverse_proxy_default_port: 80
+
+# Ports personnalisés
+reverse_proxy_overrides:
+  grafana: 3000
+  prometheus: 9090
+  alertmanager: 9093
+  snmp-exporter: 9116
+  wikijs: 3000 # ← ou le port réel de ton Wiki.js
+  harbor: 443
+  argocd: 80
+
+# Alias → service réel
+reverse_proxy_aliases:
+  snmp: grafana
+
+# Services SNMP stack hébergés sur l’hôte "snmp"
+reverse_proxy_hosts:
+  grafana: snmp
+  prometheus: snmp
+  alertmanager: snmp
+  snmp-exporter: snmp
+  argocd: k3s-manager
+
+# Certificats
+reverse_proxy_cert_days: 3650
+reverse_proxy_country: "FR"
+reverse_proxy_state: "Occitanie"
+reverse_proxy_locality: "Montpellier"
+reverse_proxy_org: "Kevin"
+reverse_proxy_ou: "IT"

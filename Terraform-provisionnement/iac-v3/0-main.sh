@@ -21,6 +21,7 @@ SCRIPT2="./2-create-user-proxmox.sh"
 SCRIPT3="./3-cloud-init-images.sh"
 SCRIPT4="./4-template-generique.sh"
 SCRIPT5="./5-generate-terraform-config.sh"
+SCRIPT6="./6-deploiement-ansible.sh"
 
 SSH_KEY_PATH="./ssh/id_ed25519_terraform-proxmox.pub"
 
@@ -33,6 +34,8 @@ REMOTE_DIR="${REMOTE_DIR:-/home/kevin-stage-devops}"
 REMOTE_SCRIPT2="$REMOTE_DIR/2-create-user-proxmox.sh"
 REMOTE_SCRIPT3="$REMOTE_DIR/3-cloud-init-images.sh"
 REMOTE_SCRIPT4="$REMOTE_DIR/4-template-generique.sh"
+REMOTE_SCRIPT5="$REMOTE_DIR/5-generate-terraform-config.sh"
+REMOTE_SCRIPT6="$REMOTE_DIR/6-deploiement-ansible.sh"
 
 ############################################
 # SSH MULTIPLEXING
@@ -197,3 +200,38 @@ fi
 
 echo ""
 echo "🎉 Pipeline IaC terminé avec succès."
+
+
+# =============================================================================
+# ÉTAPE 10: Déploiement Ansible
+# =============================================================================
+
+echo ""
+echo "🚀 [10.0] Lancement du déploiement Ansible..."
+
+# Revenir dans le dossier du script principal
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+if [ -f "$SCRIPT6" ]; then
+
+    read -p "🚀 [10.1] Déployer la configuration Ansible maintenant ? (y/N) : " CONFIRM_ANSIBLE
+
+    if [[ "$CONFIRM_ANSIBLE" =~ ^[Yy]$ ]]; then
+        echo "🚀 [10.2] Exécution du déploiement Ansible..."
+
+        # Rendre exécutable si nécessaire
+        if [ ! -x "$SCRIPT6" ]; then
+            chmod +x "$SCRIPT6"
+        fi
+
+        ./6-deploiement-ansible.sh
+    else
+        echo "⏸️  Déploiement Ansible ignoré."
+        echo "   Pour déployer manuellement : ./6-deploiement-ansible.sh"
+    fi
+
+else
+    echo "⚠️  Script 6-deploiement-ansible.sh non trouvé"
+    echo "   Pour déployer manuellement : ./6-deploiement-ansible.sh"
+fi

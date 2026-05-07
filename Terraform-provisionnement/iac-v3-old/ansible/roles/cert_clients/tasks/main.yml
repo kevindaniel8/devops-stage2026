@@ -1,0 +1,40 @@
+---
+- name: Installer la CA interne
+  copy:
+    src: "{{ cert_store_dir }}/ca/ca.crt"
+    dest: /usr/local/share/ca-certificates/kevin-ca.crt
+    mode: '0644'
+
+- name: Mettre à jour le store de certificats
+  command: update-ca-certificates
+  become: true
+
+
+# Déploiement des certificats serveur
+#- name: Créer le dossier SSL
+#  file:
+#    path: /etc/ssl/kevin/
+#    state: directory
+#    mode: '0755'
+#  tags: [certificat]
+
+#- name: Déployer le certificat serveur
+#  copy:
+#    src: server.crt
+#    dest: /etc/ssl/kevin/server.crt
+#    mode: '0644'
+#  tags: [certificat]
+
+#- name: Déployer la clé privée serveur
+#  copy:
+#    src: server.key
+#    dest: /etc/ssl/kevin/server.key
+#    mode: '0400'
+#  tags: [certificat]
+
+#- name: Déployer le fullchain
+#  copy:
+#    src: server-fullchain.crt
+#    dest: /etc/ssl/kevin/server-fullchain.crt
+#    mode: '0644'
+#  tags: [certificat]

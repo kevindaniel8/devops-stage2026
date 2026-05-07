@@ -34,10 +34,11 @@ SSH_USER="${VM_SSH_USER:-terraform}"
 # Template à utiliser (9001=Debian, 9002=Ubuntu24, 9003=Ubuntu26)
 TEMPLATE_ID="${TEMPLATE_ID:-9001}"
 
-# Configuration réseau depuis env.conf
+# Configuration réseau depuis env.conf (PRIORITAIRE sur vm-definitions.json)
 NET_BRIDGE="${NET_BRIDGE:-vmbr1}"
 GATEWAY="${GATEWAY:-192.168.20.1}"
 DNS_SERVER="${DNS_SERVER:-8.8.8.8}"
+SUBNET="${SUBNET:-192.168.20}"
 
 # Récupérer le token depuis le serveur Proxmox
 echo -e "${YELLOW}[INFO]${NC} Récupération du token API depuis Proxmox..."
@@ -83,17 +84,17 @@ if [ -f "$VM_CONFIG_FILE" ]; then
     echo -e "${GREEN}[OK]${NC} Fichier de configuration VMs trouvé: $VM_CONFIG_FILE"
     
     # Extraire les valeurs du JSON (nécessite jq)
+    # NOTE: Les valeurs réseau (gateway, dns, subnet) viennent UNIQUEMENT de env.conf
     if command -v jq &> /dev/null; then
         VMID_START=$(jq -r '.vmid_start // 200' "$VM_CONFIG_FILE")
-        GATEWAY=$(jq -r '.network.gateway // "192.168.20.1"' "$VM_CONFIG_FILE")
-        DNS_SERVER=$(jq -r '.network.dns_server // "8.8.8.8"' "$VM_CONFIG_FILE")
-        SUBNET=$(jq -r '.network.subnet // "192.168.20"' "$VM_CONFIG_FILE")
+        # SUBNET extrait du JSON uniquement si non défini dans env.conf
+        SUBNET_FROM_JSON=$(jq -r '.network.subnet // empty' "$VM_CONFIG_FILE" 2>/dev/null || echo "")
+        if [ -z "$SUBNET" ] && [ -n "$SUBNET_FROM_JSON" ]; then
+            SUBNET="$SUBNET_FROM_JSON"
+        fi
     else
         echo -e "${YELLOW}[WARN]${NC} jq non installé - utilisation des valeurs par défaut"
         VMID_START=200
-        GATEWAY="192.168.20.1"
-        DNS_SERVER="8.8.8.8"
-        SUBNET="192.168.20"
     fi
 else
     echo -e "${YELLOW}[WARN]${NC} Fichier $VM_CONFIG_FILE non trouvé - utilisation des valeurs par défaut"
@@ -131,6 +132,10 @@ proxmox_node = "$PROXMOX_NODE"
 template_id  = $TEMPLATE_ID
 disk_storage = "${DISK_STORAGE:-local-lvm}"
 net_bridge   = "$NET_BRIDGE"
+
+# --- Configuration Réseau (depuis env.conf) ---
+gateway    = "$GATEWAY"
+dns_server = "$DNS_SERVER"
 
 # --- Authentification VMs ---
 ssh_user       = "$SSH_USER"
@@ -205,10 +210,6 @@ fi
 # Fermer le bloc vm_definitions
 cat >> "$TFVARS_FILE" << EOF
 }
-
-# --- Réseau ---
-gateway    = "${GATEWAY:-192.168.20.1}"
-dns_server = "${DNS_SERVER:-8.8.8.8}"
 
 # --- Optimisations Cloud-init ---
 # Mode rapide: VM créée sans démarrage automatique (~30s par VM)

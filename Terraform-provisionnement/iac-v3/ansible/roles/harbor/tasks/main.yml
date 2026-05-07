@@ -183,3 +183,26 @@
   args:
     chdir: "{{ harbor_install_dir }}/harbor"
   become: true
+
+# =========================================================
+# 9. Service Systemd - Démarrage auto au boot
+# =========================================================
+- name: 9.1 Déployer le service systemd Harbor
+  template:
+    src: harbor.service.j2
+    dest: /etc/systemd/system/harbor.service
+    mode: '0644'
+  become: true
+  notify: Reload systemd
+
+- name: 9.2 Recharger systemd
+  systemd:
+    daemon_reload: true
+  become: true
+
+- name: 9.3 Activer le service Harbor au boot
+  systemd:
+    name: harbor
+    enabled: true
+    state: started
+  become: true

@@ -4,3 +4,7 @@
     cmd: "docker compose up -d"
     chdir: "{{ harbor_install_dir }}"
 
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
