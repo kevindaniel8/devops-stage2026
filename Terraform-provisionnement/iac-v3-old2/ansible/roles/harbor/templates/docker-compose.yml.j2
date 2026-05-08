@@ -1,0 +1,170 @@
+version: "3.8"
+
+services:
+  log:
+    image: goharbor/harbor-log:{{ harbor_version }}
+    container_name: harbor-log
+    restart: always
+    volumes:
+      - {{ harbor_data_dir }}/log:/var/log/docker/:z
+    ports:
+      - "1514:1514"
+      - "1514:1514/udp"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+  registry:
+    image: goharbor/registry-photon:{{ harbor_version }}
+    container_name: registry
+    restart: always
+    volumes:
+      - {{ harbor_data_dir }}/registry:/storage:z
+    environment:
+      REGISTRY_HTTP_ADDR: :5000
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+  registryctl:
+    image: goharbor/harbor-registryctl:{{ harbor_version }}
+    container_name: registryctl
+    restart: always
+    depends_on:
+      - registry
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+  db:
+    image: goharbor/harbor-db:{{ harbor_version }}
+    container_name: harbor-db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: {{ harbor_db_password }}
+      POSTGRES_DB: registry
+    volumes:
+      - {{ harbor_data_dir }}/database:/var/lib/postgresql/data:z
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+  redis:
+    image: goharbor/redis-photon:{{ harbor_version }}
+    container_name: redis
+    restart: always
+    command: ["redis-server", "--requirepass", "{{ harbor_redis_password }}"]
+    volumes:
+      - {{ harbor_data_dir }}/redis:/var/lib/redis:z
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+  core:
+    image: goharbor/harbor-core:{{ harbor_version }}
+    container_name: harbor-core
+    restart: always
+    depends_on:
+      - db
+      - redis
+      - registry
+    environment:
+      CORE_SECRET: core_secret
+      JOBSERVICE_SECRET: job_secret
+      REGISTRY_URL: http://registry:5000
+      REGISTRY_CONTROLLER_URL: http://registryctl:8080
+      DATABASE_TYPE: postgres
+      POSTGRESQL_HOST: db
+      POSTGRESQL_PORT: 5432
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: {{ harbor_db_password }}
+      POSTGRESQL_DATABASE: registry
+      REDIS_URL: redis:6379
+      REDIS_PASSWORD: {{ harbor_redis_password }}
+      EXT_ENDPOINT: https://{{ harbor_hostname }}
+      HARBOR_ADMIN_PASSWORD: {{ harbor_admin_password }}
+    volumes:
+      - {{ harbor_data_dir }}/core:/data:z
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+  portal:
+    image: goharbor/harbor-portal:{{ harbor_version }}
+    container_name: harbor-portal
+    restart: always
+    depends_on:
+      - core
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+  jobservice:
+    image: goharbor/harbor-jobservice:{{ harbor_version }}
+    container_name: harbor-jobservice
+    restart: always
+    depends_on:
+      - core
+      - redis
+    environment:
+      CORE_SECRET: core_secret
+      JOBSERVICE_SECRET: job_secret
+      REDIS_URL: redis:6379
+      REDIS_PASSWORD: {{ harbor_redis_password }}
+    volumes:
+      - {{ harbor_data_dir }}/jobservice:/var/log/jobs:z
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+  trivy:
+    image: goharbor/trivy-adapter-photon:{{ harbor_version }}
+    container_name: trivy
+    restart: always
+    depends_on:
+      - core
+    environment:
+      SCANNER_LOG_LEVEL: info
+    volumes:
+      - {{ harbor_data_dir }}/trivy:/home/scanner/.cache:z
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+  nginx:
+    image: goharbor/nginx-photon:{{ harbor_version }}
+    container_name: harbor-nginx
+    restart: always
+    depends_on:
+      - core
+      - portal
+      - registry
+    ports:
+      - "{{ harbor_http_port }}:80"
+      - "{{ harbor_https_port }}:443"
+    volumes:
+      - {{ harbor_cert_dir }}/harbor.crt:/etc/harbor/ssl/harbor.crt:ro
+      - {{ harbor_cert_dir }}/harbor.key:/etc/harbor/ssl/harbor.key:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"

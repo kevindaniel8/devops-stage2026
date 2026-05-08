@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    container_name: wikijs_db
+    restart: always
+    environment:
+      POSTGRES_DB: "{{ wikijs_db_name }}"
+      POSTGRES_USER: "{{ wikijs_db_user }}"
+      POSTGRES_PASSWORD: "{{ wikijs_db_password }}"
+    volumes:
+      - {{ wikijs_db_volume }}:/var/lib/postgresql/data
+
+  wikijs:
+    image: requarks/wiki:{{ wikijs_version }}
+    container_name: wikijs
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: "{{ wikijs_db_user }}"
+      DB_PASS: "{{ wikijs_db_password }}"
+      DB_NAME: "{{ wikijs_db_name }}"
+    ports:
+      - "{{ wikijs_port }}:3000"
+    volumes:
+      - {{ wikijs_app_volume }}:/wiki/data
+
+volumes:
+  {{ wikijs_db_volume }}:
+  {{ wikijs_app_volume }}:

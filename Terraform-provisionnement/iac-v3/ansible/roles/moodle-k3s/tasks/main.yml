@@ -1,0 +1,52 @@
+---
+- name: S'assurer que le namespace existe
+  kubernetes.core.k8s:
+    state: present
+    kind: Namespace
+    name: "{{ moodle_namespace }}"
+
+- name: Créer le ConfigMap Moodle
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'configmap.yml.j2') }}"
+
+- name: Créer le PVC Moodle
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'moodle-pvc.yml.j2') }}"
+
+- name: Déployer Moodle
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'moodle-deployment.yml.j2') }}"
+
+- name: Créer le service Moodle
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'moodle-service.yml.j2') }}"
+
+# Accès direct par IP (NodePort) - pour développement
+- name: Exposer Moodle en NodePort pour accès direct par IP
+  when: moodle_enable_ip_access | bool
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: moodle
+        namespace: "{{ moodle_namespace }}"
+      spec:
+        type: NodePort
+        selector:
+          app: moodle
+        ports:
+          - port: 80
+            targetPort: 80
+            nodePort: "{{ moodle_nodeport }}"
+
+- name: Créer l'ingress Moodle
+  when: moodle_enable_ingress
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'ingress.yml.j2') }}"

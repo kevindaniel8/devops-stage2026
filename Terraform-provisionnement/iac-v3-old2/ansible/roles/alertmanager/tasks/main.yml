@@ -1,0 +1,25 @@
+---
+- name: Create Alertmanager directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /opt/alertmanager
+    - /opt/alertmanager/config
+
+- name: Deploy Alertmanager config
+  template:
+    src: alertmanager.yml.j2
+    dest: /opt/alertmanager/config/alertmanager.yml
+
+- name: Run Alertmanager container
+  community.docker.docker_container:
+    name: alertmanager
+    image: prom/alertmanager:latest
+    restart_policy: always
+    networks:
+      - name: monitoring
+    ports:
+      - "9093:9093"
+    volumes:
+      - /opt/alertmanager/config:/etc/alertmanager

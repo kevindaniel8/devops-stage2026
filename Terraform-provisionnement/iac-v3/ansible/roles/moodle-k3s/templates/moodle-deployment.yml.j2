@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: moodle
+  namespace: {{ moodle_namespace }}
+spec:
+  replicas: {{ moodle_replicas }}
+  selector:
+    matchLabels:
+      app: moodle
+  template:
+    metadata:
+      labels:
+        app: moodle
+    spec:
+      containers:
+        - name: moodle
+          image: "{{ moodle_image }}"
+          env:
+            - name: MOODLE_DATABASE_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  name: moodle-config
+                  key: MOODLE_DATABASE_TYPE
+
+            - name: MOODLE_DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: moodle-config
+                  key: MOODLE_DATABASE_HOST
+
+            - name: MOODLE_DATABASE_PORT_NUMBER
+              valueFrom:
+                configMapKeyRef:
+                  name: moodle-config
+                  key: MOODLE_DATABASE_PORT_NUMBER
+
+            - name: MOODLE_DATABASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: moodle-config
+                  key: MOODLE_DATABASE_NAME
+
+            - name: MOODLE_DATABASE_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: moodle-config
+                  key: MOODLE_DATABASE_USER
+
+            - name: MOODLE_DATABASE_PASSWORD
+              value: "{{ moodle_db_password }}"
+
+          ports:
+            - containerPort: 80
+
+          volumeMounts:
+            - name: moodle-data
+              mountPath: /var/www/moodledata
+
+      volumes:
+        - name: moodle-data
+          persistentVolumeClaim:
+            claimName: moodle-data
