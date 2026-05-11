@@ -23,4 +23,5 @@ moodle_enable_ingress: true
 
 # Accès direct par IP (NodePort) - pour développement
 moodle_enable_ip_access: true
-moodle_nodeport: 30081  # port différent de ArgoCD (30080)
+moodle_node_ip: "192.168.20.220"  # IP du k3s-manager
+moodle_node_port: 30081  # port différent de ArgoCD (30080)

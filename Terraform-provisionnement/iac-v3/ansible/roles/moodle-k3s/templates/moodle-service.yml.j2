@@ -4,9 +4,16 @@ metadata:
   name: moodle
   namespace: {{ moodle_namespace }}
 spec:
+{% if moodle_enable_ip_access | bool %}
+  type: NodePort
+{% else %}
   type: {{ moodle_service_type }}
+{% endif %}
   selector:
     app: moodle
   ports:
     - port: {{ moodle_service_port }}
-      targetPort: 8080
+      targetPort: 80
+{% if moodle_enable_ip_access | bool %}
+      nodePort: {{ moodle_node_port }}
+{% endif %}

@@ -1,0 +1,11 @@
+---
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+  become: true
+
+- name: Restart k3s
+  systemd:
+    name: k3s
+    state: restarted
+  become: true

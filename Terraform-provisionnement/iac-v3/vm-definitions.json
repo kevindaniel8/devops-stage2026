@@ -5,12 +5,21 @@
   "vmid_start": 200,
   "vms": [
     {
+      "name": "dns-samba-ad",
+      "ip_suffix": 2,
+      "cores": 1,
+      "socket": 2,
+      "memory": 2048,
+      "disk": 20,
+      "description": "Samba Active Directory + DNS interne / bind9 - Authentification domaine gestionnaire annuaire"
+    },
+    {
       "name": "db-postgres-master",
       "ip_suffix": 20,
       "cores": 1,
       "socket": 2,
       "memory": 2048,
-      "disk": 30,
+      "disk": 25,
       "description": "PostgreSQL Master - Base de données principale"
     },
     {
@@ -19,7 +28,7 @@
       "cores": 1,
       "socket": 2,
       "memory": 2048,
-      "disk": 30,
+      "disk": 25,
       "description": "PostgreSQL replication - Réplication Master + Backup"
     },
     {
@@ -28,7 +37,7 @@
       "cores": 1,
       "socket": 1,
       "memory": 2048,
-      "disk": 30,
+      "disk": 25,
       "description": "Harbor - Registry Docker privé avec scan de vulnérabilités  (optionnel)"
     },
     {
@@ -46,7 +55,7 @@
       "cores": 1,
       "socket": 1,
       "memory": 2048,
-      "disk": 30,
+      "disk": 25,
       "description": "Kubernetes Worker Node #1 - Workloads conteneurisés"
     },
     {
@@ -55,7 +64,7 @@
       "cores": 1,
       "socket": 1,
       "memory": 2048,
-      "disk": 30,
+      "disk": 25,
       "description": "Kubernetes Worker Node #2 - Workloads conteneurisés"
     }
   ]

@@ -44,7 +44,8 @@ SSH_CTRL_DIR="$HOME/.ssh/ctrl"
 mkdir -p "$SSH_CTRL_DIR"
 SSH_CTRL_SOCKET="$SSH_CTRL_DIR/proxmox-ctrl-%r@%h:%p"
 
-SSH_OPTS="-o ControlMaster=auto -o ControlPersist=10m -o ControlPath=$SSH_CTRL_SOCKET"
+#SSH_OPTS="-o ControlMaster=auto -o ControlPersist=10m -o ControlPath=$SSH_CTRL_SOCKET"
+SSH_OPTS="-o ControlMaster=auto -o ControlPersist=10m -o ControlPath=$SSH_CTRL_SOCKET -o IdentitiesOnly=yes"
 
 echo "🔌 Activation du multiplexing SSH..."
 
@@ -224,6 +225,14 @@ if [ -f "$SCRIPT6" ]; then
         if [ ! -x "$SCRIPT6" ]; then
             chmod +x "$SCRIPT6"
         fi
+        #sleep 120
+        echo "Attente de 2 minutes avant la suite maj vm ..."
+            for i in {120..1}; do
+                echo -ne "⏳ Temps restant : $i secondes \r"
+                sleep 1
+            done
+            echo -e "\n✅ Attente terminée !"
+            
 
         ./6-deploiement-ansible.sh
     else

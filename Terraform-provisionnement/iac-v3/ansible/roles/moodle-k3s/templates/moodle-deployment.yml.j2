@@ -16,6 +16,7 @@ spec:
       containers:
         - name: moodle
           image: "{{ moodle_image }}"
+          imagePullPolicy: IfNotPresent
           env:
             - name: MOODLE_DATABASE_TYPE
               valueFrom:
@@ -49,6 +50,9 @@ spec:
 
             - name: MOODLE_DATABASE_PASSWORD
               value: "{{ moodle_db_password }}"
+
+            - name: MOODLE_WWWROOT
+              value: "http://{{ moodle_node_ip }}:{{ moodle_node_port }}"
 
           ports:
             - containerPort: 80

@@ -70,23 +70,22 @@ create_user_and_role() {
 # 3. CREATE TOKEN
 ############################################
 
+# modif 10.06.2026
 create_token() {
     log "3.1" "Création du token API"
-
     RAW_OUTPUT=$(pveum user token add "${USER_ID}@${REALM}" "$TOKEN_ID" --privsep=0 2>/dev/null || true)
-
     TOKEN_SECRET=$(echo "$RAW_OUTPUT" | grep -oE '[a-f0-9-]{36}' | head -1)
-
     if [[ -z "$TOKEN_SECRET" ]]; then
         warn "3.2" "Impossible d'extraire automatiquement le secret du token"
         TOKEN_SECRET="<SECRET_NON_RECUPERE>"
     fi
-
     log "3.3" "Token généré"
-
     # IMPORTANT : renvoyer uniquement le token
     echo -n "$TOKEN_SECRET"
 }
+
+
+
 
 
 ############################################
@@ -167,6 +166,7 @@ main() {
     create_user_and_role
     TOKEN_SECRET=$(create_token)
     install_ssh_key
+    echo "TOKEN_SECRET=$TOKEN_SECRET" >&2 # ajout test 10.05.2026
     generate_terraform_config "$TOKEN_SECRET"
 
     log "6.1" "Configuration terminée."

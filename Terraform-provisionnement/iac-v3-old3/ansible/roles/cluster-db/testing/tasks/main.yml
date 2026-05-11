@@ -1,0 +1,80 @@
+---
+# Tests du cluster PostgreSQL repmgr
+- name: Création de la table de test
+  postgresql_query:
+    db: postgres
+    query: |
+      CREATE TABLE IF NOT EXISTS ansible_replication_test (
+          id SERIAL PRIMARY KEY,
+          test_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          server_name VARCHAR(50) DEFAULT current_setting('application_name'),
+          random_data UUID DEFAULT gen_random_uuid(),
+          test_phase VARCHAR(50)
+      );
+  become_user: postgres
+  run_once: true
+
+- name: Insertion de données de test sur le master
+  postgresql_query:
+    db: postgres
+    query: |
+      INSERT INTO ansible_replication_test (server_name, test_phase) 
+      VALUES ('{{ inventory_hostname }}', 'initial_test');
+  become_user: postgres
+  when: is_primary | default(false)
+  run_once: true
+
+- name: Attente de la réplication
+  pause:
+    seconds: 10
+  run_once: true
+
+- name: Vérification de la réplication sur les replicas
+  postgresql_query:
+    db: postgres
+    query: |
+      SELECT COUNT(*) as replicated_records 
+      FROM ansible_replication_test 
+      WHERE test_phase = 'initial_test';
+  become_user: postgres
+  register: replication_check
+  when: not is_primary | default(false)
+
+- name: Affichage des résultats de réplication
+  debug:
+    msg: |
+      Test de réplication:
+      - Serveur: {{ inventory_hostname }}
+      - Records répliqués: {{ replication_check.query_result[0].replicated_records }}
+      - Statut: {{ 'OK' if replication_check.query_result[0].replicated_records|int > 0 else 'ÉCHEC' }}
+  when: replication_check is defined
+
+- name: Test de performance
+  postgresql_query:
+    db: postgres
+    query: |
+      INSERT INTO ansible_replication_test (server_name, test_phase, random_data)
+      SELECT '{{ inventory_hostname }}', 'performance_test', gen_random_uuid();
+  become_user: postgres
+  when: is_primary | default(false)
+  run_once: true
+
+- name: Vérification du lag de réplication
+  postgresql_query:
+    db: postgres
+    query: |
+      SELECT 
+          pg_last_wal_receive_lsn() - pg_last_wal_replay_lsn() AS lag_bytes,
+          EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - pg_last_xact_replay_timestamp())) AS lag_seconds;
+  become_user: postgres
+  register: lag_check
+  when: not is_primary | default(false)
+
+- name: Affichage du lag
+  debug:
+    msg: |
+      Lag de réplication sur {{ inventory_hostname }}:
+      - Lag bytes: {{ lag_check.query_result[0].lag_bytes }}
+      - Lag seconds: {{ lag_check.query_result[0].lag_seconds }}
+      - Statut: {{ 'OK' if lag_check.query_result[0].lag_seconds|int < 5 else 'HIGH' }}
+  when: lag_check is defined

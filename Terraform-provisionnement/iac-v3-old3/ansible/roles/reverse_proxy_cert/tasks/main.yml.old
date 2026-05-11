@@ -1,0 +1,39 @@
+---
+- name: Créer le dossier SSL
+  file:
+    path: /etc/ssl/kevin/
+    state: directory
+    mode: '0755'
+  tags: [certificat]
+
+- name: Déployer le certificat serveur
+  copy:
+    src: "{{ cert_store_dir }}/server.crt"
+    dest: /etc/ssl/kevin/server.crt
+    mode: '0644'
+  tags: [certificat]
+  notify: reload nginx
+
+- name: Déployer la clé privée serveur
+  copy:
+    src: "{{ cert_store_dir }}/server.key"
+    dest: /etc/ssl/kevin/server.key
+    mode: '0400'
+  tags: [certificat]
+  notify: reload nginx
+
+- name: Déployer le fullchain
+  copy:
+    src: "{{ cert_store_dir }}/server-fullchain.crt"
+    dest: /etc/ssl/kevin/server-fullchain.crt
+    mode: '0644'
+  tags: [certificat]
+  notify: reload nginx
+
+- name: Déployer la CA
+  copy:
+    src: "{{ cert_store_dir }}/ca.crt"
+    dest: /etc/ssl/kevin/ca.crt
+    mode: '0644'
+  tags: [certificat]
+

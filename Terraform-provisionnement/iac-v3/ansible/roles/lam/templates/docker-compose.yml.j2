@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  lam:
+    image: ldapaccountmanager/lam:stable
+    container_name: lam
+    restart: unless-stopped
+    ports:
+      - "{{ lam_port }}:80"
+    environment:
+      - LAM_LANG={{ lam_language }}
+      - LAM_PASSWORD={{ lam_admin_password }}
+    volumes:
+      - lam_data:/var/lib/ldap-account-manager
+      - ./lam.conf:/etc/ldap-account-manager/lam.conf
+    networks:
+      - lam_network
+
+volumes:
+  lam_data:
+    driver: local
+
+networks:
+  lam_network:
+    driver: bridge

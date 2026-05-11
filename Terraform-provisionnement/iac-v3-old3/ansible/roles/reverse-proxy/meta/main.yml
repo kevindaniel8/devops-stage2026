@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: kevin DANIEL & Copilot AI
+  description: Reverse proxy Nginx
+  license: MIT
+  min_ansible_version: 2.9
+dependencies: []
