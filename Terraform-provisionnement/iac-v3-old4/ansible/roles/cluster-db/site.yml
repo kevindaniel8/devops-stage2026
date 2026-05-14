@@ -1,0 +1,36 @@
+---
+# Playbook principal pour le cluster PostgreSQL repmgr
+- name: Infrastructure PostgreSQL repmgr
+  hosts: postgresql_cluster
+  become: yes
+  vars_files:
+    - group_vars/all.yml
+  roles:
+    - postgresql
+    - repmgr
+  post_tasks:
+    - name: Affichage des informations de connexion
+      debug:
+        msg: |
+          ==========================================
+          Cluster PostgreSQL repmgr déployé avec succès
+          ==========================================
+          
+          📱 Connexions PostgreSQL:
+          - Master: {{ master_ip }}:5432 ({{ postgres_user }}/{{ postgres_password }})
+          - Replica: {{ replica_ip }}:5432 ({{ postgres_user }}/{{ postgres_password }})
+          - New Server: {{ new_server_ip }}:5432 ({{ postgres_user }}/{{ postgres_password }})
+          
+          🔧 Commandes utiles:
+          - Test de réplication: ansible-playbook -i inventory/production.ini playbooks/test_replication.yml
+          - Bascule: ansible-playbook -i inventory/production.ini playbooks/failover.yml
+          
+          📊 Monitoring:
+          - ansible postgresql_cluster -i inventory/production.ini -m setup -a 'cmd=pg_isready'
+          - repmgr cluster show
+          
+          🎯 Prochaines étapes:
+          - 1. Lancer les tests: ./scripts/test.sh
+          - 2. Vérifier la réplication
+          - 3. Configurer le monitoring
+          - 4. Mettre en production

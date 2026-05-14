@@ -1,0 +1,153 @@
+---
+# =============================================================================
+# PLAYBOOK: Vérification du cluster PostgreSQL avec repmgr
+# =============================================================================
+# Ce playbook vérifie l'état du cluster sans rien modifier
+# Usage: ansible-playbook -i inventories/dev/hosts.yml playbooks/check-cluster-postgres.yml
+# =============================================================================
+
+- name: "CHECK CLUSTER | Vérification de l'état du cluster PostgreSQL"
+  hosts: database
+  become: yes
+  gather_facts: no
+  serial: 1
+
+  tasks:
+    # -------------------------------------------------------------------------
+    # 1. CONNEXION SSH
+    # -------------------------------------------------------------------------
+    - name: "CHECK | Test de connexion SSH"
+      ping:
+      register: ssh_test
+
+    - name: "CHECK | Résultat connexion SSH"
+      debug:
+        msg: "✅ Connexion SSH OK sur {{ inventory_hostname }} ({{ ansible_host }})"
+
+    # -------------------------------------------------------------------------
+    # 2. STATUT POSTGRESQL
+    # -------------------------------------------------------------------------
+    - name: "CHECK | Vérification du service PostgreSQL"
+      systemd:
+        name: "postgresql@{{ postgres_version }}-main"
+        state: started
+      check_mode: yes
+      register: pg_service
+
+    - name: "CHECK | Statut PostgreSQL"
+      command: systemctl status postgresql@{{ postgres_version }}-main --no-pager
+      changed_when: false
+      failed_when: false
+      register: pg_status
+
+    - name: "CHECK | Affichage statut PostgreSQL"
+      debug:
+        msg: |
+          {% if pg_status.rc == 0 %}
+          ✅ PostgreSQL est actif sur {{ inventory_hostname }}
+          {% else %}
+          ❌ PostgreSQL n'est pas actif sur {{ inventory_hostname }}
+          {% endif %}
+
+    # -------------------------------------------------------------------------
+    # 3. CONNEXION POSTGRESQL
+    # -------------------------------------------------------------------------
+    - name: "CHECK | Test de connexion à PostgreSQL"
+      become_user: postgres
+      command: "{{ postgres_bin_dir }}/psql -c 'SELECT version();'"
+      changed_when: false
+      failed_when: false
+      register: pg_conn
+
+    - name: "CHECK | Version PostgreSQL"
+      debug:
+        msg: "📊 {{ pg_conn.stdout | default('Non disponible') }}"
+      when: pg_conn.rc == 0
+
+    # -------------------------------------------------------------------------
+    # 4. STATUT REPMGR (sur tous les nœuds)
+    # -------------------------------------------------------------------------
+    - name: "CHECK | Vérification de repmgr"
+      become_user: postgres
+      shell: |
+        export PGPASSWORD={{ repmgr_password }}
+        {{ postgres_bin_dir }}/repmgr -f {{ repmgr_config_file }} node check
+      changed_when: false
+      failed_when: false
+      register: repmgr_check
+
+    - name: "CHECK | Résultat repmgr"
+      debug:
+        msg: |
+          {% if repmgr_check.rc == 0 %}
+          ✅ repmgr OK sur {{ inventory_hostname }}
+          {{ repmgr_check.stdout }}
+          {% else %}
+          ⚠️ repmgr a des problèmes sur {{ inventory_hostname }}
+          {{ repmgr_check.stderr | default(repmgr_check.stdout) }}
+          {% endif %}
+
+    # -------------------------------------------------------------------------
+    # 5. STATUT DU CLUSTER (depuis le master)
+    # -------------------------------------------------------------------------
+    - name: "CHECK | Statut complet du cluster (depuis master)"
+      become_user: postgres
+      shell: |
+        export PGPASSWORD={{ repmgr_password }}
+        {{ postgres_bin_dir }}/repmgr -f {{ repmgr_config_file }} cluster show
+      changed_when: false
+      failed_when: false
+      register: cluster_show
+      when: inventory_hostname == master_node
+
+    - name: "CHECK | Affichage cluster"
+      debug:
+        msg: |
+          📋 STATUT DU CLUSTER:
+          {{ cluster_show.stdout | default('Non disponible') }}
+      when: inventory_hostname == master_node and cluster_show.rc == 0
+
+    # -------------------------------------------------------------------------
+    # 6. RÉPLICATION (depuis le master)
+    # -------------------------------------------------------------------------
+    - name: "CHECK | Vérification de la réplication"
+      become_user: postgres
+      command: "{{ postgres_bin_dir }}/psql -c 'SELECT client_addr, state, sent_lsn, write_lsn FROM pg_stat_replication;'"
+      changed_when: false
+      failed_when: false
+      register: replication
+      when: inventory_hostname == master_node
+
+    - name: "CHECK | Statut réplication"
+      debug:
+        msg: |
+          {% if replication.rc == 0 and replication.stdout | length > 0 %}
+          🔄 RÉPLICATION ACTIVE:
+          {{ replication.stdout }}
+          {% else %}
+          ⚠️ Pas de réplication détectée (le replica n'est peut-être pas connecté)
+          {% endif %}
+      when: inventory_hostname == master_node
+
+# -----------------------------------------------------------------------------
+# RÉCAPITULATIF
+# -----------------------------------------------------------------------------
+- name: "CHECK | Récapitulatif"
+  hosts: database[0]
+  become: no
+  gather_facts: no
+
+  tasks:
+    - name: "CHECK | Message final"
+      debug:
+        msg: |
+          ============================================
+          VÉRIFICATION DU CLUSTER TERMINÉE
+          ============================================
+          
+          Pour voir les détails complets, relancer avec -v:
+            ansible-playbook -i inventories/dev/hosts.yml playbooks/check-cluster-postgres.yml -v
+          
+          Pour déployer le cluster:
+            ansible-playbook -i inventories/dev/hosts.yml playbooks/deploy-database-cluster.yml
+          ============================================

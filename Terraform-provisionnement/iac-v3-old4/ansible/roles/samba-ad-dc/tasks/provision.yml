@@ -1,0 +1,30 @@
+---
+- name: Stop samba-ad-dc before provisioning
+  systemd:
+    name: samba-ad-dc
+    state: stopped
+  when: not samba_provisioned.stat.exists
+
+- name: Provision Samba AD domain (BIND9_DLZ)
+  command: >
+    samba-tool domain provision
+    --domain={{ samba_domain }}
+    --realm={{ samba_realm }}
+    --adminpass='{{ samba_admin_password }}'
+    --server-role=dc
+    --use-rfc2307
+    --dns-backend=BIND9_DLZ
+  args:
+    creates: /var/lib/samba/private/sam.ldb
+  when: not samba_provisioned.stat.exists
+  register: samba_provision_cmd
+  notify:
+    - restart samba
+    - restart bind9
+
+- name: Copy Kerberos config from Samba
+  copy:
+    src: /var/lib/samba/private/krb5.conf
+    dest: /etc/krb5.conf
+    remote_src: yes
+  when: not samba_provisioned.stat.exists

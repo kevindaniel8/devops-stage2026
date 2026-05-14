@@ -22,9 +22,31 @@
     - restart samba
     - restart bind9
 
+- name: Force Samba to bind only to the correct interface
+  blockinfile:
+    path: /etc/samba/smb.conf
+    marker: "# {mark} ANSIBLE MANAGED INTERFACES"
+    insertafter: '^\[global\]'
+    block: |
+      interfaces = lo {{ samba_interface }}
+      bind interfaces only = yes
+  when: not samba_provisioned.stat.exists
+  notify: restart samba
+
 - name: Copy Kerberos config from Samba
   copy:
     src: /var/lib/samba/private/krb5.conf
     dest: /etc/krb5.conf
     remote_src: yes
   when: not samba_provisioned.stat.exists
+
+#- name: Clean old docker0 DNS A records (172.17.0.1)
+#  command: >
+#    samba-tool dns delete 127.0.0.1 {{ samba_domain | lower }}.org
+#    {{ item.name }} A 172.17.0.1
+#    -U administrator%{{ samba_admin_password }}
+#  loop:
+#    - { name: "dns-samba-ad" }
+#    - { name: "@" }
+#  ignore_errors: yes
+#  when: not samba_provisioned.stat.exists

@@ -1,0 +1,90 @@
+---
+# ============================================================================
+# META - PROJET DE STAGE
+# ============================================================================
+# Éntreprise             : e-petitpas.pro
+# Stagiare               : DANIEL Kevin
+# Objectif personnel     : Création d'une startup GreenContracts (objectif futur)
+# Sujet                  : Conception et mise en place d'une infrastructure
+#                          DevOps automatisée avec Terraform, Ansible et Kubernetes
+#                          ...
+# ============================================================================
+#
+# CONTEXTUE DU PROJET :
+# --------------------
+# Ce projet de stage vise à concevoir, étudier et proposer une architecture
+# d'infrastructure moderne pour e-petitpas.pro, entreprise souhaitant :
+#
+#   - Automatiser le déploiement d'infrastructure (IaC) dans les pays les **pays en développement**,
+#     engagés dans une dynamique de croissance économique et cherchant à moderniser leurs infrastructures éducatives.
+#   - Mettre en place un cluster Kubernetes résilient
+#   - Intégrer une registry Docker privée (Harbor)
+#   - Assurer la haute disponibilité des bases de données PostgreSQL
+#   - Implémenter une stratégie de backup et de monitoring
+#
+# RÉALISATIONS :
+# -------------
+#   ✓ Infrastructure as Code avec Terraform sur Proxmox
+#   ✓ Configuration management idempotente avec Ansible
+#   ✓ Cluster PostgreSQL HA avec repmgr (streaming replication)
+#   ✓ Registry Docker privée Harbor avec scan de vulnérabilités Trivy
+#   ✓ Cluster Kubernetes K3s préparé pour déploiement
+#   ✓ Scripts d'automatisation et documentation complète
+#   ✓ Documentation complète et détaillée
+#   ✓ Tests et validation de l'infrastructure
+#   ✓ Bonnes pratiques DevOps appliquées
+#   ✓ Déploiement CI/CD GitHub Actions
+#
+# PROPOSITION D'ARCHITECTURE :
+# ---------------------------
+#                          ┌─────────────────┐
+#                          │   Utilisateurs  │
+#                          └────────┬────────┘
+#                                   │
+#                          ┌────────▼────────┐
+#                          │  Nginx Proxy    │
+#                          │  (HTTPS/WAF)    │
+#                          └────────┬────────┘
+#                                   │
+#              ┌────────────────────┼────────────────────┐
+#              │                    │                    │
+#     ┌────────▼────────┐  ┌────────▼────────┐  ┌───────▼────────┐
+#     │   K3s Cluster   │  │   Harbor        │  │   PostgreSQL   │
+#     │   (Apps)        │  │   (Registry)    │  │   Cluster HA   │
+#     │                 │  │                 │  │                │
+#     │  ┌───────────┐  │  │  ┌───────────┐  │  │  ┌──────┐     │
+#     │  │  Pods     │  │  │  │ Trivy     │  │  │  │Master│◄────┼──┐
+#     │  │  Services │  │  │  │ Scanner   │  │  │  └──────┘     │  │
+#     │  └───────────┘  │  │  └───────────┘  │  │               │  │
+#     └─────────────────┘  └─────────────────┘  │  ┌──────┐     │  │
+#                                               │  │Replica│◄────┼──┘
+#                                               │  └──────┘     │
+#                                               │               │
+#                                               └───────────────┘
+#
+# NOTES :
+# -------
+# Ce rôle Ansible installe et configure Harbor Registry avec :
+#   - Registry Docker privée sécurisée
+#   - Scan de vulnérabilités avec Trivy
+#   - Gestion des utilisateurs et projets
+#   - Réplication d'images entre registres
+#   - Stockage des artefacts avec rétention
+#
+# Il fait partie de l'architecture globale iac-v3.
+#
+# Contact : kevin.daniel@greencontracts.org (futur)
+# Date    : Mai 2026
+# Auteur  : Kevin DANIEL
+# ============================================================================
+
+galaxy_info:
+  author: Kevin DANIEL
+  description: "Installation de Harbor Registry avec Trivy - Projet de stage e-petitpas.pro / GreenContracts"
+  license: MIT
+  min_ansible_version: 2.12
+  platforms:
+    - name: Ubuntu
+      versions:
+        - noble
+dependencies: []

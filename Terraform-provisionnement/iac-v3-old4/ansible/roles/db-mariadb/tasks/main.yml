@@ -1,0 +1,21 @@
+---
+- name: Créer le volume Docker pour MariaDB
+  community.docker.docker_volume:
+    name: mariadb_data
+
+- name: Déployer le conteneur MariaDB
+  community.docker.docker_container:
+    name: mariadb
+    image: "mariadb:{{ mariadb_version | default('12') }}"
+    state: started
+    restart_policy: always
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ mariadb_root_password }}"
+      MYSQL_DATABASE: "{{ mariadb_database | default('appdb') }}"
+      MYSQL_USER: "{{ mariadb_user | default('appuser') }}"
+      MYSQL_PASSWORD: "{{ mariadb_password | default('password') }}"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+

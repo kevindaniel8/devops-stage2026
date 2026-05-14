@@ -1,0 +1,47 @@
+hostname: {{ hostname | regex_replace('^https?://', '') }}
+external_url: "https://{{ hostname | regex_replace('^https?://', '') }}"
+
+http:
+  port: 80
+
+https:
+  enabled: true
+  certificate: "/opt/harbor/certs/harbor.crt"
+  private_key: "/opt/harbor/certs/harbor.key"
+
+harbor_admin_password: {{ harbor_admin_password }}
+
+data_volume: {{ harbor_data_dir }}
+
+database:
+  password: "changeit"
+
+trivy:
+  enabled: {{ enable_trivy | lower }}
+
+chartmuseum:
+  enabled: {{ enable_chartmuseum | lower }}
+
+notary:
+  enabled: {{ enable_notary | lower }}
+
+jobservice:
+  max_job_workers: 10
+  job_loggers:
+    - stdout
+  logger_sweeper_duration: 1
+
+notification:
+  webhook_job_max_retry: 3
+  webhook_job_http_client_timeout: 3
+
+cache:
+  enabled: false
+
+log:
+  level: info
+  local:
+    rotate_count: 50
+    rotate_size: 200M
+    location: /var/log/harbor
+

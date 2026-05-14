@@ -1,0 +1,27 @@
+---
+moodle_namespace: moodle
+
+moodle_image: "192.168.20.205/library/moodle:latest"
+moodle_replicas: 1
+
+moodle_service_type: ClusterIP
+moodle_service_port: 80
+
+moodle_pvc_size: "10Gi"
+moodle_storage_class: ""   # vide = storageClass par défaut de k3s
+
+moodle_db_type: "pgsql"
+moodle_db_host: "192.168.20.20"  # IP postgres-master (pas k3s-manager!)
+moodle_db_port: "5432"
+moodle_db_name: "moodle"
+moodle_db_user: "moodle"
+moodle_db_password: "motdepasse"
+
+
+moodle_hostname: "moodle.greencontracts.org"   # pour l’ingress à remplacer par e-petitpas.pro sur le reseaux wan
+moodle_enable_ingress: true
+
+# Accès direct par IP (NodePort) - pour développement
+moodle_enable_ip_access: true
+moodle_node_ip: "192.168.20.220"  # IP du k3s-manager
+moodle_node_port: 30081  # port différent de ArgoCD (30080)
