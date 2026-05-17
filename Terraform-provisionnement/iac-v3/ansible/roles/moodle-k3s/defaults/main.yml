@@ -4,24 +4,54 @@ moodle_namespace: moodle
 moodle_image: "192.168.20.205/library/moodle:latest"
 moodle_replicas: 1
 
+# Service
 moodle_service_type: ClusterIP
 moodle_service_port: 80
 
+# Storage
 moodle_pvc_size: "10Gi"
 moodle_storage_class: ""   # vide = storageClass par défaut de k3s
 
+# Base de données PostgreSQL
 moodle_db_type: "pgsql"
-moodle_db_host: "192.168.20.20"  # IP postgres-master (pas k3s-manager!)
+moodle_db_host: "192.168.20.20"
 moodle_db_port: "5432"
 moodle_db_name: "moodle"
 moodle_db_user: "moodle"
 moodle_db_password: "motdepasse"
 
-
-moodle_hostname: "moodle.greencontracts.org"   # pour l’ingress à remplacer par e-petitpas.pro sur le reseaux wan
-moodle_enable_ingress: true
-
-# Accès direct par IP (NodePort) - pour développement
+# Accès direct par IP (NodePort) - pour dev
 moodle_enable_ip_access: true
-moodle_node_ip: "192.168.20.220"  # IP du k3s-manager
-moodle_node_port: 30081  # port différent de ArgoCD (30080)
+moodle_node_ip: "192.168.20.220"
+moodle_node_port: 30081
+
+# Admin Moodle (entrypoint.sh)
+moodle_admin_user: "admin"
+moodle_admin_password: "Admin@123"
+moodle_admin_email: "admin@example.com"
+moodle_site_name: "Moodle 5.2"
+
+moodle_image_pull_policy: Always # avant #imagePullPolicy: IfNotPresent
+
+# Ingress / hostname
+#moodle_hostname: "moodle.greencontracts.org" # mode prod a remettre plus tard
+moodle_hostname: "192.168.20.220:30081" # mode dev moodle_wwwroot: "http://192.168.20.220:30081"
+#moodle_enable_ingress: true # mode prod a remettre plus tard
+moodle_enable_ingress: false # mode dev
+
+
+
+# WWWROOT logique hybride :
+# - par défaut : http://hostname (Ingress HTTP)
+# - pour dev IP : override à "http://<ip>:<port>"
+# - pour HTTPS plus tard : override à "https://<hostname>"
+moodle_wwwroot: "http://{{ moodle_hostname }}"
+
+# Ressources (à ajuster)
+moodle_resources:
+  requests:
+    cpu: "500m"
+    memory: "1Gi"
+  limits:
+    cpu: "1"
+    memory: "2Gi"

@@ -1,0 +1,31 @@
+---
+- hosts: reverse_proxy
+  become: true
+  vars:
+    cert_store_dir: "{{ playbook_dir }}/../files/certificat_temp"
+  roles:
+    - ca
+    - reverse_proxy_cert
+
+  tasks:
+    - name: Vérifier le certificat servi par Nginx
+      shell: |
+        openssl s_client -connect reverse-proxy.kevin.lan:443 \
+          -servername reverse-proxy.kevin.lan \
+          -showcerts < /dev/null
+      register: sclient
+      changed_when: false
+
+    - name: Vérifier que le certificat présenté contient reverse-proxy.kevin.lan
+      assert:
+        that:
+          - "'subject=CN = reverse-proxy.kevin.lan' in sclient.stdout"
+        fail_msg: "Le reverse-proxy ne présente pas le bon certificat"
+
+- hosts: cert_clients
+  become: true
+  vars:
+    cert_store_dir: "{{ playbook_dir }}/../files/certificat_temp"
+  roles:
+    - cert_clients
+

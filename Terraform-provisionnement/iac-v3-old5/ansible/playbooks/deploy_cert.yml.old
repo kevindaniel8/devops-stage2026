@@ -1,0 +1,17 @@
+---
+- hosts: reverse_proxy
+  become: true
+  vars:
+    cert_store_dir: "{{ playbook_dir }}/../files/certificat_temp"
+  roles:
+    - ca
+    - collect_pki
+    - reverse_proxy_cert
+
+- hosts: cert_clients
+  become: true
+  vars:
+    cert_store_dir: "{{ playbook_dir }}/../files/certificat_temp"
+  roles:
+    - cert_clients
+

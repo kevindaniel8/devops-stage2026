@@ -5,6 +5,11 @@
     kind: Namespace
     name: "{{ moodle_namespace }}"
 
+- name: Créer le Secret DB Moodle
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'secret-db.yml.j2') }}"
+
 - name: Créer le ConfigMap Moodle
   kubernetes.core.k8s:
     state: present
@@ -20,13 +25,13 @@
     state: present
     definition: "{{ lookup('template', 'moodle-deployment.yml.j2') }}"
 
-- name: Créer le service Moodle (ClusterIP ou NodePort)
+- name: Créer le service Moodle
   kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('template', 'moodle-service.yml.j2') }}"
 
 - name: Créer l'ingress Moodle
-  when: moodle_enable_ingress
+  when: moodle_enable_ingress | bool
   kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('template', 'ingress.yml.j2') }}"

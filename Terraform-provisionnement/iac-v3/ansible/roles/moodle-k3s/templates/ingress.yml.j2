@@ -4,7 +4,8 @@ metadata:
   name: moodle
   namespace: {{ moodle_namespace }}
   annotations:
-    kubernetes.io/ingress.class: "traefik"   # k3s utilise traefik par défaut
+    kubernetes.io/ingress.class: "traefik"
+    traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   rules:
     - host: {{ moodle_hostname }}

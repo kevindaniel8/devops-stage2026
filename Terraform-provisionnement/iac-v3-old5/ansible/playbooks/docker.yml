@@ -1,0 +1,6 @@
+---
+- name: Déploiement Docker
+  hosts: harbor #gitlab,wikijs
+  become: yes
+  roles:
+    - docker

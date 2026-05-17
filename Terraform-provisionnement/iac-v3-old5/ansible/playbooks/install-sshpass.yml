@@ -1,0 +1,38 @@
+---
+# =============================================================================
+# PLAYBOOK: Installation de sshpass
+# =============================================================================
+# Ce playbook installe sshpass sur la machine de contrôle Ansible
+# Nécessaire pour l'authentification par mot de passe
+# =============================================================================
+
+- name: "SSHPASS | Installation sur la machine de contrôle"
+  hosts: localhost
+  connection: local
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: "SSHPASS | Mise à jour du cache APT"
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: "SSHPASS | Installation du package"
+      apt:
+        name: sshpass
+        state: present
+
+    - name: "SSHPASS | Vérification"
+      command: sshpass -V
+      register: version
+      changed_when: false
+
+    - name: "SSHPASS | Confirmation"
+      debug:
+        msg: |
+          ✅ sshpass installé avec succès!
+          Version: {{ version.stdout_lines[0] | default('inconnue') }}
+          
+          Vous pouvez maintenant utiliser Ansible avec 
+          l'authentification par mot de passe.

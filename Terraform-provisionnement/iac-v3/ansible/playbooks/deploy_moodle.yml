@@ -6,14 +6,15 @@
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
   vars:
     ansible_python_interpreter: "{{ ansible_playbook_python }}"
+
   pre_tasks:
     - name: Fix permissions kubeconfig
       become: true
       file:
         path: /etc/rancher/k3s/k3s.yaml
         mode: '0644'
+
   roles:
     - role: moodle-k3s
       vars:
         moodle_hostname: "moodle.greencontracts.org"
-
