@@ -1,0 +1,28 @@
+---
+- name: Install nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+
+- name: Ensure nginx is started and enabled
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Deploy nginx config
+  template:
+    src: default.conf.j2
+    dest: /etc/nginx/sites-available/default
+    mode: '0644'
+  notify: Restart nginx
+
+- name: Test nginx configuration
+  command: nginx -t
+  changed_when: false
+
+- name: Reload nginx
+  service:
+    name: nginx
+    state: reloaded

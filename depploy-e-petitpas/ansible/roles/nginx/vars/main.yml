@@ -1,0 +1,15 @@
+# roles/nginx/vars/main.yml
+---
+nginx_proxy_host: "127.0.0.1"
+nginx_proxy_port: 5173
+# Domaine pour lequel générer le certificat
+domain: e-petitpas.fr
+
+# Liste des domaines supplémentaires
+domains: ["www.e-petitpas.fr"]
+
+# Email pour Let’s Encrypt (notifications et renouvellements)
+email: direction@e-petitpas.fr
+
+# Web server type
+web_server: nginx

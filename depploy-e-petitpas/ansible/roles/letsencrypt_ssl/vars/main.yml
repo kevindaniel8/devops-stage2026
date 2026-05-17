@@ -1,0 +1,8 @@
+---
+ssl_domain: "e-petitpas.fr"
+
+ssl_domains:
+  - "www.e-petitpas.fr"
+ssl_email: "direction@e-petitpas.fr"
+ssl_cert_path: "/etc/letsencrypt/live/{{ ssl_domain }}/fullchain.pem"
+ssl_key_path: "/etc/letsencrypt/live/{{ ssl_domain }}/privkey.pem"

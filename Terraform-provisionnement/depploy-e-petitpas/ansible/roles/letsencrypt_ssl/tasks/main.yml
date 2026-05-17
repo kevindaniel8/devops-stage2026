@@ -1,0 +1,80 @@
+---
+- name: Install certbot and nginx plugin
+  apt:
+    name:
+      - certbot
+      - python3-certbot-nginx
+    state: present
+    update_cache: yes
+
+- name: Check if certificate already exists
+  stat:
+    path: "{{ ssl_cert_path }}"
+  register: cert_stat
+
+- name: Deploy temporary HTTP nginx config for ACME challenge
+  template:
+    src: pre_ssl.conf.j2
+    dest: /etc/nginx/sites-available/default
+    mode: '0644'
+  when: not cert_stat.stat.exists
+  notify: Reload nginx
+
+- name: Force nginx reload before certbot
+  meta: flush_handlers
+
+- name: Obtain SSL certificate via certbot
+  command: >
+    certbot certonly --nginx
+    -d {{ ssl_domain }}
+    {% for d in ssl_domains %}-d {{ d }}{% endfor %}
+    --non-interactive
+    --agree-tos
+    --email {{ ssl_email }}
+  when: not cert_stat.stat.exists
+
+- name: Deploy SSL nginx config
+  template:
+    src: ssl.conf.j2
+    dest: /etc/nginx/sites-available/default
+    mode: '0644'
+  notify: Reload nginx
+
+- name: Test nginx configuration
+  command: nginx -t
+  changed_when: false
+
+- name: Force nginx reload with SSL config
+  meta: flush_handlers
+
+- name: Setup certbot auto-renewal cron
+  cron:
+    name: "Certbot auto-renewal"
+    minute: "0"
+    hour: "3"
+    day: "*/2"
+    job: 'certbot renew --quiet --nginx --deploy-hook "systemctl reload nginx"'
+- name: Installer Certbot
+  apt:
+    name:
+      - certbot
+      - "python3-certbot-{{ web_server }}"
+    state: present
+    update_cache: yes
+
+- name: Créer le certificat SSL avec Certbot
+  command: >
+    certbot --{{ web_server }} -n --agree-tos
+    --email {{ email }}
+    -d {{ domain }}
+    {% for d in domains %} -d {{ d }} {% endfor %}
+  args:
+    creates: "/etc/letsencrypt/live/{{ domain }}/fullchain.pem"
+  notify: Reload web server
+
+- name: Configurer le renouvellement automatique
+  cron:
+    name: "Renew Let’s Encrypt certificates"
+    job: "/usr/bin/certbot renew --quiet"
+    minute: "0"
+    hour: "3"

@@ -1,0 +1,15 @@
+---
+- name: Reload nginx
+  service:
+    name: nginx
+    state: reloaded
+
+- name: Restart nginx
+  service:
+    name: nginx
+    state: restarted
+    
+#- name: Reload web server
+#  service:
+#    name: "{{ web_server }}"
+#    state: reloaded

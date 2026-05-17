@@ -1,0 +1,15 @@
+# Config HTTP temporaire pour la validation ACME (avant SSL)
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name {{ ssl_domain }} {% for d in ssl_domains %}{{ d }} {% endfor %};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    location / {
+        return 200 'OK';
+        add_header Content-Type text/plain;
+    }
+}

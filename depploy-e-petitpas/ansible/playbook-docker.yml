@@ -1,0 +1,62 @@
+---
+- hosts: web
+  become: yes
+  gather_facts: false
+
+  pre_tasks:
+
+    - name: Install Python3 if missing
+      raw: |
+        test -e /usr/bin/python3 || (apt update && apt install -y python3)
+      changed_when: false
+
+    - name: Gather facts
+      setup:
+
+  roles:
+    - docker
+    - nginx
+    - letsencrypt_ssl
+    # Ajout du role letsencrypt_ssl par Longzhou et Kevin
+
+  tasks:
+    - name: Create app directory
+      file:
+        path: /var/www/node-app
+        state: directory
+
+    - name: Clone repository
+      git:
+        repo: "git@github.com:E-petitpas/projet_epetitpas.git"
+        dest: /var/www/node-app
+        version: develop
+        key_file: /home/ubuntu/.ssh/id_ed25519
+        accept_hostkey: yes
+        force: yes
+        update: yes
+
+    - name: Generate frontend .env file
+      template:
+        src: templates/env_frontend.j2
+        dest: /var/www/node-app/frontend/.env
+        mode: '600'
+
+    - name: Generate backend .env file
+      template:
+        src: templates/env_backend.j2
+        dest: /var/www/node-app/backend/.env
+        mode: '600'
+
+    # 🧹 Nettoyage du cache Docker builder
+    - name: Clean Docker builder cache
+      shell: docker builder prune -af
+
+    # 🧹 Suppression des images non utilisées (optionnel)
+    - name: Remove unused Docker images
+      shell: docker image prune -af
+
+    # 🚀 Rebuild et restart des containers
+    - name: Start docker compose
+      shell: |
+        cd /var/www/node-app
+        docker compose up -d --build

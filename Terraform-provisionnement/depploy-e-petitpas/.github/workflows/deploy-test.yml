@@ -1,0 +1,60 @@
+name: Deploy with Ansible
+
+on:
+  workflow_dispatch:
+  
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    environment: projet_epetitpas_aws
+    
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      # 🔧 AJOUT : Passage des secrets GitHub à Ansible
+      - name: Run Ansible Playbook
+        run: |
+          ansible-playbook \
+            -i ansible/inventory.ini \
+            ansible/playbook-docker.yml \
+            --extra-vars "
+              database_password=${{ secrets.DATABASE_PASSWORD }}
+              service_role_key=${{ secrets.SERVICE_ROLE_KEY }}
+              lba_jwt_token=${{ secrets.LBA_JWT_TOKEN }}
+              lba_login_password=${{ secrets.LBA_LOGIN_PASSWORD }}
+              jwt_secret=${{ secrets.JWT_SECRET }}
+              admin_password=${{ secrets.JWT_ADMIN_PASSWORD }}
+              smtp_host=${{ secrets.SMTP_HOST }}
+              smtp_port=${{ secrets.SMTP_PORT }}
+              smtp_user=${{ secrets.SMTP_USER }}
+              smtp_pass=${{ secrets.SMTP_PASSWORD }}
+              paypal_client_id=${{ secrets.PAYPAL_CLIENT_ID }}
+              paypal_client_secret=${{ secrets.PAYPAL_CLIENT_SECRET }}
+              twilio_sid=${{ secrets.TWILIO_ACCOUNT_SID }}
+              twilio_token=${{ secrets.TWILIO_AUTH_TOKEN }}
+              vapid_public_key=${{ secrets.VAPID_PUBLIC_KEY}}
+              vapid_private_key=${{ secrets.VAPID_PRIVATE_KEY}}
+              vite_supabase_anon_key=${{ secrets.VITE_SUPABASE_ANON_KEY_FRONTEND }}
+            "
