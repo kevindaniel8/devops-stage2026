@@ -1,0 +1,11 @@
+wikijs_version: "2.5.300"
+wikijs_install_dir: "/opt/wikijs"
+
+wikijs_db_name: "wikijs"
+wikijs_db_user: "wikijs"
+wikijs_db_password: "ChangeMe123"
+
+wikijs_db_volume: "wikijs_db_data"
+wikijs_app_volume: "wikijs_app_data"
+
+wikijs_port: 3000

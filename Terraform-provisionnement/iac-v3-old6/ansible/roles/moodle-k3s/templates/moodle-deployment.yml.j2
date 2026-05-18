@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: moodle
+  namespace: {{ moodle_namespace }}
+spec:
+  replicas: {{ moodle_replicas }}
+  selector:
+    matchLabels:
+      app: moodle
+  template:
+    metadata:
+      labels:
+        app: moodle
+    spec:
+      containers:
+        - name: moodle
+          image: "{{ moodle_image }}"
+          imagePullPolicy: {{ moodle_image_pull_policy }}
+          env:
+            - name: MOODLE_DATABASE_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  name: moodle-config
+                  key: MOODLE_DATABASE_TYPE
+
+            - name: MOODLE_DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: moodle-config
+                  key: MOODLE_DATABASE_HOST
+
+            - name: MOODLE_DATABASE_PORT_NUMBER
+              valueFrom:
+                configMapKeyRef:
+                  name: moodle-config
+                  key: MOODLE_DATABASE_PORT_NUMBER
+
+            - name: MOODLE_DATABASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: moodle-config
+                  key: MOODLE_DATABASE_NAME
+
+            - name: MOODLE_DATABASE_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: moodle-config
+                  key: MOODLE_DATABASE_USER
+
+            - name: MOODLE_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: moodle-db-secret
+                  key: db-password
+
+            # WWWROOT hybride (hostname ou IP selon la variable)
+            - name: MOODLE_WWWROOT
+              value: "{{ moodle_wwwroot }}"
+
+            - name: MOODLE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: moodle-config
+                  key: MOODLE_USERNAME
+
+            - name: MOODLE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: moodle-config
+                  key: MOODLE_PASSWORD
+
+            - name: MOODLE_EMAIL
+              valueFrom:
+                configMapKeyRef:
+                  name: moodle-config
+                  key: MOODLE_EMAIL
+
+            - name: MOODLE_SITE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: moodle-config
+                  key: MOODLE_SITE_NAME
+
+          ports:
+            - containerPort: 80
+
+          volumeMounts:
+            - name: moodle-data
+              mountPath: /var/www/moodledata
+
+          resources:
+            requests:
+              cpu: "{{ moodle_resources.requests.cpu }}"
+              memory: "{{ moodle_resources.requests.memory }}"
+            limits:
+              cpu: "{{ moodle_resources.limits.cpu }}"
+              memory: "{{ moodle_resources.limits.memory }}"
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+
+      volumes:
+        - name: moodle-data
+          persistentVolumeClaim:
+            claimName: moodle-data

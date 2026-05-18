@@ -14,13 +14,31 @@
       "description": "Samba Active Directory + DNS interne / bind9 - Authentification domaine gestionnaire annuaire"
     },
     {
-      "name": "smtp-mailserver - reverse proxy",
+      "name": "reverse-proxy",
+      "ip_suffix": 3,
+      "cores": 1,
+      "socket": 1,
+      "memory": 2048,
+      "disk": 10,
+      "description": "Reverse proxy nginx"
+    },
+    {
+      "name": "smtp-mailserver",
       "ip_suffix": 4,
       "cores": 1,
       "socket": 1,
       "memory": 2048,
       "disk": 20,
-      "description": "Mailcow - Serveur email complet (SMTP/IMAP/Webmail)"
+      "description": "Serveur email complet (SMTP/IMAP/Webmail)"
+    },
+    {
+      "name": "next-cloud",
+      "ip_suffix": 10,
+      "cores": 2,
+      "socket": 1,
+      "memory": 2048,
+      "disk": 20,
+      "description": "Outils opensource suite bureautique"
     },
     {
       "name": "db-postgres-master",

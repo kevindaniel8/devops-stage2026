@@ -1,0 +1,43 @@
+---
+# Rôle : Nettoyage DNS Samba AD (docker0, incohérences, etc.)
+
+- name: Vérifier que Bind9 DLZ répond
+  command: dig @127.0.0.1 greencontracts.org
+  register: dig_result
+  changed_when: false
+  failed_when: dig_result.rc != 0
+
+- name: Supprimer les enregistrements A pourris (172.17.0.1) - racine (@)
+  command: >
+    samba-tool dns delete 127.0.0.1 {{ samba_domain | lower }}.org
+    @ A 172.17.0.1
+    -U administrator%{{ samba_admin_password }}
+  register: delete_root
+  failed_when: false
+  changed_when: "'Record deleted successfully' in delete_root.stdout"
+
+- name: Supprimer les enregistrements A pourris (172.17.0.1) - DC
+  command: >
+    samba-tool dns delete 127.0.0.1 {{ samba_domain | lower }}.org
+    dns-samba-ad A 172.17.0.1
+    -U administrator%{{ samba_admin_password }}
+  register: delete_dc
+  failed_when: false
+  changed_when: "'Record deleted successfully' in delete_dc.stdout"
+
+- name: Forcer Samba à mettre à jour ses enregistrements DNS
+  command: samba_dnsupdate --verbose
+  register: dnsupdate
+  failed_when: false
+  changed_when: "'No DNS updates needed' not in dnsupdate.stdout"
+
+- name: Vérifier la zone DNS après nettoyage
+  command: >
+    samba-tool dns query 127.0.0.1 {{ samba_domain | lower }}.org @ ALL
+    -U administrator%{{ samba_admin_password }}
+  register: final_zone
+  changed_when: false
+
+- name: Afficher la zone DNS finale
+  debug:
+    var: final_zone.stdout

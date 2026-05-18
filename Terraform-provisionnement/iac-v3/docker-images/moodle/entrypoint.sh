@@ -117,6 +117,11 @@ if [ ! -f "${MOODLE_CONFIG}" ]; then
 
     echo "🛠 Création config.php..."
 
+    # IMPORTANT :
+    # On utilise <<'EOF' (heredoc littéral) pour empêcher Bash
+    # d'interpréter les variables PHP ($CFG->xxx)
+    # Cela évite les erreurs de syntaxe dans config.php.
+
 cat > "${MOODLE_CONFIG}" <<EOF
 <?php
 
@@ -150,6 +155,7 @@ global \$CFG;
 \$CFG->wwwroot = '${WWWROOT}';
 \$CFG->dataroot = '${MOODLE_DATA}';
 \$CFG->dirroot = '${MOODLE_ROOT}';
+\$CFG->libdir = '${MOODLE_ROOT}/lib';
 \$CFG->admin = 'admin';
 
 # ------------------------------------------------
@@ -158,7 +164,10 @@ global \$CFG;
 
 \$CFG->directorypermissions = 02777;
 
+
+# IMPORTANT :
 require_once(__DIR__ . '/lib/setup.php');
+
 EOF
 
     chown www-data:www-data "${MOODLE_CONFIG}"
@@ -169,6 +178,7 @@ EOF
 else
     echo "ℹ️ config.php déjà présent"
 fi
+
 
 # =========================================================
 # 07 - Vérification connexion PostgreSQL

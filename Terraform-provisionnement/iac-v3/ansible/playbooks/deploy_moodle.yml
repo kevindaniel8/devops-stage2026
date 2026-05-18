@@ -17,4 +17,6 @@
   roles:
     - role: moodle-k3s
       vars:
-        moodle_hostname: "moodle.greencontracts.org"
+        moodle_hostname: "{{ moodle_node_ip }}:{{ moodle_node_port }}"
+        #moodle_hostname: "moodle.greencontracts.org"
+        
