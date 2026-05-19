@@ -14,22 +14,22 @@
       "description": "Samba Active Directory + DNS interne / bind9 - Authentification domaine gestionnaire annuaire"
     },
     {
-      "name": "reverse-proxy",
+      "name": "smtp-reverse-proxy",
       "ip_suffix": 3,
       "cores": 1,
       "socket": 1,
       "memory": 2048,
-      "disk": 10,
-      "description": "Reverse proxy nginx"
+      "disk": 20,
+      "description": "Serveur email complet (SMTP/IMAP/Webmail) + Reverse proxy nginx "
     },
     {
-      "name": "smtp-mailserver",
+      "name": "snmp",
       "ip_suffix": 4,
       "cores": 1,
       "socket": 1,
       "memory": 2048,
-      "disk": 20,
-      "description": "Serveur email complet (SMTP/IMAP/Webmail)"
+      "disk": 10,
+      "description": "Machine snmp ou autre "
     },
     {
       "name": "next-cloud",

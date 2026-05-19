@@ -1,0 +1,18 @@
+network:
+  version: 2
+  ethernets:
+    {{ ansible_default_ipv4.interface }}:
+      match:
+        macaddress: "{{ ansible_default_ipv4.macaddress }}"
+      addresses:
+        - "{{ ansible_default_ipv4.address }}/{{ ansible_default_ipv4.prefix }}"
+      nameservers:
+        addresses:
+          - {{ dns_primary }}
+          - {{ dns_secondary }}
+        search:
+          - {{ dns_domain }}
+      set-name: "{{ ansible_default_ipv4.interface }}"
+      routes:
+        - to: "default"
+          via: "{{ ansible_default_ipv4.gateway }}"

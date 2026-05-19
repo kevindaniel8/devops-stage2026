@@ -71,3 +71,6 @@ monitoring:
   check_interval: 30
   alert_email: admin@company.com
   log_retention_days: 30
+
+
+

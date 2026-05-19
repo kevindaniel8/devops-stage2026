@@ -1,0 +1,15 @@
+---
+nextcloud_admin_user: admin
+nextcloud_admin_password: "ChangeMe123!"
+
+nextcloud_trusted_domains:
+  - localhost
+  - "192.168.20.10"
+  - "cloud.e-petitpas.fr"
+
+nextcloud_listen_port: 80
+
+nextcloud_enable_https: false
+nextcloud_email: admin@example.com
+
+nextcloud_enable_https_self_signed: false

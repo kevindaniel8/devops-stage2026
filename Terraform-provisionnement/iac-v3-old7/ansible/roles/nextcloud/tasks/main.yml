@@ -1,0 +1,68 @@
+---
+- name: Ensure snapd is installed
+  ansible.builtin.apt:
+    name: snapd
+    state: present
+    update_cache: true
+
+- name: Ensure snapd service is started
+  ansible.builtin.systemd:
+    name: snapd
+    enabled: true
+    state: started
+
+- name: Check if Nextcloud is already installed
+  ansible.builtin.command:
+    cmd: snap list nextcloud
+  register: nextcloud_installed
+  ignore_errors: true
+  changed_when: false
+
+- name: Install Nextcloud snap
+  ansible.builtin.command:
+    cmd: snap install nextcloud
+  when: nextcloud_installed.rc != 0
+
+- name: Wait for Nextcloud initialization
+  ansible.builtin.pause:
+    seconds: 30
+
+- name: Check if Nextcloud is already configured
+  ansible.builtin.stat:
+    path: /var/snap/nextcloud/current/nextcloud/config/config.php
+  register: nextcloud_config
+
+- name: Configure Nextcloud admin account
+  ansible.builtin.command:
+    cmd: >
+      nextcloud.manual-install
+      {{ nextcloud_admin_user }}
+      {{ nextcloud_admin_password }}
+  when: not nextcloud_config.stat.exists
+
+- name: Configure trusted domains
+  ansible.builtin.command:
+    cmd: >
+      nextcloud.occ config:system:set trusted_domains {{ index }}
+      --value={{ item }}
+  loop: "{{ nextcloud_trusted_domains }}"
+  loop_control:
+    index_var: index
+  changed_when: true
+
+- name: Configure HTTP port
+  ansible.builtin.command:
+    cmd: >
+      snap set nextcloud ports.http={{ nextcloud_listen_port }}
+  when: nextcloud_listen_port != 80
+  notify: Restart Nextcloud
+
+- name: Enable self-signed HTTPS
+  ansible.builtin.command:
+    cmd: nextcloud.enable-https self-signed
+  when: nextcloud_enable_https
+
+- name: Ensure Nextcloud services are running
+  ansible.builtin.command:
+    cmd: snap start nextcloud
+  changed_when: false

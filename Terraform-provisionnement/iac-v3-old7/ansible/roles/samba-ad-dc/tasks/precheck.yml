@@ -1,0 +1,9 @@
+---
+- name: Check if Samba AD is already provisioned
+  stat:
+    path: /var/lib/samba/private/sam.ldb
+  register: samba_provisioned
+
+- name: Debug provision state
+  debug:
+    msg: "Samba AD already provisioned: {{ samba_provisioned.stat.exists }}"

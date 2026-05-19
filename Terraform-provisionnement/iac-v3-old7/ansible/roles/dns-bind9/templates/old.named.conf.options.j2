@@ -1,0 +1,27 @@
+options {
+    directory "/var/cache/bind";
+
+    // Autorise la récursion pour ton réseau local
+    recursion yes;
+    allow-recursion { 192.168.200.0/24; };
+
+    // Bind écoute sur toutes les interfaces
+    listen-on { any; };
+    listen-on-v6 { any; };
+
+    // DNS internes + DNS publics en fallback
+    forwarders {
+        192.168.200.254;   // Ton DNS interne
+        8.8.8.8;           // Google DNS
+        1.1.1.1;           // Cloudflare DNS
+    };
+
+    dnssec-validation no;
+
+    // Réponse NXDOMAIN conforme RFC
+    auth-nxdomain no;
+
+    // Empêche Bind de répondre en tant que serveur autoritaire
+    // pour des zones qu'il ne gère pas
+    minimal-responses yes;
+};

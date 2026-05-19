@@ -1,0 +1,31 @@
+# Variables sensibles Packer
+packer/vars.pkrvars.hcl
+packer/crash.log
+
+# Clés SSH
+ssh/
+*.pem
+*.key
+
+# Fichiers Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.*.backup
+.terraform.lock.hcl
+*.tfvars
+
+# Fichiers sensibles
+*.env
+.env*
+secrets/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

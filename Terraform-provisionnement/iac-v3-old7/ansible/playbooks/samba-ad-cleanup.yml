@@ -1,0 +1,4 @@
+- hosts: samba-ad-dc
+  become: yes
+  roles:
+    - samba-ad-cleanup

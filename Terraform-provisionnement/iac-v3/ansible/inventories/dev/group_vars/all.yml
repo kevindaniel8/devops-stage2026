@@ -1,0 +1,23 @@
+# =============================================================================
+# MODOBOA
+# =============================================================================
+
+
+modoboa_domain: mail.example.com
+
+modoboa_admin_user: admin
+modoboa_admin_password: ChangeMe123!
+modoboa_admin_email: admin@example.com
+
+modoboa_db_host: 192.168.20.20
+modoboa_db_port: 5432
+
+modoboa_db_name: modoboa
+modoboa_db_user: modoboa
+modoboa_db_password: StrongPassword
+
+modoboa_install_path: /opt/modoboa
+modoboa_venv: /opt/modoboa/venv
+
+modoboa_ssl_enabled: true
+modoboa_letsencrypt_email: admin@example.com

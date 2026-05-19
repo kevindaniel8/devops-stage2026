@@ -1,0 +1,150 @@
+{
+  "_comment": "Configuration des VMs de la mini-infrastructure complète (IaC - IaaS)",
+  "_note": "Architecture: Firewall → AD/DNS → Services → DB → K8s → CI/CD certaine machine peuvent etre supprimé ou eteinte",
+  
+  "network": {
+    "gateway": "192.168.20.1",
+    "dns_server": "192.168.20.2",
+    "subnet": "192.168.20"
+  },
+
+  "vmid_start": 200,
+
+  "vms": [
+    {
+      "name": "firewall-opnsense",
+      "ip_suffix": 1,
+      "cores": 1,
+      "socket": 1,
+      "memory": 3072,
+      "disk":20,
+      "description": "Firewall / Gateway / Routeur OPNsense - NAT + filtrage WAN/LAN"
+    },
+    {
+      "name": "machine-management peut etre utilise ocasionnellement sinon eteinte",
+      "ip_suffix": 2,
+      "cores": 1,
+      "socket": 2,
+      "memory": 2048,
+      "disk": 35,
+      "description": "Machine de management - deploiement - test pouvant etre supprimé ou eteinte"
+    },
+    {
+      "name": "nas-truenasScale",
+      "ip_suffix": 3,
+      "cores": 2,
+      "socket": 1,
+      "memory": 4096,
+      "disk": 50,
+      "description": "TrueNAS - Stockage NAS partagé (NFS/SMB) pour les VMs"
+    },
+    {
+      "name": "ad-dns-samba",
+      "ip_suffix": 5,
+      "cores": 2,
+      "socket": 1,
+      "memory": 3072,
+      "disk": 20,
+      "description": "Samba Active Directory + DNS interne / bind9 - Authentification domaine gestionnaire annuaire"
+    },
+    {
+      "name": "smtp-mailserver - reverse proxy",
+      "ip_suffix": 8,
+      "cores": 2,
+      "socket": 1,
+      "memory": 4096,
+      "disk": 30,
+      "description": "Mailcow - Serveur email complet (SMTP/IMAP/Webmail)"
+    },
+    {
+      "name": "db-postgres-master",
+      "ip_suffix": 20,
+      "cores": 1,
+      "socket": 2,
+      "memory": 2048,
+      "disk": 40,
+      "description": "PostgreSQL Master - Base de données principale"
+    },
+    {
+      "name": "db-postgres-replication",
+      "ip_suffix": 21,
+      "cores": 1,
+      "socket": 2,
+      "memory": 2048,
+      "disk": 40,
+      "description": "PostgreSQL replication - Réplication Master + Backup"
+    },
+    {
+      "name": "nextcloud (optionnel)",
+      "ip_suffix": 10,
+      "cores": 2,
+      "socket": 1,
+      "memory": 4096,
+      "disk": 50,
+      "description": "Nextcloud - Cloud auto-hébergé (fichiers, calendrier, contacts)"
+    },
+    {
+      "name": "reverse-proxy (optionnel)",
+      "ip_suffix": 200,
+      "cores": 2,
+      "socket": 1,
+      "memory": 2048,
+      "disk": 15,
+      "description": "Nginx Reverse Proxy - Terminaison SSL + routage vers services"
+    },
+    {
+      "name": "cicd-runner (optionnel) ou  allumé occasionnellement",
+      "ip_suffix": 201,
+      "cores": 4,
+      "socket": 1,
+      "memory": 8192,
+      "disk": 40,
+      "description": "Github Action CI/Jenkins Runner - Pipeline de build et déploiement"
+    },
+    {
+      "name": "harbor-registry",
+      "ip_suffix": 205,
+      "cores": 1,
+      "socket": 1,
+      "memory": 2048,
+      "disk": 100,
+      "description": "Harbor - Registry Docker privé avec scan de vulnérabilités  (optionnel)"
+    },
+    {
+      "name": "loadbalancer-k8s (optinnel)",
+      "ip_suffix": 210,
+      "cores": 2,
+      "socket": 1,
+      "memory": 2048,
+      "disk": 15,
+      "description": "HAProxy/MetalLB - Load balancer pour ingress Kubernetes"
+    },
+    {
+      "name": "k8s-master",
+      "ip_suffix": 220,
+      "cores": 2,
+      "socket": 1,
+      "memory": 4096,
+      "disk": 30,
+      "description": "Kubernetes Control Plane - API Server, etcd, Scheduler"
+    },
+    {
+      "name": "k8s-worker1",
+      "ip_suffix": 221,
+      "cores": 1,
+      "socket": 1,
+      "memory": 2048,
+      "disk": 50,
+      "description": "Kubernetes Worker Node #1 - Workloads conteneurisés"
+    },
+    {
+      "name": "k8s-worker2",
+      "ip_suffix": 222,
+      "cores": 1,
+      "socket": 1,
+      "memory": 2048,
+      "disk": 50,
+      "description": "Kubernetes Worker Node #2 - Workloads conteneurisés"
+    }
+  ]
+}

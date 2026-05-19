@@ -1,0 +1,11 @@
+---
+nextcloud_admin_user: admin
+nextcloud_admin_password: "ChangeMe123!"
+
+nextcloud_trusted_domains:
+  - localhost
+
+nextcloud_listen_port: 80
+
+nextcloud_enable_https: false
+nextcloud_email: admin@example.com
