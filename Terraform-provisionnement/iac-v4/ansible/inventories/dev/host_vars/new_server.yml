@@ -1,0 +1,19 @@
+---
+# Variables spécifiques au nouveau serveur
+node_id: 3
+node_name: node3
+is_primary: false
+role: replica
+upstream_node_id: 2
+upstream_node_name: node2
+
+# Configuration spécifique nouveau serveur
+postgresql_config:
+  max_wal_senders: 5
+  max_replication_slots: 5
+  
+# Ports Vagrant
+vagrant:
+  forwarded_ports:
+    - guest: 5432
+      host: 5435

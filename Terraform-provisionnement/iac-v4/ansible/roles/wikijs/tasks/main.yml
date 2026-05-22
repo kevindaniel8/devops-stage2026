@@ -1,0 +1,124 @@
+---
+###############################################################################
+# Wiki.js - tasks/main.yml
+# Objectif :
+# - Créer DB + user PostgreSQL sur VM distante (via SSH delegate_to)
+# - Déployer Wiki.js sur VM dédiée
+###############################################################################
+
+###############################################################################
+# 1. CRÉATION USER POSTGRESQL (sur VM DB via SSH)
+###############################################################################
+
+- name: Vérifier si l'utilisateur PostgreSQL existe déjà
+  ansible.builtin.shell: |
+    sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='{{ wikijs_db_user }}'"
+  register: pg_user_exists
+  changed_when: false
+  delegate_to: "{{ groups[wikijs_db_group][0] }}"
+  become: true
+  tags: postgres
+
+- name: Créer l'utilisateur PostgreSQL pour Wiki.js (si absent)
+  ansible.builtin.shell: |
+    sudo -u postgres psql -c "CREATE USER {{ wikijs_db_user }} WITH PASSWORD '{{ wikijs_db_password }}';"
+  when: pg_user_exists.stdout != "1"
+  delegate_to: "{{ groups[wikijs_db_group][0] }}"
+  become: true
+  tags: postgres
+
+
+###############################################################################
+# 2. CRÉATION BASE POSTGRESQL (sur VM DB)
+###############################################################################
+
+- name: Vérifier si la base PostgreSQL existe déjà
+  ansible.builtin.shell: |
+    sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='{{ wikijs_db_name }}'"
+  register: pg_db_exists
+  changed_when: false
+  delegate_to: "{{ groups[wikijs_db_group][0] }}"
+  become: true
+  tags: postgres
+
+- name: Créer la base PostgreSQL Wiki.js (si absente)
+  ansible.builtin.shell: |
+    sudo -u postgres createdb -O {{ wikijs_db_user }} {{ wikijs_db_name }}
+  when: pg_db_exists.stdout != "1"
+  delegate_to: "{{ groups[wikijs_db_group][0] }}"
+  become: true
+  tags: postgres
+
+
+###############################################################################
+# 3. DROITS POSTGRESQL
+###############################################################################
+
+- name: Donner tous les privilèges sur la base Wiki.js
+  ansible.builtin.shell: |
+    sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE {{ wikijs_db_name }} TO {{ wikijs_db_user }};"
+  delegate_to: "{{ groups[wikijs_db_group][0] }}"
+  become: true
+  changed_when: false
+  tags: postgres
+
+
+###############################################################################
+# 4. ATTENTE POSTGRESQL DISPONIBLE
+###############################################################################
+
+- name: Attendre que PostgreSQL soit accessible sur le réseau
+  ansible.builtin.wait_for:
+    host: "{{ hostvars[groups[wikijs_db_group][0]].ansible_host }}"
+    port: 5432
+    timeout: 30
+  tags: postgres
+
+
+###############################################################################
+# 5. PRÉPARATION WIKI.JS
+###############################################################################
+
+- name: Créer le dossier d'installation Wiki.js
+  ansible.builtin.file:
+    path: "{{ wikijs_install_dir }}"
+    state: directory
+    mode: "0755"
+  tags: wikijs
+
+
+###############################################################################
+# 6. DÉPLOIEMENT DOCKER COMPOSE
+###############################################################################
+
+- name: Générer docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ wikijs_install_dir }}/docker-compose.yml"
+    mode: "0644"
+  tags: wikijs
+
+
+###############################################################################
+# 7. DÉMARRAGE WIKI.JS
+###############################################################################
+
+- name: Démarrer Wiki.js avec Docker Compose
+  ansible.builtin.command:
+    cmd: docker compose up -d
+    chdir: "{{ wikijs_install_dir }}"
+  register: wikijs_start
+  changed_when: "'Creating' in wikijs_start.stdout or 'Starting' in wikijs_start.stdout"
+  tags: wikijs
+
+
+###############################################################################
+# 8. ATTENTE WIKI.JS DISPONIBLE
+###############################################################################
+
+- name: Attendre que Wiki.js soit accessible
+  ansible.builtin.wait_for:
+    host: "{{ wikijs_host }}"
+    port: "{{ wikijs_port }}"
+    timeout: 60
+  tags: wikijs

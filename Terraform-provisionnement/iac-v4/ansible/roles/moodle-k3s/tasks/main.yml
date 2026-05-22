@@ -1,0 +1,37 @@
+---
+- name: S'assurer que le namespace existe
+  kubernetes.core.k8s:
+    state: present
+    kind: Namespace
+    name: "{{ moodle_namespace }}"
+
+- name: Créer le Secret DB Moodle
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'secret-db.yml.j2') }}"
+
+- name: Créer le ConfigMap Moodle
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'configmap.yml.j2') }}"
+
+- name: Créer le PVC Moodle
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'moodle-pvc.yml.j2') }}"
+
+- name: Déployer Moodle
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'moodle-deployment.yml.j2') }}"
+
+- name: Créer le service Moodle
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'moodle-service.yml.j2') }}"
+
+- name: Créer l'ingress Moodle
+  when: moodle_enable_ingress | bool
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'ingress.yml.j2') }}"

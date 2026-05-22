@@ -1,0 +1,55 @@
+---
+# Bascule manuelle du cluster PostgreSQL repmgr
+- name: Bascule du cluster
+  hosts: postgresql_replicas
+  become: yes
+  vars_files:
+    - group_vars/all.yml
+    - host_vars/replica.yml
+  tasks:
+    - name: Vérification que le replica est en mode recovery
+      postgresql_query:
+        db: postgres
+        query: "SELECT pg_is_in_recovery();"
+      become_user: postgres
+      register: recovery_status
+
+    - name: Échec si le replica n'est pas en recovery
+      fail:
+        msg: "Le replica n'est pas en mode recovery, impossible de promouvoir"
+      when: recovery_status.query_result[0].pg_is_in_recovery != true
+
+    - name: Promotion du replica en master
+      shell: |
+        export PGPASSWORD={{ repmgr_password }}
+        repmgr -f /etc/repmgr/{{ postgresql_version }}/repmgr.conf standby promote
+      become_user: postgres
+      register: promote_result
+      failed_when: false
+
+    - name: Vérification de la promotion
+      postgresql_query:
+        db: postgres
+        query: "SELECT pg_is_in_recovery();"
+      become_user: postgres
+      register: post_promote_status
+
+    - name: Affichage du résultat
+      debug:
+        msg: |
+          Promotion terminée. Nouveau statut: {{ post_promote_status.query_result[0].pg_is_in_recovery }}
+      when: post_promote_status is defined
+
+- name: Reconfiguration des autres replicas
+  hosts: postgresql_replicas:!{{ inventory_hostname }}
+  become: yes
+  vars_files:
+    - group_vars/all.yml
+  tasks:
+    - name: Suivi du nouveau master
+      shell: |
+        export PGPASSWORD={{ repmgr_password }}
+        repmgr -f /etc/repmgr/{{ postgresql_version }}/repmgr.conf standby follow
+      become_user: postgres
+      register: follow_result
+      failed_when: false
