@@ -1,0 +1,105 @@
+---
+# =============================================================================
+# Playbook SSL Orchestrator - Gestion des certificats SSL/TLS
+# =============================================================================
+# Ce playbook orchestre la gestion des certificats SSL/TLS pour tous les services
+# Il utilise le catalogue de services défini dans hosts.yml pour déterminer
+# quel mode TLS utiliser (internal_ca, letsencrypt, ou none)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 1. Génération de la CA interne et certificats pour services LAN
+# -----------------------------------------------------------------------------
+- name: Générer CA interne et certificats pour services LAN
+  hosts: localhost
+  connection: local
+  become: false
+  vars_files:
+    - "{{ playbook_dir }}/../inventories/dev/hosts.yml"
+  roles:
+    - ssl-ca-interne
+  tags:
+    - ca-interne
+    - ssl
+
+# -----------------------------------------------------------------------------
+# 2. Génération des certificats Let's Encrypt pour services exposés
+# -----------------------------------------------------------------------------
+- name: Générer certificats Let's Encrypt pour services exposés
+  hosts: reverse_proxy
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../inventories/dev/hosts.yml"
+  roles:
+    - ssl-letsencrypt
+  tags:
+    - letsencrypt
+    - ssl
+
+# -----------------------------------------------------------------------------
+# 3. Distribution des certificats et CA aux clients
+# -----------------------------------------------------------------------------
+- name: Distribuer les certificats et CA aux clients
+  hosts: cert_clients
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../inventories/dev/hosts.yml"
+  roles:
+    - ssl-distribute
+  tags:
+    - distribute
+    - ssl
+
+# -----------------------------------------------------------------------------
+# 4. Activation TLS sur le reverse-proxy
+# -----------------------------------------------------------------------------
+- name: Activer TLS sur le reverse-proxy
+  hosts: reverse_proxy
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../inventories/dev/hosts.yml"
+  tasks:
+    - name: Recharger Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
+  tags:
+    - activate-tls
+    - ssl
+
+# -----------------------------------------------------------------------------
+# 5. Vérification des certificats
+# -----------------------------------------------------------------------------
+- name: Vérifier les certificats SSL
+  hosts: reverse_proxy
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../inventories/dev/hosts.yml"
+  tasks:
+    - name: Vérifier que Nginx écoute sur 443
+      ansible.builtin.wait_for:
+        port: 443
+        delay: 5
+        timeout: 30
+
+    - name: Vérifier le certificat pour chaque service TLS
+      ansible.builtin.uri:
+        url: "https://{{ item.value.fqdn }}"
+        method: HEAD
+        validate_certs: false
+        status_code: 200, 301, 302
+      loop: "{{ services | dict2items | selectattr('value.tls_mode', 'defined') | selectattr('value.tls_mode', 'ne', 'none') | list }}"
+      loop_control:
+        label: "{{ item.key }}"
+      register: cert_check
+      ignore_errors: true
+
+    - name: Afficher les résultats de vérification
+      ansible.builtin.debug:
+        msg: "Service {{ item.item.key }}: {{ 'OK' if item.status == 200 or item.status in [301, 302] else 'FAILED' }}"
+      loop: "{{ cert_check.results }}"
+      loop_control:
+        label: "{{ item.item.key }}"
+  tags:
+    - verify
+    - ssl

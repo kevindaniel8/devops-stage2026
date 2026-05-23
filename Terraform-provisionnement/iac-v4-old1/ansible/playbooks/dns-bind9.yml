@@ -1,0 +1,4 @@
+- hosts: dns
+  become: yes
+  roles:
+    - dns-bind9-old

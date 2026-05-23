@@ -1,0 +1,23 @@
+<VirtualHost *:80>
+    DocumentRoot /var/www/moodle/public
+    <Directory /var/www/moodle/public>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+    
+    # Alias for non-public scripts that need to be accessible
+    Alias /lib /var/www/moodle/lib
+    <Directory /var/www/moodle/lib>
+        Require all denied
+    </Directory>
+    
+    # Moodle data directory (outside web root)
+    Alias /moodledata /var/www/moodledata
+    <Directory /var/www/moodledata>
+        Require all denied
+    </Directory>
+    
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>

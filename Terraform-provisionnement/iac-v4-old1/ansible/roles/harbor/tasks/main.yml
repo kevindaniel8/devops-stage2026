@@ -1,0 +1,208 @@
+---
+# =========================================================
+# 1. Installation des dépendances système
+# =========================================================
+- name: 1.1 Installer les paquets système requis
+  apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+    update_cache: true
+  become: true
+
+
+# =========================================================
+# 2. Nettoyage des anciennes installations Harbor
+# =========================================================
+
+## 2.0 Suppression des conteneurs Harbor orphelins
+- name: 2.0.1 Lister les conteneurs Harbor existants
+  shell: "docker ps -a --format '{{ '{{' }}.Names{{ '}}' }}' | grep '^harbor' || true"
+  register: harbor_containers
+  changed_when: false
+  become: true
+
+- name: 2.0.2 Supprimer les conteneurs Harbor orphelins
+  shell: "docker rm -f {{ item }}"
+  loop: "{{ harbor_containers.stdout_lines }}"
+  when: harbor_containers.stdout != ''
+  become: true
+
+## 2.1 Arrêt de Harbor si déjà installé
+- name: 2.1 Arrêter Harbor si présent
+  shell: docker compose down -v
+  args:
+    chdir: "{{ harbor_install_dir }}/harbor"
+  register: harbor_stop
+  failed_when: harbor_stop.rc != 0 and 'No such file' not in harbor_stop.msg
+  changed_when: harbor_stop.rc == 0
+  become: true
+
+## 2.2 Suppression des anciens fichiers
+- name: 2.2 Supprimer l'ancien dossier Harbor
+  file:
+    path: "{{ harbor_install_dir }}/harbor"
+    state: absent
+  become: true
+
+- name: 2.3 Supprimer l'ancien docker-compose.yml
+  file:
+    path: "{{ harbor_install_dir }}/docker-compose.yml"
+    state: absent
+  become: true
+
+- name: 2.4 Créer le dossier d'installation Harbor
+  file:
+    path: "{{ harbor_install_dir }}"
+    state: directory
+    mode: "0755"
+  become: true
+
+
+# =========================================================
+# 3. Téléchargement et extraction de Harbor
+# =========================================================
+- name: 3.1 Télécharger l'installateur Harbor
+  get_url:
+    url: "{{ harbor_download_url }}"
+    dest: "{{ harbor_install_dir }}/{{ harbor_installer_filename }}"
+    mode: "0644"
+  become: true
+
+- name: 3.2 Extraire l'installateur Harbor
+  unarchive:
+    src: "{{ harbor_install_dir }}/{{ harbor_installer_filename }}"
+    dest: "{{ harbor_install_dir }}"
+    remote_src: true
+  become: true
+
+
+# =========================================================
+# 4. Préparation des dossiers Harbor
+# =========================================================
+- name: 4.1 Créer le dossier des données Harbor
+  file:
+    path: "{{ harbor_data_dir }}"
+    state: directory
+    mode: "0755"
+  become: true
+
+
+# =========================================================
+# 5. Déploiement du fichier harbor.yml
+# =========================================================
+- name: 5.1 Déployer le fichier harbor.yml
+  template:
+    src: "harbor.yml.j2"
+    dest: "{{ harbor_install_dir }}/harbor/harbor.yml"
+    mode: "0644"
+  become: true
+
+
+# =========================================================
+# 6. Permissions et dossiers internes
+# =========================================================
+- name: 6.1 Fixer les permissions du dossier Harbor
+  file:
+    path: "{{ harbor_install_dir }}/harbor"
+    state: directory
+    recurse: true
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+
+- name: 6.2.1 Supprimer le dossier input
+  file:
+    path: "{{ harbor_install_dir }}/harbor/input"
+    state: absent
+  become: true
+
+- name: 6.2.2 Recréer le dossier input
+  file:
+    path: "{{ harbor_install_dir }}/harbor/input"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+
+
+# =========================================================
+# 6.3 Génération des certificats HTTPS (si activé)
+# =========================================================
+- name: 6.3.1 Créer le dossier des certificats
+  file:
+    path: "{{ harbor_install_dir }}/certs"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+
+- name: 6.3.2 Générer la clé privée Harbor
+  command: >
+    openssl genrsa -out {{ harbor_install_dir }}/certs/harbor.key 2048
+  args:
+    creates: "{{ harbor_install_dir }}/certs/harbor.key"
+  become: true
+
+- name: 6.3.3 Générer le certificat Harbor
+  command: >
+    openssl req -x509 -new -nodes
+    -key {{ harbor_install_dir }}/certs/harbor.key
+    -sha256 -days 365
+    -subj "/CN={{ hostname }}"
+    -out {{ harbor_install_dir }}/certs/harbor.crt
+  args:
+    creates: "{{ harbor_install_dir }}/certs/harbor.crt"
+  become: true
+
+
+# =========================================================
+# 7. Préparation Harbor
+# =========================================================
+- name: 7.1 Exécuter Harbor prepare
+  shell: ./prepare --with-trivy
+  args:
+    chdir: "{{ harbor_install_dir }}/harbor"
+  become: true
+
+
+# =========================================================
+# 8. Installation Harbor
+# =========================================================
+- name: 8.1 Installer Harbor
+  shell: |
+    ./install.sh {{ '--with-trivy' if enable_trivy else '' }} \
+                 {{ '--with-notary' if enable_notary else '' }} \
+                 {{ '--with-chartmuseum' if enable_chartmuseum else '' }}
+  args:
+    chdir: "{{ harbor_install_dir }}/harbor"
+  become: true
+
+# =========================================================
+# 9. Service Systemd - Démarrage auto au boot
+# =========================================================
+- name: 9.1 Déployer le service systemd Harbor
+  template:
+    src: harbor.service.j2
+    dest: /etc/systemd/system/harbor.service
+    mode: '0644'
+  become: true
+  notify: Reload systemd
+
+- name: 9.2 Recharger systemd
+  systemd:
+    daemon_reload: true
+  become: true
+
+- name: 9.3 Activer le service Harbor au boot
+  systemd:
+    name: harbor
+    enabled: true
+    state: started
+  become: true

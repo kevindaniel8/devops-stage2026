@@ -1,0 +1,14 @@
+---
+samba_domain: greencontracts
+samba_realm: GREENCONTRACTS.LAN
+samba_admin_password: "ChangeMe123!"
+samba_dns_forwarder: "8.8.8.8"
+
+samba_bind_listen_ip: "{{ ansible_default_ipv4.address }}"
+samba_bind_allow_query:
+  - "127.0.0.1"
+  - "{{ ansible_default_ipv4.network }}/{{ ansible_default_ipv4.netmask }}"
+
+samba_interface: eth0
+
+

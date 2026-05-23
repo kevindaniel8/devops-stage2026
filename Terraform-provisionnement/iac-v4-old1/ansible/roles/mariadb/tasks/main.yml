@@ -1,0 +1,45 @@
+---
+- name: Installer les paquets MariaDB
+  ansible.builtin.package:
+    name: "{{ mariadb_packages }}"
+    state: present
+
+- name: S'assurer que MariaDB est démarré et activé
+  ansible.builtin.service:
+    name: mariadb
+    state: started
+    enabled: true
+
+- name: Définir le mot de passe root
+  ansible.builtin.command: >
+    mysqladmin -u root password "{{ mariadb_root_password }}"
+  args:
+    creates: /root/.mariadb_root_password_set
+
+- name: Créer un fichier témoin pour éviter de réexécuter la commande
+  ansible.builtin.file:
+    path: /root/.mariadb_root_password_set
+    state: touch
+
+- name: Déployer la configuration my.cnf
+  ansible.builtin.template:
+    src: my.cnf.j2
+    dest: /etc/mysql/my.cnf
+  notify: Restart MariaDB
+
+- name: Créer les bases de données
+  community.mysql.mysql_db:
+    name: "{{ item.name }}"
+    state: present
+    encoding: "{{ item.encoding | default('utf8mb4') }}"
+  loop: "{{ mariadb_databases }}"
+
+- name: Créer les utilisateurs
+  community.mysql.mysql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    priv: "{{ item.priv | default('*.*:ALL') }}"
+    host: "{{ item.host | default('%') }}"
+    state: present
+  loop: "{{ mariadb_users }}"
+

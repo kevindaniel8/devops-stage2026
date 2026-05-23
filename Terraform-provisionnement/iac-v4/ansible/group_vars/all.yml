@@ -10,6 +10,17 @@ reverse_proxy_domain: "greencontracts.lan"
 domain: "greencontracts.lan"
 subnet: "192.168.20"
 
+# =============================================================================
+# VARIABLES SSL/TLS (depuis env.conf)
+# =============================================================================
+tls_mode: "{{ tls_mode | default('mixed') }}"
+ca_common_name: "{{ ca_common_name | default('GreenContracts-Root-CA') }}"
+ca_validity_days: "{{ ca_validity_days | default(3650) }}"
+cert_validity_days: "{{ cert_validity_days | default(365) }}"
+cert_key_size: "{{ cert_key_size | default(4096) }}"
+letsencrypt_email: "{{ letsencrypt_email | default('admin@greencontracts.lan') }}"
+letsencrypt_staging: "{{ letsencrypt_staging | default(false) }}"
+
 # IPs du cluster PostgreSQL (calculées depuis SUBNET)
 master_ip: 192.168.20.20
 replica_ip: 192.168.20.21

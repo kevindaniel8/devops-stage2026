@@ -1,0 +1,15 @@
+	$TTL 86400
+@   IN  SOA ns.{{ dns_domain }}. admin.{{ dns_domain }}. (
+        2026012001 ; Serial
+        3600       ; Refresh
+        1800       ; Retry
+        604800     ; Expire
+        86400 )     ; Minimum
+
+@       IN  NS      ns.{{ dns_domain }}.
+
+{% for record in dns_records %}
+{% set last_octet = record.ip.split('.')[-1] %}
+{{ last_octet }}   IN  PTR   {{ record.name }}.
+{% endfor %}
+
