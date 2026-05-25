@@ -81,6 +81,7 @@
         port: 443
         delay: 5
         timeout: 30
+      ignore_errors: true
 
     - name: Vérifier le certificat pour chaque service TLS
       ansible.builtin.uri:

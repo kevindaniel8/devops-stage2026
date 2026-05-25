@@ -27,6 +27,9 @@ enable_trivy: true
 enable_notary: false
 enable_chartmuseum: false
 
+# Désactiver HTTPS temporairement jusqu'au déploiement SSL
+harbor_https_enabled: false
+
 install_docker: true
 docker_user: "ubuntu"
 

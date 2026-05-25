@@ -1,0 +1,5 @@
+domain: "greencontracts.lan"
+
+# clean-up samba-ad
+samba_domain: "{{ domain }}"
+samba_admin_password: "ChangeMe123!"

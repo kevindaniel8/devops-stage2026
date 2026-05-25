@@ -1,0 +1,30 @@
+# HTTP → HTTPS
+server {
+    listen 80;
+    server_name {{ item.key }}.{{ reverse_proxy_domain }};
+    return 301 https://$host$request_uri;
+}
+
+# HTTPS
+server {
+    listen 443 ssl;
+    server_name {{ item.key }}.{{ reverse_proxy_domain }};
+
+    {% if item.key == "kevin" %}
+    ssl_certificate     /etc/nginx/certs/{{ reverse_proxy_domain }}.crt;
+    ssl_certificate_key /etc/nginx/certs/{{ reverse_proxy_domain }}.key;
+    {% else %}
+    ssl_certificate     /etc/nginx/certs/wildcard.{{ reverse_proxy_domain }}.crt;
+    ssl_certificate_key /etc/nginx/certs/wildcard.{{ reverse_proxy_domain }}.key;
+    {% endif %}
+
+    include /etc/nginx/snippets/wildcard-ssl.conf;
+
+    location / {
+        proxy_pass http://{{ item.value.ip }}:{{ item.value.port }};
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

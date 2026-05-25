@@ -1,0 +1,59 @@
+---
+# =============================================================================
+# Rôle ssl-distribute - Distribution des certificats aux services
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 1. Distribution de la CA interne aux clients
+# -----------------------------------------------------------------------------
+- name: Distribuer la CA interne aux clients
+  copy:
+    src: "{{ playbook_dir }}/../files/pki/ca/ca.crt"
+    dest: "{{ ssl_distribute_ca_path }}/{{ ssl_distribute_ca_internal_name }}"
+    mode: '0644'
+  become: true
+  when:
+    - inventory_hostname in groups['cert_clients'] | default([])
+  notify: Update CA certificates
+
+# -----------------------------------------------------------------------------
+# 2. Distribution de la CA Let's Encrypt aux clients
+# -----------------------------------------------------------------------------
+- name: Distribuer la CA Let's Encrypt aux clients
+  copy:
+    src: /tmp/isrgrootx1.pem
+    dest: "{{ ssl_distribute_ca_path }}/{{ ssl_distribute_ca_letsencrypt_name }}"
+    mode: '0644'
+  become: true
+  when:
+    - inventory_hostname in groups['cert_clients'] | default([])
+  notify: Update CA certificates
+
+# -----------------------------------------------------------------------------
+# 3. Distribution des certificats spécifiques aux services
+# -----------------------------------------------------------------------------
+- name: Distribuer les certificats aux services selon leur tls_mode
+  block:
+    - name: Services avec certificats internes
+      debug:
+        msg: "Service {{ item.key }} utilise CA interne"
+      loop: "{{ ssl_distribute_services | dict2items | selectattr('value.tls_mode', 'equalto', 'internal_ca') | list }}"
+      when: item.key in ssl_distribute_service_hosts
+      run_once: true
+
+    - name: Services avec certificats Let's Encrypt
+      debug:
+        msg: "Service {{ item.key }} utilise Let's Encrypt"
+      loop: "{{ ssl_distribute_services | dict2items | selectattr('value.tls_mode', 'equalto', 'letsencrypt') | list }}"
+      when: item.key in ssl_distribute_service_hosts
+      run_once: true
+
+  when: ssl_distribute_services is defined
+
+# -----------------------------------------------------------------------------
+# 4. Mise à jour du store de certificats
+# -----------------------------------------------------------------------------
+- name: Mettre à jour le store de certificats
+  command: update-ca-certificates
+  become: true
+  changed_when: true

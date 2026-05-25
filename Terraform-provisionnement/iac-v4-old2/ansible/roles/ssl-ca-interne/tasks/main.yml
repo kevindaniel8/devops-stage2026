@@ -1,0 +1,254 @@
+---
+# =============================================================================
+# Rôle ssl-ca-interne - Génération CA interne et certificats X.509
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 0. Préparation des dossiers (localhost)
+# -----------------------------------------------------------------------------
+- name: Créer l'arborescence PKI locale
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ ssl_ca_base_dir }}"
+    - "{{ ssl_certs_base_dir }}"
+    - "{{ ssl_keys_base_dir }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+# -----------------------------------------------------------------------------
+# 1. Génération de la CA racine (localhost)
+# -----------------------------------------------------------------------------
+- name: Générer la clé privée de la CA
+  community.crypto.openssl_privatekey:
+    path: "{{ ssl_ca_key_file }}"
+    size: "{{ ssl_ca_key_size }}"
+    type: RSA
+    mode: '0400'
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Générer le certificat CA (self-signed)
+  #community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
+    path: "{{ ssl_ca_cert_file }}"
+    privatekey_path: "{{ ssl_ca_key_file }}"
+    provider: selfsigned
+    selfsigned_not_after: "+{{ ssl_ca_validity_days }}d"
+    selfsigned_digest: sha256
+    mode: '0644'
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Ajouter extensions CA au certificat
+  community.crypto.x509_certificate:
+    path: "{{ ssl_ca_cert_file }}"
+    privatekey_path: "{{ ssl_ca_key_file }}"
+    provider: selfsigned
+    selfsigned_not_after: "+{{ ssl_ca_validity_days }}d"
+    selfsigned_digest: sha256
+    selfsigned_extensions:
+      - "{{ role_path }}/files/ca_extensions.cnf"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+# -----------------------------------------------------------------------------
+# 2. Vérification de la CA
+# -----------------------------------------------------------------------------
+- name: Vérifier que la CA est valide
+  command: "openssl x509 -in {{ ssl_ca_cert_file }} -text -noout"
+  register: ca_check
+  delegate_to: localhost
+  become: false
+  run_once: true
+  changed_when: false
+
+- name: Vérifier CA:TRUE
+  assert:
+    that:
+      - "'CA:TRUE' in ca_check.stdout"
+    fail_msg: "ERREUR : La CA générée n'est pas valide"
+  run_once: true
+
+# -----------------------------------------------------------------------------
+# 3. Génération des certificats pour services internes
+# -----------------------------------------------------------------------------
+- name: Générer les certificats pour services avec tls_mode: internal_ca
+  block:
+    - name: Générer la clé privée pour {{ item.key }}
+      community.crypto.openssl_privatekey:
+        path: "{{ ssl_keys_base_dir }}/{{ item.key }}.key"
+        size: "{{ ssl_cert_key_size }}"
+        type: RSA
+        mode: '0400'
+      delegate_to: localhost
+      become: false
+      run_once: true
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Générer le CSR pour {{ item.key }}
+      community.crypto.openssl_csr:
+        path: "{{ ssl_certs_base_dir }}/{{ item.key }}.csr"
+        privatekey_path: "{{ ssl_keys_base_dir }}/{{ item.key }}.key"
+        common_name: "{{ item.value.fqdn }}"
+        subject_alt_name:
+          - "DNS:{{ item.value.fqdn }}"
+        mode: '0644'
+      delegate_to: localhost
+      become: false
+      run_once: true
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Signer le certificat {{ item.key }} avec la CA
+      #community.crypto.openssl_certificate:
+      community.crypto.x509_certificate:
+        path: "{{ ssl_certs_base_dir }}/{{ item.key }}.crt"
+        csr_path: "{{ ssl_certs_base_dir }}/{{ item.key }}.csr"
+        privatekey_path: "{{ ssl_ca_key_file }}"
+        provider: ownca
+        ownca_path: "{{ ssl_ca_cert_file }}"
+        ownca_not_after: "+{{ ssl_cert_validity_days }}d"
+        ownca_digest: sha256
+        mode: '0644'
+      delegate_to: localhost
+      become: false
+      run_once: true
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Générer le fullchain pour {{ item.key }}
+      assemble:
+        src: "{{ ssl_certs_base_dir }}/{{ item.key }}.crt"
+        dest: "{{ ssl_certs_base_dir }}/{{ item.key }}-fullchain.crt"
+        regexp: ".*\\.crt$"
+      delegate_to: localhost
+      become: false
+      run_once: true
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Ajouter la CA au fullchain pour {{ item.key }}
+      blockinfile:
+        path: "{{ ssl_certs_base_dir }}/{{ item.key }}-fullchain.crt"
+        block: "{{ lookup('file', ssl_ca_cert_file) }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - CA CERTIFICATE"
+      delegate_to: localhost
+      become: false
+      run_once: true
+      loop_control:
+        label: "{{ item.key }}"
+
+  loop: "{{ ssl_internal_services }}"
+  when: ssl_internal_services | length > 0
+  run_once: true
+
+# -----------------------------------------------------------------------------
+# 4. Vérification des certificats
+# -----------------------------------------------------------------------------
+- name: Vérifier que les certificats sont signés par la CA
+  command: >
+    openssl verify -CAfile {{ ssl_ca_cert_file }}
+    {{ ssl_certs_base_dir }}/{{ item.key }}.crt
+  register: verify_certs
+  delegate_to: localhost
+  become: false
+  run_once: true
+  loop: "{{ ssl_internal_services }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when: ssl_internal_services | length > 0
+  changed_when: false
+
+- name: Vérifier la validité des certificats
+  assert:
+    that:
+      - verify_certs.results | map(attribute='stdout') | list | select('search', 'OK') | length == ssl_internal_services | length
+    fail_msg: "ERREUR : Un ou plusieurs certificats ne sont pas signés par la CA"
+  run_once: true
+  when: ssl_internal_services | length > 0
+
+# -----------------------------------------------------------------------------
+# 5. Déploiement de la CA sur les hôtes cibles
+# -----------------------------------------------------------------------------
+- name: Créer le dossier pour la CA
+  file:
+    path: "{{ ssl_deploy_ca_path }}"
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Déployer le certificat CA sur les hôtes
+  copy:
+    src: "{{ ssl_ca_cert_file }}"
+    dest: "{{ ssl_deploy_ca_path }}/{{ ssl_deploy_ca_name }}"
+    mode: '0644'
+  become: true
+
+- name: Mettre à jour le store de certificats
+  command: update-ca-certificates
+  become: true
+  changed_when: true
+
+# -----------------------------------------------------------------------------
+# 6. Déploiement des certificats sur le reverse-proxy
+# -----------------------------------------------------------------------------
+- name: Créer le dossier SSL Nginx
+  file:
+    path: "{{ ssl_nginx_certs_path }}"
+    state: directory
+    mode: '0755'
+  become: true
+  when: inventory_hostname in groups['reverse_proxy']
+
+- name: Déployer les certificats sur le reverse-proxy
+  block:
+    - name: Déployer certificat CRT
+      copy:
+        src: "{{ ssl_certs_base_dir }}/{{ item.key }}.crt"
+        dest: "{{ ssl_nginx_certs_path }}/{{ item.key }}.crt"
+        mode: '0644'
+      become: true
+      loop_control:
+        label: "{{ item.key }}"
+      notify: Reload nginx
+
+    - name: Déployer clé privée KEY
+      copy:
+        src: "{{ ssl_keys_base_dir }}/{{ item.key }}.key"
+        dest: "{{ ssl_nginx_certs_path }}/{{ item.key }}.key"
+        mode: '0400'
+      become: true
+      loop_control:
+        label: "{{ item.key }}"
+      notify: Reload nginx
+
+    - name: Déployer fullchain CRT
+      copy:
+        src: "{{ ssl_certs_base_dir }}/{{ item.key }}-fullchain.crt"
+        dest: "{{ ssl_nginx_certs_path }}/{{ item.key }}-fullchain.crt"
+        mode: '0644'
+      become: true
+      loop_control:
+        label: "{{ item.key }}"
+      notify: Reload nginx
+
+    - name: Déployer la CA pour référence
+      copy:
+        src: "{{ ssl_ca_cert_file }}"
+        dest: "{{ ssl_nginx_certs_path }}/ca.crt"
+        mode: '0644'
+      become: true
+      notify: Reload nginx
+
+  loop: "{{ ssl_internal_services }}"
+  when:
+    - inventory_hostname in groups['reverse_proxy']
+    - ssl_internal_services | length > 0

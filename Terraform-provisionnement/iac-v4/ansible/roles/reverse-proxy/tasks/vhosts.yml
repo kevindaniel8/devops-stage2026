@@ -1,13 +1,12 @@
 ---
-# Construire la liste des services exposés
+# Construire la liste des services à exposer
 - name: Construire la liste des services à exposer
   ansible.builtin.set_fact:
     reverse_proxy_services: >-
       {{
         services
         | dict2items
-        | selectattr('value.expose_external', 'defined')
-        | selectattr('value.expose_external', 'equalto', true)
+        | selectattr('value.fqdn', 'defined')
       }}
 
 # Générer les vhosts

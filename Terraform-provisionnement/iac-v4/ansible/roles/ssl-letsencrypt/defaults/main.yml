@@ -9,8 +9,8 @@
 # -----------------------------------------------------------------------------
 # Configuration Certbot
 # -----------------------------------------------------------------------------
-ssl_letsencrypt_email: "{{ letsencrypt_email | default('admin@greencontracts.lan') }}"
-ssl_letsencrypt_staging: "{{ letsencrypt_staging | default(false) }}"
+ssl_letsencrypt_email: "{{ letsencrypt_email | default('kevin@example.com') }}"
+ssl_letsencrypt_staging: "{{ letsencrypt_staging | default(true) }}"
 ssl_letsencrypt_certbot_package: certbot
 ssl_letsencrypt_certbot_nginx_package: python3-certbot-nginx
 
