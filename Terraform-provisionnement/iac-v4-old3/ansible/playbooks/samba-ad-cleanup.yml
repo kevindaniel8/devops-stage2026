@@ -1,0 +1,32 @@
+- name: Préparation Samba
+  hosts: samba-ad-dc
+  become: yes
+
+  tasks:
+    - name: Attendre que Samba AD DC soit complètement opérationnel
+      wait_for:
+        port: 389
+        host: 127.0.0.1
+        delay: 5
+        timeout: 60
+      tags: wait_samba
+
+    - name: Attendre que DNS Bind9 DLZ soit prêt
+      wait_for:
+        port: 53
+        host: 127.0.0.1
+        timeout: 60
+      tags: wait_bind9
+
+- name: Samba AD cleanup
+  hosts: samba-ad-dc
+  become: yes
+  gather_facts: false
+
+  pre_tasks:
+    - name: Attendre 25 secondes avant cleanup
+      ansible.builtin.pause:
+        seconds: 25
+
+  roles:
+    - samba-ad-cleanup

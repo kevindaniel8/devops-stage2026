@@ -1,13 +1,15 @@
 hostname: {{ hostname | regex_replace('^https?://', '') }}
-external_url: "https://{{ hostname | regex_replace('^https?://', '') }}"
+external_url: "{% if harbor_https_enabled | default(false) %}https{% else %}http{% endif %}://{{ hostname | regex_replace('^https?://', '') }}"
 
 http:
   port: 80
 
+{% if harbor_https_enabled | default(false) %}
 https:
   enabled: true
   certificate: "/opt/harbor/certs/harbor.crt"
   private_key: "/opt/harbor/certs/harbor.key"
+{% endif %}
 
 harbor_admin_password: {{ harbor_admin_password }}
 

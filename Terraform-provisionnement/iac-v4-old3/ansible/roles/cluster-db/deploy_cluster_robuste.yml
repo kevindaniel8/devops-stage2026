@@ -1,0 +1,230 @@
+---
+# Déploiement robuste du cluster PostgreSQL repmgr (basé sur V1 fonctionnelle)
+- name: Installation PostgreSQL robuste
+  hosts: "{{ target_host | default('all') }}"
+  become: yes
+  vars:
+    postgresql_version: 16
+    postgres_user: postgres
+    repmgr_user: repmgr
+    repmgr_database: repmgr
+    postgres_password: "{{ postgres_password | default('postgres') }}"
+    repmgr_password: "{{ repmgr_password | default('repmgr_password') }}"
+    master_ip: "192.168.56.21"
+    replica_ip: "192.168.56.22"
+    new_server_ip: "192.168.56.23"
+  tasks:
+    - name: Importer le rôle postgresql
+      include_role:
+        name: postgresql
+
+- name: Configuration et enregistrement repmgr robuste
+  hosts: "{{ target_host | default('all') }}"
+  become: yes
+  vars:
+    postgresql_version: 16
+    postgres_user: postgres
+    repmgr_user: repmgr
+    repmgr_database: repmgr
+    postgres_password: "{{ postgres_password | default('postgres') }}"
+    repmgr_password: "{{ repmgr_password | default('repmgr_password') }}"
+    master_ip: "192.168.56.21"
+    replica_ip: "192.168.56.22"
+    new_server_ip: "192.168.56.23"
+    is_primary: "{{ inventory_hostname == 'master' }}"
+    node_id: "{{ '1' if inventory_hostname == 'master' else ('2' if inventory_hostname == 'replica' else '3') }}"
+    node_name: "{{ 'node1' if inventory_hostname == 'master' else ('node2' if inventory_hostname == 'replica' else 'node3') }}"
+    upstream_node_id: "{{ '1' if inventory_hostname == 'replica' else ('1' if inventory_hostname == 'newserver' else omit) }}"
+    upstream_node_name: "{{ 'node1' if inventory_hostname == 'replica' else ('node1' if inventory_hostname == 'newserver' else omit) }}"
+  tasks:
+    - name: Attendre que PostgreSQL soit complètement démarré
+      pause:
+        seconds: 10
+
+    - name: Vérification que PostgreSQL est accessible
+      shell: |
+        sudo -u postgres /usr/lib/postgresql/16/bin/pg_isready -h /var/run/postgresql -p 5432
+      become_user: root
+      retries: 5
+      delay: 5
+      register: pg_check
+
+    - name: Création du dossier de configuration repmgr
+      file:
+        path: "/etc/repmgr/16"
+        state: directory
+        owner: postgres
+        group: postgres
+        mode: '0755'
+
+    - name: Configuration de repmgr.conf
+      template:
+        src: repmgr.conf.j2
+        dest: "/etc/repmgr/16/repmgr.conf"
+        owner: postgres
+        group: postgres
+        mode: '0644'
+        backup: yes
+      vars:
+        ansible_host: "{{ master_ip if inventory_hostname == 'master' else (replica_ip if inventory_hostname == 'replica' else new_server_ip) }}"
+
+    - name: Création du fichier .pgpass pour repmgr
+      copy:
+        dest: "/var/lib/postgresql/.pgpass"
+        content: "{{ ansible_host }}:5432:{{ repmgr_database }}:{{ repmgr_user }}:{{ repmgr_password }}"
+        owner: postgres
+        group: postgres
+        mode: '0600'
+      become_user: root
+
+    - name: Redémarrage PostgreSQL pour réplication
+      systemd:
+        name: "postgresql@16-main"
+        state: restarted
+        enabled: yes
+      retries: 3
+      delay: 5
+
+    - name: Attendre que PostgreSQL soit prêt après redémarrage
+      shell: |
+        timeout 60 bash -c "until sudo -u postgres /usr/lib/postgresql/16/bin/pg_isready -h /var/run/postgresql -p 5432; do sleep 2; done"
+      become_user: root
+      retries: 3
+      delay: 5
+
+    - name: Enregistrement du master avec retry
+      shell: |
+        export PGPASSWORD={{ repmgr_password }}
+        repmgr -f /etc/repmgr/16/repmgr.conf primary register --force
+      become_user: postgres
+      register: master_register
+      retries: 3
+      delay: 10
+      failed_when: false
+      when: inventory_hostname == 'master'
+
+    - name: Pause et vérification après enregistrement du master
+      block:
+        - name: Pause pour propagation
+          pause:
+            seconds: 15
+
+        - name: Vérification que le master est enregistré
+          shell: |
+            export PGPASSWORD={{ repmgr_password }}
+            repmgr -f /etc/repmgr/16/repmgr.conf cluster show | grep -q "primary.*running"
+          become_user: postgres
+          register: master_check
+          retries: 3
+          delay: 5
+          failed_when: false
+      when: inventory_hostname == 'master'
+
+    - name: Clonage robuste depuis le master (replica et newserver)
+      block:
+        - name: Arrêter PostgreSQL sur replica
+          systemd:
+            name: "postgresql@16-main"
+            state: stopped
+          become_user: root
+          retries: 3
+          delay: 5
+          when: inventory_hostname in ['replica', 'newserver']
+
+        - name: Nettoyer les données existantes
+          shell: |
+            rm -rf /var/lib/postgresql/16/main/*
+            mkdir -p /var/lib/postgresql/16/main
+            chown postgres:postgres /var/lib/postgresql/16/main
+            chmod 700 /var/lib/postgresql/16/main
+          become_user: root
+
+        - name: Test de connexion au master avant clonage
+          shell: |
+            export PGPASSWORD={{ repmgr_password }}
+            timeout 30 psql -h {{ master_ip }} -U {{ repmgr_user }} -d {{ repmgr_database }} -c "SELECT 1;"
+          become_user: postgres
+          register: master_connection_test
+          retries: 3
+          delay: 10
+          failed_when: false
+
+        - name: Clonage depuis le master avec retry
+          shell: |
+            export PGPASSWORD={{ repmgr_password }}
+            repmgr -f /etc/repmgr/16/repmgr.conf standby clone -h {{ master_ip }} -U {{ repmgr_user }} -d {{ repmgr_database }} --verbose --force
+          become_user: postgres
+          environment:
+            PGPASSWORD: "{{ repmgr_password }}"
+          register: clone_result
+          retries: 3
+          delay: 15
+          failed_when: false
+
+        - name: Vérification que les données sont bien clonées
+          stat:
+            path: "/var/lib/postgresql/16/main/PG_VERSION"
+          register: pg_version_check
+
+        - name: Échec du clonage si données manquantes
+          fail:
+            msg: "Le clonage a échoué - PG_VERSION non trouvé"
+          when: not pg_version_check.stat.exists
+
+        - name: Démarrage PostgreSQL replica
+          systemd:
+            name: "postgresql@16-main"
+            state: started
+          become_user: root
+          retries: 3
+          delay: 5
+
+        - name: Attendre que PostgreSQL replica soit prêt
+          shell: |
+            timeout 60 bash -c "until sudo -u postgres /usr/lib/postgresql/16/bin/pg_isready -h /var/run/postgresql -p 5432; do sleep 2; done"
+          become_user: root
+          retries: 5
+          delay: 5
+
+        - name: Vérification que le replica est en mode recovery
+          shell: |
+            sudo -u postgres psql -tAc "SELECT pg_is_in_recovery();" 2>/dev/null | tr -d ' '
+          become_user: root
+          register: recovery_mode
+          failed_when: false
+
+        - name: Échec si pas en mode recovery
+          fail:
+            msg: "Le replica n'est pas en mode recovery"
+          when: recovery_mode.stdout_lines[0] != 't'
+
+        - name: Enregistrement du replica avec retry
+          shell: |
+            export PGPASSWORD={{ repmgr_password }}
+            repmgr -f /etc/repmgr/16/repmgr.conf standby register --force
+          become_user: postgres
+          environment:
+            PGPASSWORD: "{{ repmgr_password }}"
+          register: replica_register
+          retries: 3
+          delay: 10
+          failed_when: false
+      when: inventory_hostname in ['replica', 'newserver']
+
+    - name: Vérification finale du cluster
+      shell: |
+        export PGPASSWORD={{ repmgr_password }}
+        repmgr -f /etc/repmgr/16/repmgr.conf cluster show
+      become_user: postgres
+      register: cluster_status
+      retries: 3
+      delay: 5
+      failed_when: false
+
+    - name: Affichage du statut final
+      debug:
+        msg: |
+          🎉 Cluster PostgreSQL repmgr configuré avec robustesse !
+          📍 Nœud: {{ inventory_hostname }} ({{ 'Master' if inventory_hostname == 'master' else 'Replica' }})
+          📊 Cluster:
+          {{ cluster_status.stdout_lines | join('\n') if cluster_status is defined and cluster_status.stdout_lines | length > 0 else 'Configuration terminée' }}

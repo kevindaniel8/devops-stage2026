@@ -22,7 +22,7 @@
     label: "{{ item.key }}"
   vars:
     svc_name: "{{ item.key }}"
-    svc: "{{ item.value }}"
+    svc: "{{ item.value }}" # a supprimer si besoin
   notify: Reload nginx
   become: true
 

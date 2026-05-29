@@ -37,7 +37,8 @@
   args:
     chdir: "{{ harbor_install_dir }}/harbor"
   register: harbor_stop
-  failed_when: harbor_stop.rc != 0 and 'No such file' not in harbor_stop.msg
+  #failed_when: harbor_stop.rc != 0 and 'No such file' not in harbor_stop.msg #avant modif
+  failed_when: harbor_stop.rc != 0 and 'No such file' not in harbor_stop.msg and 'not found' not in harbor_stop.stderr
   changed_when: harbor_stop.rc == 0
   become: true
 

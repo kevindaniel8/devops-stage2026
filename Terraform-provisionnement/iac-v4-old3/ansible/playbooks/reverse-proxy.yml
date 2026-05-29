@@ -1,0 +1,5 @@
+- name: Configurer le reverse-proxy
+  hosts: reverse_proxy
+  become: true
+  roles:
+    - reverse-proxy

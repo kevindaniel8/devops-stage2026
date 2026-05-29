@@ -1,0 +1,25 @@
+---
+# Déployer un certificat de service sur le reverse-proxy
+- name: Déployer certificat CRT pour {{ service_name }}
+  copy:
+    src: "{{ ssl_certs_base_dir }}/{{ service_name }}.crt"
+    dest: "{{ ssl_nginx_certs_path }}/{{ service_name }}.crt"
+    mode: '0644'
+  become: true
+  notify: Reload nginx
+
+- name: Déployer clé privée KEY pour {{ service_name }}
+  copy:
+    src: "{{ ssl_keys_base_dir }}/{{ service_name }}.key"
+    dest: "{{ ssl_nginx_certs_path }}/{{ service_name }}.key"
+    mode: '0400'
+  become: true
+  notify: Reload nginx
+
+- name: Déployer fullchain CRT pour {{ service_name }}
+  copy:
+    src: "{{ ssl_certs_base_dir }}/{{ service_name }}-fullchain.crt"
+    dest: "{{ ssl_nginx_certs_path }}/{{ service_name }}-fullchain.crt"
+    mode: '0644'
+  become: true
+  notify: Reload nginx

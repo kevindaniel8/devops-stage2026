@@ -51,6 +51,48 @@
     - ssl
 
 # -----------------------------------------------------------------------------
+# 3.5. Déploiement des certificats sur le reverse-proxy
+# -----------------------------------------------------------------------------
+- name: Déployer les certificats sur le reverse-proxy
+  hosts: reverse_proxy
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../inventories/dev/hosts.yml"
+  tasks:
+    - name: Créer le dossier SSL Nginx
+      file:
+        path: /etc/nginx/ssl
+        state: directory
+        mode: '0755'
+
+    - name: Copier les certificats depuis localhost
+      copy:
+        src: "{{ playbook_dir }}/../files/pki/certs/{{ item.key }}.crt"
+        dest: "/etc/nginx/ssl/{{ item.key }}.crt"
+        mode: '0644'
+      loop: "{{ services | dict2items | selectattr('value.tls_mode', 'defined') | selectattr('value.tls_mode', 'equalto', 'internal_ca') | list }}"
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Copier les clés depuis localhost
+      copy:
+        src: "{{ playbook_dir }}/../files/pki/keys/{{ item.key }}.key"
+        dest: "/etc/nginx/ssl/{{ item.key }}.key"
+        mode: '0600'
+      loop: "{{ services | dict2items | selectattr('value.tls_mode', 'defined') | selectattr('value.tls_mode', 'equalto', 'internal_ca') | list }}"
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Copier la CA pour référence
+      copy:
+        src: "{{ playbook_dir }}/../files/pki/ca/ca.crt"
+        dest: "/etc/nginx/ssl/ca.crt"
+        mode: '0644'
+  tags:
+    - deploy-certs
+    - ssl
+
+# -----------------------------------------------------------------------------
 # 4. Activation TLS sur le reverse-proxy
 # -----------------------------------------------------------------------------
 - name: Activer TLS sur le reverse-proxy

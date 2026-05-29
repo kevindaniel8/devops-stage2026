@@ -1,0 +1,48 @@
+---
+# Générer un certificat pour un service spécifique
+- name: Générer la clé privée pour {{ service_name }}
+  community.crypto.openssl_privatekey:
+    path: "{{ ssl_keys_base_dir }}/{{ service_name }}.key"
+    size: "{{ ssl_cert_key_size }}"
+    type: RSA
+    mode: '0400'
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Générer le CSR pour {{ service_name }}
+  community.crypto.openssl_csr:
+    path: "{{ ssl_certs_base_dir }}/{{ service_name }}.csr"
+    privatekey_path: "{{ ssl_keys_base_dir }}/{{ service_name }}.key"
+    common_name: "{{ service_config.fqdn }}"
+    subject_alt_name:
+      - "DNS:{{ service_config.fqdn }}"
+    mode: '0644'
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Signer le certificat {{ service_name }} avec la CA
+  community.crypto.x509_certificate:
+    path: "{{ ssl_certs_base_dir }}/{{ service_name }}.crt"
+    csr_path: "{{ ssl_certs_base_dir }}/{{ service_name }}.csr"
+    ownca_privatekey_path: "{{ ssl_ca_key_file }}"
+    ownca_path: "{{ ssl_ca_cert_file }}"
+    ownca_not_after: "+{{ ssl_cert_validity_days }}d"
+    ownca_digest: sha256
+    ownca_create_authority_key_identifier: true
+    ownca_create_subject_key_identifier: always_create
+    provider: ownca
+    mode: '0644'
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Générer le fullchain pour {{ service_name }}
+  copy:
+    content: "{{ lookup('file', ssl_certs_base_dir + '/' + service_name + '.crt') }}\n{{ lookup('file', ssl_ca_cert_file) }}"
+    dest: "{{ ssl_certs_base_dir }}/{{ service_name }}-fullchain.crt"
+    mode: '0644'
+  delegate_to: localhost
+  become: false
+  run_once: true
