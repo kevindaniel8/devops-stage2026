@@ -1,0 +1,13 @@
+---
+- name: Ensure samba-ad-dc is running
+  systemd:
+    name: samba-ad-dc
+    state: started
+    enabled: yes
+
+- name: Ensure bind9 is running
+  systemd:
+    name: bind9
+    state: started
+    enabled: yes
+

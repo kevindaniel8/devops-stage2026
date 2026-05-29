@@ -1,0 +1,40 @@
+---
+- name: Installer Nginx et OpenSSL
+  ansible.builtin.package:
+    name:
+      - nginx
+      - openssl
+    state: present
+
+- name: Créer le dossier des certificats
+  ansible.builtin.file:
+    path: /etc/nginx/certs
+    state: directory
+    mode: '0755'
+
+- name: Générer les certificats autosignés pour chaque service
+  ansible.builtin.command:
+    cmd: >
+      openssl req -x509 -nodes -newkey rsa:2048
+      -keyout /etc/nginx/certs/{{ item.key }}.key
+      -out /etc/nginx/certs/{{ item.key }}.crt
+      -days {{ reverse_proxy_cert_days }}
+      -subj "/C={{ reverse_proxy_country }}/ST={{ reverse_proxy_state }}/L={{ reverse_proxy_locality }}/O={{ reverse_proxy_org }}/OU={{ reverse_proxy_ou }}/CN={{ item.key }}"
+  args:
+    creates: "/etc/nginx/certs/{{ item.key }}.crt"
+  loop: "{{ reverse_proxy_services | dict2items }}"
+  notify: Reload nginx
+
+- name: Déployer les vhosts Nginx
+  ansible.builtin.template:
+    src: vhost.conf.j2
+    dest: "/etc/nginx/sites-enabled/{{ item.key }}.conf"
+    mode: '0644'
+  loop: "{{ reverse_proxy_services | dict2items }}"
+  notify: Reload nginx
+
+- name: Activer et démarrer Nginx
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true

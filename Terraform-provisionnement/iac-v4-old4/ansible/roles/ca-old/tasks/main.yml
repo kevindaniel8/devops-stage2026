@@ -1,0 +1,196 @@
+---
+# -----------------------------
+# 0. Préparation des dossiers
+# -----------------------------
+
+- name: Créer le dossier CA local
+  file:
+    path: "{{ ca_cert_base_dir }}"
+    state: directory
+    mode: '0755'
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Créer le dossier nginx local
+  file:
+    path: "{{ nginx_cert_base_dir }}"
+    state: directory
+    mode: '0755'
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+# -----------------------------
+# 1. Génération de la CA
+# -----------------------------
+
+- name: Générer la clé privée de la CA
+  command: >
+    openssl genrsa -out {{ ca_cert_base_dir }}/ca.key 4096
+  args:
+    creates: "{{ ca_cert_base_dir }}/ca.key"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Générer le certificat CA (self-signed)
+  command: >
+    openssl req -x509 -new -nodes
+    -key {{ ca_cert_base_dir }}/ca.key
+    -sha256 -days 3650
+    -config {{ role_path }}/files/ca_ext.cnf
+    -out {{ ca_cert_base_dir }}/ca.crt
+  args:
+    creates: "{{ ca_cert_base_dir }}/ca.crt"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+# -----------------------------
+# 2. Génération des certificats Nginx
+# -----------------------------
+
+- name: Générer les certificats nginx
+  vars:
+    certs:
+      - name: "wildcard.kevin.lan"
+        cn: "{{ wildcard_domain }}"
+        san: "{{ wildcard_domain }}"
+      - name: "kevin.lan"
+        cn: "{{ root_domain }}"
+        san: "{{ root_domain }}"
+      - name: "reverse-proxy.kevin.lan"
+        cn: "{{ reverse_proxy_domain }}"
+        san: "{{ reverse_proxy_domain }}"
+  block:
+
+    - name: Générer la clé privée
+      command: >
+        openssl genrsa -out {{ nginx_cert_base_dir }}/{{ item.name }}.key 4096
+      args:
+        creates: "{{ nginx_cert_base_dir }}/{{ item.name }}.key"
+      loop: "{{ certs }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: localhost
+      become: false
+      run_once: true
+
+    - name: Générer le fichier de configuration OpenSSL
+      copy:
+        dest: "{{ nginx_cert_base_dir }}/{{ item.name }}.cnf"
+        mode: '0644'
+        content: |
+          [ req ]
+          default_bits = 4096
+          prompt = no
+          default_md = sha256
+          distinguished_name = dn
+          req_extensions = v3_req
+
+          [ dn ]
+          CN = {{ item.cn }}
+
+          [ v3_req ]
+          subjectAltName = @alt_names
+
+          [ alt_names ]
+          DNS.1 = {{ item.san }}
+      loop: "{{ certs }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: localhost
+      become: false
+      run_once: true
+
+    - name: Générer le CSR
+      command: >
+        openssl req -new
+        -key {{ nginx_cert_base_dir }}/{{ item.name }}.key
+        -config {{ nginx_cert_base_dir }}/{{ item.name }}.cnf
+        -out {{ nginx_cert_base_dir }}/{{ item.name }}.csr
+      args:
+        creates: "{{ nginx_cert_base_dir }}/{{ item.name }}.csr"
+      loop: "{{ certs }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: localhost
+      become: false
+      run_once: true
+
+    - name: Signer le certificat avec la CA
+      command: >
+        openssl x509 -req
+        -in {{ nginx_cert_base_dir }}/{{ item.name }}.csr
+        -CA {{ ca_cert_base_dir }}/ca.crt
+        -CAkey {{ ca_cert_base_dir }}/ca.key
+        -CAcreateserial
+        -out {{ nginx_cert_base_dir }}/{{ item.name }}.crt
+        -days 3650
+        -sha256
+        -extensions v3_req
+        -extfile {{ nginx_cert_base_dir }}/{{ item.name }}.cnf
+      args:
+        creates: "{{ nginx_cert_base_dir }}/{{ item.name }}.crt"
+      loop: "{{ certs }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: localhost
+      become: false
+      run_once: true
+
+    - name: Générer le fullchain
+      copy:
+        dest: "{{ nginx_cert_base_dir }}/{{ item.name }}-fullchain.crt"
+        content: |
+          {{ lookup('file', nginx_cert_base_dir + '/' + item.name + '.crt') }}
+          {{ lookup('file', ca_cert_base_dir + '/ca.crt') }}
+        mode: '0644'
+      loop: "{{ certs }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: localhost
+      become: false
+      run_once: true
+
+# -----------------------------
+# 3. Vérifications
+# -----------------------------
+
+- name: Vérifier que la CA est valide
+  command: "openssl x509 -in {{ ca_cert_base_dir }}/ca.crt -text -noout"
+  register: ca_check
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Vérifier CA:TRUE
+  assert:
+    that:
+      - "'CA:TRUE' in ca_check.stdout"
+    fail_msg: "ERREUR : La CA générée n'est pas valide"
+  run_once: true
+
+- name: Vérifier que les certificats nginx sont signés par la CA
+  vars:
+    certs:
+      - "wildcard.kevin.lan"
+      - "kevin.lan"
+      - "reverse-proxy.kevin.lan"
+  command: >
+    openssl verify -CAfile {{ ca_cert_base_dir }}/ca.crt {{ nginx_cert_base_dir }}/{{ item }}.crt
+  register: verify_nginx
+  loop: "{{ certs }}"
+  loop_control:
+    label: "{{ item }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Vérifier la validité des certificats nginx
+  assert:
+    that:
+      - verify_nginx.results | map(attribute='stdout') | list | select('search', 'OK') | length == 3
+    fail_msg: "ERREUR : Un ou plusieurs certificats nginx ne sont pas signés par la CA"
+  run_once: true

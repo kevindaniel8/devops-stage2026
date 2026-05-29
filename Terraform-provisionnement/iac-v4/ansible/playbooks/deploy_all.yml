@@ -15,6 +15,6 @@
 #- import_playbook: deploy_beszel_agents.yml
 #- import_playbook: samba-ad-cleanup.yml # nettoyage après déploiement de samba-ad et lui laisse le temps de se stabiliser
 # playbook paramtrage ssl / tls / reverse proxy ici
-#- import_playbook: deploy_moodle.yml # en attente du role deploiement certificat pour demarer le role 
+#- import_playbook: deploy_moodle.yml # a ne pas mettre dedans car doit etre deployer ensuite via le script 7-deploy-moodle.sh car il generé une image dans harbor puis deploy dans kubernetes
 #- import_playbook: deploy_observability.yml
 # playbook paramterage ici

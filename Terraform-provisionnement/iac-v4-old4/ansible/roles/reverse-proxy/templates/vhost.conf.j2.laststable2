@@ -1,0 +1,66 @@
+# ============================================================
+#  VHOST HTTP (toujours présent)
+# ============================================================
+server {
+    listen 80;
+    server_name {{ svc.fqdn }};
+
+    {% if svc.tls_mode != 'none' and enable_tls %}
+    # Redirection HTTP -> HTTPS (TLS activé)
+    return 301 https://$host$request_uri;
+    {% else %}
+    # Pas de TLS → proxy direct
+    location / {
+        {% if svc.backend_type == 'vm' %}
+        proxy_pass http://{{ svc.backend_ip }}:{{ svc.backend_port }};
+        {% elif svc.backend_type == 'kubernetes' %}
+        proxy_pass http://{{ svc.node_ip }}:{{ svc.node_port }};
+        {% endif %}
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Headers spécifiques pour Harbor (force HTTPS)
+        {% if svc_name == 'harbor' %}
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
+        proxy_redirect off;
+        {% endif %}
+    }
+    {% endif %}
+
+    # Health check
+    location /health {
+        access_log off;
+        return 200 "healthy\n";
+        add_header Content-Type text/plain;
+    }
+}
+
+# ============================================================
+#  VHOST HTTPS (uniquement si TLS activé globalement)
+# ============================================================
+{% if svc.tls_mode != 'none' and enable_tls %}
+server {
+    listen 443 ssl;
+    server_name {{ svc.fqdn }};
+
+    ssl_certificate     /etc/nginx/ssl/{{ svc_name }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ svc_name }}.key;
+
+    location / {
+        {% if svc.backend_type == 'vm' %}
+        proxy_pass http://{{ svc.backend_ip }}:{{ svc.backend_port }};
+        {% elif svc.backend_type == 'kubernetes' %}
+        proxy_pass http://{{ svc.node_ip }}:{{ svc.node_port }};
+        {% endif %}
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+{% endif %}

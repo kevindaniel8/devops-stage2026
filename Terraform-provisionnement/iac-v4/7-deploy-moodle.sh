@@ -12,6 +12,7 @@ NC='\033[0m'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HARBOR_URL="192.168.20.205"
+#HARBOR_URL="harbor.greencontracts.lan"
 HARBOR_PROJECT="library"
 IMAGE_NAME="moodle"
 IMAGE_TAG="latest"
