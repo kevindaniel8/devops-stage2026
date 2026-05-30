@@ -22,7 +22,7 @@
     label: "{{ item.key }}"
   vars:
     svc_name: "{{ item.key }}"
-    svc: "{{ item.value }}" # a supprimer si besoin
+    svc: "{{ item.value }}"
   notify: Reload nginx
   become: true
 
@@ -51,3 +51,10 @@
     }}
   when: reverse_proxy_services is defined
   become: true
+
+# -------------------------------------------------------------------
+# 6) PAUSE APRES NETTOYAGE DES VHOSTS
+# -------------------------------------------------------------------
+- name: Pause après nettoyage des vhosts
+  pause:
+    seconds: 50

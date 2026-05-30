@@ -1,6 +1,8 @@
 ---
+- import_playbook: init_modoboa_db.yml
+
 - hosts: mailserver
   become: yes
   roles:
-    - docker
-    - modoboa
+    - ../roles/docker
+    - ../roles/modoboa

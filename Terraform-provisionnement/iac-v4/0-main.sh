@@ -271,6 +271,26 @@ else
     echo "   Pour déployer manuellement : ./6-deploiement-ansible.sh"
 fi
 
+############## etape deploy-moodle ##############
+
+if [[ -f "./7-deploy-moodle.sh" ]]; then
+    echo "📦 Déploiement Moodle..."
+    if [[ "$AUTO_DEPLOY_MOODLE" == "false" ]]; then
+        echo "⏸️  Déploiement Moodle ignoré (AUTO_DEPLOY_MOODLE=false)."
+        echo "   Pour déployer manuellement : ./7-deploy-moodle.sh"
+    else
+        # Déploiement par défaut avec reset-db pour créer la DB au premier déploiement
+        ./7-deploy-moodle.sh reset-db
+    fi
+else
+    echo "⚠️  Script 7-deploy-moodle.sh non trouvé"
+    echo "   Pour déployer manuellement : ./7-deploy-moodle.sh"
+fi
+
+
+
+
+############## fin etape deploy-moodle ##############
 
 end_time=$(date +%s)
 

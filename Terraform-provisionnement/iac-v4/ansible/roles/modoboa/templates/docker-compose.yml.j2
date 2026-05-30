@@ -11,6 +11,7 @@ services:
       DB_USER: "{{ modoboa_db_user }}"
       DB_PASSWORD: "{{ modoboa_db_password }}"
       APP_PORT: "{{ modoboa_app_port }}"
+      DJANGO_ALLOWED_HOSTS: "{{ modoboa_domain }}"
 
     ports:
       - "{{ modoboa_app_port }}:{{ modoboa_app_port }}"

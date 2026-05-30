@@ -104,6 +104,8 @@ Le script vous demandera **une seule fois** le mot de passe root de Proxmox.
 | **9.4** | Plan | `terraform plan -out=tfplan` |
 | **9.5** | Confirmation apply | Demande confirmation finale |
 | **9.6** | Apply | `terraform apply tfplan` |
+| **10** | **Déploiement Ansible** | Exécute `6-deploiement-ansible.sh` (optionnel) |
+| **11** | **Déploiement Moodle** | Exécute `7-deploy-moodle.sh` avec reset-db (optionnel) |
 
 ## 🔐 Multiplexing SSH (ControlMaster)
 
@@ -209,6 +211,7 @@ ENV_FILE=/path/to/custom.env ./0-main.sh
 | `VM_SSH_USER` | `terraform` | Utilisateur SSH VMs |
 | `VM_PASSWORD` | `changeme` | Mot de passe VMs (mode dev) |
 | `NET_BRIDGE` | `vmbr1` | Bridge réseau |
+| `AUTO_DEPLOY_MOODLE` | `true` `false` | Déploiement Moodle automatique | `true` |
 
 ### Exemple complet: Déploiement Debian spécifique
 
@@ -233,6 +236,74 @@ cat env.conf | grep -E "SCRIPT3_ARG|TEMPLATE_ID"
 # 🧹 [9.1] Nettoyage du state Terraform...
 # 🔄 [9.2] Initialisation Terraform...
 ```
+
+## 🎓 Déploiement Moodle (Étape 11)
+
+Le pipeline inclut une étape optionnelle de déploiement Moodle sur K3s via le script `7-deploy-moodle.sh`.
+
+### Variables d'environnement
+
+| Variable | Valeurs | Description | Défaut |
+|----------|---------|-------------|--------|
+| `AUTO_DEPLOY_MOODLE` | `true` `false` | Active/désactive le déploiement Moodle automatique | `true` |
+
+### Options du script 7-deploy-moodle.sh
+
+Le script `7-deploy-moodle.sh` accepte les arguments suivants :
+
+| Argument | Description |
+|----------|-------------|
+| `build` | Build l'image Docker et push vers Harbor |
+| `skip-build` | Skip le build (utilise l'image existante) |
+| `reset-db` | Reset la base de données PostgreSQL et recrée Moodle |
+
+### Utilisation
+
+```bash
+# Déploiement automatique (défaut)
+./0-main.sh
+
+# Ignorer le déploiement Moodle
+AUTO_DEPLOY_MOODLE=false ./0-main.sh
+
+# Déploiement manuel avec reset DB
+./7-deploy-moodle.sh reset-db
+
+# Déploiement manuel sans build
+./7-deploy-moodle.sh skip-build
+```
+
+### Processus de déploiement Moodle
+
+1. **Build image Docker** (optionnel) : Build l'image Moodle depuis `docker-images/moodle/Dockerfile`
+2. **Push vers Harbor** : Push l'image vers `192.168.20.205/library/moodle:latest`
+3. **Reset DB** (si `reset-db`) : Supprime et recrée la base PostgreSQL Moodle
+4. **Suppression ancien deployment** : Supprime le deployment K3s existant
+5. **Déploiement Ansible** : Exécute `ansible-playbook playbooks/deploy_moodle.yml`
+6. **Vérification** : Attend que le pod Moodle soit prêt
+
+### Accès Moodle
+
+Après déploiement, Moodle est accessible via :
+- **IP directe** : `http://192.168.20.220:30081`
+- **FQDN** : `http://moodle.greencontracts.lan` (si DNS configuré)
+
+### Commandes utiles
+
+```bash
+# Logs Moodle
+ssh ubuntu@192.168.20.220 'sudo k3s kubectl logs -n moodle deployment/moodle -f'
+
+# Shell dans le pod Moodle
+ssh ubuntu@192.168.20.220 'sudo k3s kubectl exec -n moodle deployment/moodle -it -- bash'
+
+# Status des pods Moodle
+ssh ubuntu@192.168.20.220 'sudo k3s kubectl get pods -n moodle'
+```
+
+### Note importante
+
+Le déploiement Moodle utilise par défaut l'option `reset-db` pour créer la base de données au premier déploiement. Si la base existe déjà, elle sera supprimée et recréée. Pour éviter cela, utilisez `skip-build` à la place.
 
 ## �🚨 Dépannage
 

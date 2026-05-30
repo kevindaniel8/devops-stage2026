@@ -1,0 +1,7 @@
+---
+# Handlers pour le rôle ssl-distribute
+
+- name: Update CA certificates
+  command: update-ca-certificates
+  become: true
+  changed_when: true

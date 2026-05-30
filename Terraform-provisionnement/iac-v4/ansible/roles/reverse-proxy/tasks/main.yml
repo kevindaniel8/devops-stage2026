@@ -62,7 +62,14 @@
   become: true
 
 # -------------------------------------------------------------------
-# 4) GÉNÉRATION DES VHOSTS DYNAMIQUES
+# 4) PAUSE AVANT GÉNÉRATION DES VHOSTS
+# -------------------------------------------------------------------
+- name: Pause avant la génération des vhosts
+  pause:
+    seconds: 2
+
+# -------------------------------------------------------------------
+# 5) GÉNÉRATION DES VHOSTS DYNAMIQUES
 # -------------------------------------------------------------------
 - name: Générer les vhosts Nginx à partir de services
   ansible.builtin.include_tasks: vhosts.yml

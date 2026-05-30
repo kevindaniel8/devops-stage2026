@@ -156,3 +156,134 @@ sudo update-ca-certificates
 - La CA interne ne doit être distribuée qu'aux machines de confiance
 - Le mode SSH utilise scp pour le transfert sécurisé
 - Le mode HTTP doit être utilisé uniquement sur des réseaux de confiance
+
+
+######################################### A Eviter #########################################
+## Configuration FQDN avec certificat local (optionnel)
+
+Pour utiliser les services via FQDN (ex: `moodle.greencontracts.lan`) au lieu de l'IP directe, suivre ces étapes :
+
+### 1. Configuration DNS
+
+Ajouter l'entrée dans `/etc/hosts` sur chaque client :
+```bash
+sudo nano /etc/hosts
+# Ajouter :
+192.168.20.3 moodle.greencontracts.lan nextcloud.greencontracts.lan mail.greencontracts.lan
+```
+
+Ou configurer le DNS sur la box/routeur pour résoudre `*.greencontracts.lan` vers `192.168.20.3`.
+
+### 2. Configuration Moodle
+
+Modifier `ansible/roles/moodle-k3s/defaults/main.yml` :
+```yaml
+# Ingress / hostname
+moodle_hostname: "moodle.greencontracts.lan" # mode prod
+#moodle_hostname: "192.168.20.220:30081" # mode dev
+
+# WWWROOT
+moodle_wwwroot: "https://{{ moodle_hostname }}"
+```
+
+Puis redéployer Moodle :
+```bash
+ansible-playbook -i ansible/inventories/dev/hosts.yml ansible/playbooks/deploy_moodle.yml
+```
+
+### 3. Installation de la CA
+
+Utiliser le script de distribution CA sur chaque client :
+```bash
+./7-a-distribute-ca.sh manual  # pour installation locale
+./7-a-distribute-ca.sh ssh user@IP  # pour distribution SSH
+```
+
+### 4. Vérification
+
+Tester l'accès HTTPS :
+```bash
+openssl s_client -connect moodle.greencontracts.lan:443 -showcerts
+```
+
+### Notes importantes
+
+- **Accès IP perdu** : Après cette configuration, l'accès direct via IP (`http://192.168.20.220:30081`) ne fonctionnera plus car Moodle redirigera vers le FQDN
+- **Persistance** : Sauvegarder `ansible/files/pki/` pour éviter de régénérer les certificats à chaque redéploiement
+- **Accès web public** : Pour un accès web public, utiliser Let's Encrypt au lieu de la CA interne
+- **Firefox** : Firefox utilise son propre store de certificats, il faudra ajouter la CA manuellement dans Firefox
+######################################### Fin A Eviter #########################################
+
+## Configuration Let's Encrypt pour accès web public (recommandé pour prod)
+
+Pour utiliser Let's Encrypt pour les certificats publics (recommandé pour la production), suivre ces étapes :
+
+### 1. Prérequis
+
+- Domaine public pointant vers l'IP publique du reverse-proxy
+- Port 80 et 443 ouverts sur le pare-feu
+- DNS configuré correctement
+
+### 2. Configuration des services
+
+Modifier `ansible/roles/reverse-proxy/defaults/main.yml` ou `env.conf` :
+```yaml
+# Pour Moodle
+moodle_tls_mode: letsencrypt
+moodle_domain: "moodle.greencontracts.com"
+
+# Pour Nextcloud
+nextcloud_tls_mode: letsencrypt
+nextcloud_domain: "nextcloud.greencontracts.com"
+
+# Pour Mail
+mail_tls_mode: letsencrypt
+mail_domain: "mail.greencontracts.com"
+```
+
+### 3. Configuration Let's Encrypt
+
+Modifier `ansible/roles/ssl-letsencrypt/defaults/main.yml` :
+```yaml
+letsencrypt_email: "your-email@example.com"
+letsencrypt_staging: false  # true pour les tests, false pour la prod
+```
+
+### 4. Déploiement
+
+Lancer le playbook SSL orchestrator :
+```bash
+ansible-playbook -i ansible/inventories/dev/hosts.yml ansible/playbooks/ssl-orchestrator.yml
+```
+
+Le rôle `ssl-letsencrypt` va :
+- Générer des certificats via Let's Encrypt
+- Déployer les certificats sur le reverse-proxy
+- Configurer Nginx pour utiliser ces certificats
+
+### 5. Configuration Moodle
+
+Modifier `ansible/roles/moodle-k3s/defaults/main.yml` :
+```yaml
+moodle_hostname: "moodle.greencontracts.com"
+moodle_wwwroot: "https://{{ moodle_hostname }}"
+```
+
+### 6. Redéploiement Moodle
+
+```bash
+ansible-playbook -i ansible/inventories/dev/hosts.yml ansible/playbooks/deploy_moodle.yml
+```
+
+### Avantages de Let's Encrypt
+
+- Certificats reconnus par tous les navigateurs
+- Renouvellement automatique
+- Pas besoin de distribuer de CA aux clients
+- Adapté pour l'accès web public
+
+### Inconvénients
+
+- Nécessite un domaine public
+- Nécessite une IP publique
+- Ne fonctionne pas pour les réseaux internes uniquement

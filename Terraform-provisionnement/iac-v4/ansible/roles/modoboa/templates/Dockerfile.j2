@@ -18,13 +18,7 @@ RUN pip install modoboa==2.1.1 gunicorn
 
 WORKDIR /data
 
-CMD bash -c " \
-    if [ ! -d /data/instance ]; then \
-        echo 'First run: deploying Modoboa'; \
-        modoboa-admin.py deploy instance \
-        --dburl postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}; \
-        mv instance /data/instance; \
-    else \
-        echo 'Instance already exists, skipping deploy'; \
-    fi && \
-    gunicorn instance.wsgi:application --chdir /data/instance --bind 0.0.0.0:${APP_PORT}"
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

@@ -1,0 +1,70 @@
+# =============================================================================
+# GROUP VARS - Database (DEV)
+# =============================================================================
+# Variables pour le cluster PostgreSQL avec réplication repmgr (environnement dev)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# CONFIGURATION POSTGRESQL
+# -----------------------------------------------------------------------------
+postgres_version: "16"
+postgres_data_dir: "/var/lib/postgresql/{{ postgres_version }}/main"
+postgres_config_dir: "/etc/postgresql/{{ postgres_version }}/main"
+postgres_bin_dir: "/usr/lib/postgresql/{{ postgres_version }}/bin"
+
+# Port et écoute
+postgres_port: 5432
+postgres_listen_addresses: "*"
+
+# -----------------------------------------------------------------------------
+# NŒUDS DU CLUSTER
+# -----------------------------------------------------------------------------
+master_node: "db-postgres-master"
+master_ip: "192.168.20.20"
+replica_ip: "192.168.20.21"
+
+# -----------------------------------------------------------------------------
+# UTILISATEURS ET BASES
+# -----------------------------------------------------------------------------
+# Utilisateur postgres (superuser pour DBeaver)
+postgres_password: "postgres_secure_password"
+
+# Utilisateur applicatif
+app_database: "app_database"
+app_user: "app_user"
+app_password: "app_secure_password"
+
+# Utilisateur repmgr (réplication et gestion cluster)
+repmgr_user: "repmgr"
+repmgr_password: "repmgr_secure_password"
+repmgr_database: "repmgr"
+
+# Utilisateur backup
+backup_user: "backup"
+backup_password: "backup_secure_password"
+
+# -----------------------------------------------------------------------------
+# CONFIGURATION REPMGR
+# -----------------------------------------------------------------------------
+repmgr_config_dir: "/etc/repmgr/{{ postgres_version }}"
+repmgr_config_file: "{{ repmgr_config_dir }}/repmgr.conf"
+repmgr_failover: "automatic"
+repmgr_monitoring_history: "true"
+repmgr_monitor_interval_secs: 2
+repmgr_reconnect_attempts: 6
+repmgr_reconnect_interval: 5
+repmgr_use_replication_slots: 1
+
+# -----------------------------------------------------------------------------
+# RÉPLICATION
+# -----------------------------------------------------------------------------
+max_replication_slots: 10
+max_wal_senders: 10
+wal_keep_size: "1GB"
+hot_standby: "on"
+
+# -----------------------------------------------------------------------------
+# BACKUP
+# -----------------------------------------------------------------------------
+backup_dir: "/var/lib/postgresql/backups"
+backup_retention_days: 7

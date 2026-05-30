@@ -55,23 +55,22 @@ case "${MODE}" in
 
         echo -e "${BLUE}📤 Distribution via SSH vers ${TARGET}...${NC}"
         
-        # Copier la CA via SCP
-        scp "${CA_FILE}" "${TARGET}:/tmp/${CA_NAME}"
+        # Copier la CA via SCP dans le home directory
+        scp "${CA_FILE}" "${TARGET}:~/${CA_NAME}"
         
-        # Installer la CA via SSH
-        ssh "${TARGET}" << 'EOF'
-            # Créer le répertoire de destination s'il n'existe pas
-            sudo mkdir -p /usr/local/share/ca-certificates
-            # Copier la CA
-            sudo cp /tmp/greencontracts-ca.crt /usr/local/share/ca-certificates/
-            # Mettre à jour le store de certificats
-            sudo update-ca-certificates
-            # Nettoyer le fichier temporaire
-            sudo rm /tmp/greencontracts-ca.crt
-            echo "✅ CA installée avec succès"
-EOF
+        echo -e "${YELLOW}⚠️  CA copiée dans le home directory de ${TARGET}${NC}"
+        echo -e "${YELLOW}⚠️  Exécutez cette commande sur ${TARGET} pour installer la CA:${NC}"
+        echo -e "${GREEN}sudo mkdir -p /usr/local/share/ca-certificates && sudo cp ~/${CA_NAME} /usr/local/share/ca-certificates/ && sudo update-ca-certificates && rm ~/${CA_NAME}${NC}"
         
-        echo -e "${GREEN}✅ CA distribuée et installée sur ${TARGET}${NC}"
+        # Tenter l'installation automatique
+        ssh "${TARGET}" "sudo mkdir -p /usr/local/share/ca-certificates && sudo cp ~/${CA_NAME} /usr/local/share/ca-certificates/ && sudo update-ca-certificates && rm ~/${CA_NAME}" 2>&1
+        
+        if [[ $? -eq 0 ]]; then
+            echo -e "${GREEN}✅ CA distribuée et installée sur ${TARGET}${NC}"
+        else
+            echo -e "${RED}❌ Échec de l'installation automatique${NC}"
+            echo -e "${YELLOW}Exécutez manuellement la commande ci-dessus sur ${TARGET}${NC}"
+        fi
         ;;
         
     http)
