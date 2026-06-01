@@ -1,0 +1,79 @@
+all:
+  vars:
+    # L'IP vers laquelle tous les clients doivent pointer
+    dns_server_ip: "192.168.20.2"
+    betzel_hub_ip: "192.168.20.4"
+    pg_cluster_master: "192.168.20.20"
+    pg_cluster_replica: "192.168.20.21"
+  
+  children:
+    # -------------------------------------------------------------
+    # GROUPE CHAPEAU : Centralise toutes les machines sous Ansible
+    # -------------------------------------------------------------
+    infrastructure:
+      children:
+        
+        # Le PRODUCTEUR du service DNS et de l'Active Directory
+        domain_controllers:
+          hosts:
+            srv-dc-dns:
+              ansible_host: 192.168.20.2
+
+        # Les CONSOMMATEURS du DNS (Reçoivent automatiquement le rôle DNS Client)
+        domain_clients:
+          hosts:
+            srv-proxy-mail:
+              ansible_host: 192.168.20.3
+              proxy_services:
+                - { name: "mail", ext_port: 443, int_port: 8000, dest_ip: "127.0.0.1" }
+            srv-apps-snmp:
+              ansible_host: 192.168.20.4
+              proxy_services:
+                - { name: "wiki", ext_port: 443, int_port: 3000, dest_ip: "192.168.20.4" }
+            srv-nas-local:
+              ansible_host: 192.168.20.8
+            srv-nextcloud:
+              ansible_host: 192.168.20.10
+              proxy_services:
+                - { name: "cloud", ext_port: 443, int_port: 80, dest_ip: "192.168.20.10" }
+            srv-pg-master:
+              ansible_host: 192.168.20.20
+            srv-pg-replica:
+              ansible_host: 192.168.20.21
+            srv-arbor:
+              ansible_host: 192.168.20.205
+            k3s-manager:
+              ansible_host: 192.168.20.220
+              proxy_services:
+                - { name: "argocd", ext_port: 443, int_port: 30080, dest_ip: "192.168.20.220" }
+                - { name: "moodle", ext_port: 443, int_port: 30081, dest_ip: "192.168.20.220" }
+            k3s-worker-1:
+              ansible_host: 192.168.20.221
+            k3s-worker-2:
+              ansible_host: 192.168.20.222
+
+    # -------------------------------------------------------------
+    # GROUPES MÉTIERS : Pour l'application des configurations spécifiques
+    # -------------------------------------------------------------
+    reverse_proxy:
+      hosts:
+        srv-proxy-mail:
+    postgres_cluster:
+      hosts:
+        srv-pg-master:
+          pg_role: "master"
+        srv-pg-replica:
+          pg_role: "replica"
+    k3s_cluster:
+      children:
+        master:
+          hosts:
+            k3s-manager:
+        workers:
+          hosts:
+            k3s-worker-1:
+            k3s-worker-2:
+    management:
+      hosts:
+        pc-management:
+          ansible_connection: local

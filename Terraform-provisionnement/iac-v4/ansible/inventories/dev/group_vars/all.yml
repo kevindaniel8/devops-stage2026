@@ -3,7 +3,7 @@
 # =============================================================================
 
 
-modoboa_domain: mail.example.com
+modoboa_domain: mail.greencontracts.lan
 
 modoboa_admin_user: admin
 modoboa_admin_password: ChangeMe123!
@@ -15,6 +15,8 @@ modoboa_db_port: 5432
 modoboa_db_name: modoboa
 modoboa_db_user: modoboa
 modoboa_db_password: StrongPassword
+
+modoboa_app_port: 8000
 
 modoboa_install_path: /opt/modoboa
 modoboa_venv: /opt/modoboa/venv

@@ -8,3 +8,6 @@
     name: postgresql
     state: reloaded
   delegate_to: "{{ modoboa_db_host }}"
+
+- name: Restart modoboa
+  command: docker restart modoboa

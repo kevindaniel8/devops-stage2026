@@ -1,0 +1,24 @@
+FROM python:3.10-slim
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    g++ \
+    libpq-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    libffi-dev \
+    libssl-dev \
+    librrd-dev \
+    rrdtool \
+    && apt-get clean
+
+RUN pip install --upgrade pip
+RUN pip install modoboa==2.1.1 gunicorn
+
+WORKDIR /data
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

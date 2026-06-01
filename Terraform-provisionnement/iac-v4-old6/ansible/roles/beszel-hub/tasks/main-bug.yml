@@ -1,0 +1,118 @@
+---
+# 0
+- name: Ensure docker is installed
+  ansible.builtin.package:
+    name:
+      - docker-ce
+      - docker-compose
+    state: present
+# 0
+- name: Create Beszel directory
+  ansible.builtin.file:
+    path: "{{ beszel_install_dir }}"
+    state: directory
+    mode: "0755"
+# 1
+- name: Deploy templated Dockerfile
+  ansible.builtin.template:
+    src: Dockerfile.j2
+    dest: "{{ beszel_install_dir }}/Dockerfile"
+    mode: "0644"
+# 1
+- name: Build custom Beszel image
+  ansible.builtin.command:
+    cmd: docker build -t {{ beszel_image_name }} .
+    chdir: "{{ beszel_install_dir }}"
+  notify:
+    - Stop Beszel
+    - Start Beszel
+
+# 1. Déployer le docker-compose du Hub
+- name: Deploy Beszel Hub docker-compose
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ beszel_install_dir }}/docker-compose.yml"
+    mode: "0644"
+  notify:
+    - Stop Beszel
+    - Start Beszel
+
+# 2. Démarrer le Hub
+- name: Start Beszel Hub
+  ansible.builtin.command:
+    cmd: docker compose up -d
+    chdir: "{{ beszel_install_dir }}"
+
+# 3. Attendre que l’API du Hub soit prête
+- name: Wait for Beszel Hub API to be ready
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:8090/api/version"
+    method: GET
+    status_code: 200
+  register: hub_ready
+  retries: 30
+  delay: 2
+  until: hub_ready.status == 200
+
+# 4. Créer automatiquement le compte admin
+- name: Initialize Beszel Hub admin account
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:8090/api/setup"
+    method: POST
+    body_format: json
+    body:
+      username: "{{ beszel_admin_user }}"
+      password: "{{ beszel_admin_password }}"
+    status_code: 200
+  register: admin_setup
+
+# 5. Obtenir le JWT admin
+- name: Authenticate admin to get JWT
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:8090/api/login"
+    method: POST
+    body_format: json
+    body:
+      username: "{{ beszel_admin_user }}"
+      password: "{{ beszel_admin_password }}"
+    status_code: 200
+  register: admin_login
+
+- set_fact:
+    beszel_admin_jwt: "{{ admin_login.json.token }}"
+
+# 6. Activer le token universel permanent
+- name: Get universal token
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:8090/api/settings/token"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ beszel_admin_jwt }}"
+    body_format: json
+    body:
+      permanent: true
+  register: token_response
+
+- set_fact:
+    beszel_agent_token: "{{ token_response.json.token }}"
+
+# 7. Exporter automatiquement le docker-compose agent
+- name: Download agent docker-compose from Hub
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:8090/api/agent/docker-compose"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ beszel_admin_jwt }}"
+  register: agent_compose
+
+- name: Save agent docker-compose file
+  ansible.builtin.copy:
+    dest: "{{ beszel_install_dir }}/docker-compose-agent.yml"
+    content: "{{ agent_compose.content }}"
+    mode: "0644"
+
+# 8. Lancer automatiquement l’agent sur le Hub
+- name: Start Beszel agent
+  ansible.builtin.command:
+    cmd: docker compose -f docker-compose-agent.yml up -d
+    chdir: "{{ beszel_install_dir }}"

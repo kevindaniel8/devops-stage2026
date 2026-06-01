@@ -1,0 +1,25 @@
+---
+- name: Récupérer la CA
+  fetch:
+    src: /etc/pki/ca/certs/ca.crt
+    dest: "{{ cert_store_dir }}/"
+    flat: yes
+
+- name: Récupérer le certificat serveur
+  fetch:
+    src: /etc/pki/ca/certs/server.crt
+    dest: "{{ cert_store_dir }}/"
+    flat: yes
+
+- name: Récupérer la clé privée serveur
+  fetch:
+    src: /etc/pki/ca/private/server.key
+    dest: "{{ cert_store_dir }}/"
+    flat: yes
+
+- name: Récupérer le fullchain
+  fetch:
+    src: /etc/pki/ca/certs/server-fullchain.crt
+    dest: "{{ cert_store_dir }}/"
+    flat: yes
+

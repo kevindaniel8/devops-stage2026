@@ -1,23 +1,22 @@
 ---
 #- import_playbook: deploy_dns.yml # intégrer avec samba-ad juste rajouter un role de parametrage aprés deploiement de toutes les machine
 #- import_playbook: deploy_reverse_proxy.yml # integré au serveur de messagerie stockaga sur nas a parametrer 
-- import_playbook: pipeline_cd.yml
-- import_playbook: deploy-cluster-db.yml
-- import_playbook: deploy-ad-dc.yml # ad & dns ensemble
-#- import_playbook: deploy_snmp.yml // version prometheus-exporter
-- import_playbook: deploy_beszel.yml
-- import_playbook: deploy_nextcloud.yml
-- import_playbook: deploy_wikijs.yml # voir sur quel autre machine l'intégrer peut etre sur beszel serveur 
-- import_playbook: deploy_modoboa.yml # en attente de reglages
-- import_playbook: deploy_nds.yml # playbook paramtrage ssl / tls / reverse proxy ici
-#- import_playbook: deploy_modoboa.yml # en attente de reglages
-
-#- import_playbook: deploy_nextcloud_office.yml
-#- import_playbook: deploy_beszel_agents.yml
-#- import_playbook: deploy_observability.yml
-#- import_playbook: samba-ad-cleanup.yml # nettoyage après déploiement de samba-ad et lui laisse le temps de se stabiliser si docker sur la machine
-
-# playbook paramterage ici
+- import_playbook: pipeline_cd.yml # Group1
+- import_playbook: deploy-cluster-db.yml # Group1
+- import_playbook: deploy-ad-dc.yml # ad & dns ensemble Group1
+#- import_playbook: deploy_snmp.yml // version prometheus-exporter evolution future pour eviter de deployer en 2 temps et si machine 64 go et pas 32 go
+- import_playbook: deploy_beszel.yml # Group1
+- import_playbook: deploy_nextcloud.yml # Group1
+- import_playbook: deploy_wikijs.yml # Group1
+- import_playbook: deploy_modoboa.yml # en attente de reglages Group1
+- import_playbook: deploy_nds.yml # playbook paramtrage ssl / tls / reverse proxy ici Group1
+#- import_playbook: deploy_moodle.yml # a ne pas mettre dedans car doit etre deployer ensuite via le script 7-deploy-moodle.sh (lui meme inclut dans le script 0-main.sh) car il generé une image dans harbor puis deploy dans kubernetes
 
 
-#- import_playbook: deploy_moodle.yml # a ne pas mettre dedans car doit etre deployer ensuite via le script 7-deploy-moodle.sh car il generé une image dans harbor puis deploy dans kubernetes
+#- import_playbook: deploy_nextcloud_office.yml # Group 2
+#- import_playbook: deploy_beszel_agents.yml # Group 2 deploy ne peut etre deployer ici car il faut recuperer la clé ssh et le token
+#- import_playbook: deploy_observability.yml # Group 2 deploy ne peut etre deployer ici car il faut attendre que beszel agent soit deployer
+#- import_playbook: samba-ad-cleanup.yml # nettoyage après déploiement de samba-ad et lui laisse le temps de se stabiliser si et seulement si docker est deployer sur la machine
+# playbook paramterage ici #Group2
+
+
