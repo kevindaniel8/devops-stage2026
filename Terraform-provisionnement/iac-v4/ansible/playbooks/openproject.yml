@@ -1,0 +1,7 @@
+---
+
+- hosts: openproject
+  become: yes
+  roles:
+    - ../roles/docker
+    - ../roles/openproject

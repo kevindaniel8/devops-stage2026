@@ -32,3 +32,5 @@ postgres_admin_user: "postgres"
 postgres_ssh_user: "ubuntu"
 
 wikijs_db_group: "db_master"
+
+

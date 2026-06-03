@@ -1,0 +1,20 @@
+openproject_version: "16" # la derniere version à besoin de postgres 17 mini mais à etudier upgrade si possible plus tard
+
+# Host public (IMPORTANT : doit matcher le reverse proxy / URL réelle)
+openproject_host: "{{ services.openproject.fqdn }}"
+
+openproject_port: "{{ services.openproject.backend_port }}"
+
+openproject_data_dir: "/var/lib/openproject"
+
+# PostgreSQL cluster (via inventory db master)
+openproject_pg_host: "{{ hostvars['db-postgres-master']['ansible_host'] }}" #"postgresql.service.local" ne fonctionne pas car pas configuerer dans reverse proxy
+openproject_pg_port: 5432
+
+openproject_pg_user: "openproject"
+openproject_pg_password: "supersecret"
+openproject_pg_database: "openproject"
+openproject_pg_admin_user: "postgres"
+openproject_pg_admin_password: "{{ postgres_password | default('postgres_secure_password') }}"
+
+openproject_secret_key: "changeme-secret-key"

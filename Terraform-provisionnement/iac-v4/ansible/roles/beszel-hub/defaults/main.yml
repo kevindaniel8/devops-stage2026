@@ -16,7 +16,7 @@ beszel_admin_user: "admin"
 beszel_admin_password: "ChangeMe123"
 
 # Token agent (sera rempli automatiquement)
-beszel_agent_token: ""
+#beszel_agent_token: ""
 
 # URL interne du Hub (corrigé)
 beszel_hub_url: "http://127.0.0.1:{{ beszel_port }}"

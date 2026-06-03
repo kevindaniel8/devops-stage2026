@@ -1,5 +1,10 @@
 ---
-# 0. Désinstallation des anciennes versions
+# 0. Fixer la timezone (corrige certaines erreurs SSL)
+#- name: 0. Fixer la timezone Europe/Paris
+#  timezone:
+#    name: Europe/Paris
+
+# 0.1 Désinstallation des anciennes versions Docker
 - name: 0. Supprimer les anciens paquets Docker
   apt:
     name:
@@ -19,28 +24,46 @@
     name:
       - ca-certificates
       - curl
+      - gnupg
     state: present
-    update_cache: yes
 
 # 2. Création du dossier keyrings
 - name: 2. Créer /etc/apt/keyrings
   file:
     path: /etc/apt/keyrings
     state: directory
-    mode: '0755'
+    mode: "0755"
 
-# 3. Téléchargement de la clé GPG Docker
-- name: 3. Télécharger la clé GPG Docker (format .asc)
+# 3. Télécharger la clé Docker
+- name: 3. Télécharger la clé Docker
   get_url:
     url: https://download.docker.com/linux/ubuntu/gpg
-    dest: "{{ docker_keyring_path }}"
-    mode: '0644'
+    dest: /tmp/docker.asc
+    mode: "0644"
 
-# 4. Création du fichier docker.sources (méthode officielle)
-- name: 4. Ajouter le dépôt Docker dans docker.sources
+# 3.1 Convertir la clé au format gpg
+- name: 3.1 Convertir la clé Docker
+  command:
+    argv:
+      - gpg
+      - --dearmor
+      - -o
+      - "{{ docker_keyring_path }}"
+      - /tmp/docker.asc
+  args:
+    creates: "{{ docker_keyring_path }}"
+
+# 3.2 Permissions sur la clé
+- name: 3.2 Fixer les permissions de la clé Docker
+  file:
+    path: "{{ docker_keyring_path }}"
+    mode: "0644"
+
+# 4. Ajouter le dépôt Docker
+- name: 4. Ajouter le dépôt Docker
   copy:
     dest: "{{ docker_sources_file }}"
-    mode: '0644'
+    mode: "0644"
     content: |
       Types: deb
       URIs: https://download.docker.com/linux/ubuntu
@@ -48,45 +71,65 @@
       Components: stable
       Signed-By: {{ docker_keyring_path }}
 
-# 4.1 Attendre que le lock APT soit libéré
-- name: Attendre que le lock APT soit libéré
+# 4.1 Attendre la libération du lock APT
+- name: 4.1 Attendre que le lock APT soit libéré
   shell: |
     while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
       sleep 2
     done
   changed_when: false
 
-# 5. Mise à jour de l’index APT (avec retry)
-- name: 5. Mettre à jour apt (retry)
+# 4.2 Nettoyer les index APT
+- name: 4.2 Nettoyer les index APT
+  file:
+    path: /var/lib/apt/lists
+    state: absent
+
+# 4.3 Recréer le dossier des index
+- name: 4.3 Recréer le dossier des index
+  file:
+    path: /var/lib/apt/lists
+    state: directory
+    mode: "0755"
+
+# 5. Mise à jour du cache APT
+- name: 5. Mettre à jour le cache APT
   apt:
-    update_cache: yes
+    update_cache: true
   register: apt_update
   retries: 10
-  delay: 5
+  delay: 10
   until: apt_update is succeeded
 
-# 6. Installation de Docker Engine
-- name: 6. Installer Docker Engine et plugins
+# 6. Installation de Docker
+- name: 6. Installer Docker Engine
   apt:
-    name:
-      - docker-ce
-      - docker-ce-cli
-      - containerd.io
-      - docker-buildx-plugin
-      - docker-compose-plugin
+    name: "{{ docker_packages }}"
     state: present
 
-# 7. Activation du service Docker
+# 7. Démarrer Docker
 - name: 7. Activer et démarrer Docker
   service:
     name: docker
     state: started
-    enabled: yes
+    enabled: true
 
-# 8. Ajout de l’utilisateur au groupe docker
-- name: 8. Ajouter utilisateur au groupe docker
+# 8. Ajouter l'utilisateur au groupe docker
+- name: 8. Ajouter l'utilisateur au groupe docker
   user:
     name: "{{ ansible_user }}"
     groups: docker
-    append: yes
-  when: ansible_user is defined
+    append: true
+  when:
+    - ansible_user is defined
+
+# 9. Vérification Docker
+- name: 9. Vérifier Docker
+  command: docker --version
+  register: docker_version
+  changed_when: false
+
+# 10. Afficher la version Docker
+- name: 10. Afficher la version Docker
+  debug:
+    msg: "{{ docker_version.stdout }}"

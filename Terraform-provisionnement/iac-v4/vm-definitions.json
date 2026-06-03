@@ -18,8 +18,8 @@
       "ip_suffix": 3,
       "cores": 1,
       "socket": 1,
-      "memory": 2048,
-      "disk": 20,
+      "memory": 3072,
+      "disk": 25,
       "description": "Serveur email complet (SMTP/IMAP/Webmail) + Reverse proxy nginx "
     },
     {
@@ -27,8 +27,8 @@
       "ip_suffix": 4,
       "cores": 1,
       "socket": 1,
-      "memory": 2048,
-      "disk": 10,
+      "memory": 3072,
+      "disk": 30,
       "description": "Machine snmp ou autre "
     },
     {

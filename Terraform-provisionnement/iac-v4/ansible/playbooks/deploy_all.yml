@@ -9,6 +9,7 @@
 - import_playbook: deploy_nextcloud.yml # Group1
 - import_playbook: deploy_wikijs.yml # Group1
 - import_playbook: deploy_modoboa.yml # en attente de reglages Group1
+- import_playbook: openproject.yml # Group1
 - import_playbook: deploy_nds.yml # playbook paramtrage ssl / tls / reverse proxy ici Group1
 #- import_playbook: deploy_moodle.yml # a ne pas mettre dedans car doit etre deployer ensuite via le script 7-deploy-moodle.sh (lui meme inclut dans le script 0-main.sh) car il generé une image dans harbor puis deploy dans kubernetes
 
