@@ -1,0 +1,9 @@
+modoboa_domain: "mail.greencontracts.lan"
+
+modoboa_db_host: "192.168.20.20"
+modoboa_db_name: "modoboa"
+modoboa_db_user: "modoboa"
+modoboa_db_password: "StrongPassword"
+
+modoboa_docker_dir: "/srv/modoboa"
+modoboa_app_port: 8000

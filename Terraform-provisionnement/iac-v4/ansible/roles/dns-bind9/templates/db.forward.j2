@@ -11,6 +11,11 @@ $TTL 86400
 ; Serveur DNS
 ns      IN  A       {{ dns_server_ip }}
 
+; Mail
+mail    IN  A       {{ reverse_proxy_ip }}
+
+@       IN  MX      10 mail.{{ dns_domain }}.
+
 ; Wildcard vers le reverse proxy
 *       IN  A       {{ reverse_proxy_ip }}
 

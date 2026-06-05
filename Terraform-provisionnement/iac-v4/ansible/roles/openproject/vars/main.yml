@@ -1,4 +1,4 @@
-openproject_version: "16" # la derniere version à besoin de postgres 17 mini mais à etudier upgrade si possible plus tard
+openproject_version: "15" # la derniere version à besoin de postgres 17 mini mais à etudier upgrade si possible plus tard
 
 # Host public (IMPORTANT : doit matcher le reverse proxy / URL réelle)
 openproject_host: "{{ services.openproject.fqdn }}"

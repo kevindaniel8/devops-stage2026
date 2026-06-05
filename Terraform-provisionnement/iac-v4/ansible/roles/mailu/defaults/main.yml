@@ -1,0 +1,22 @@
+mailu_version: "2.0"
+
+mailu_domain: "{{ main_domain | default('greencontracts.lan') }}"
+mailu_fqdn: "mail.{{ mailu_domain }}"
+
+mailu_data_dir: "/opt/mailu"
+
+mailu_bind_ip: "127.0.0.1"
+mailu_web_port: 8080
+
+mailu_smtp_port: 25
+mailu_submission_port: 587
+mailu_imap_port: 993
+
+mailu_db_flavor: sqlite
+
+mailu_admin_user: admin
+mailu_admin_password: "ChangeMeNow"
+
+mailu_tls_flavor: notls
+
+mailu_secret_key: "{{ lookup('password', '/dev/null length=64 chars=ascii_letters,digits') }}"

@@ -1,0 +1,129 @@
+---
+# --------------------------------------------------
+# 3 - Créer dossier Modoboa
+# --------------------------------------------------
+- name: "3 - Créer le dossier Modoboa"
+  file:
+    path: "{{ modoboa_docker_dir }}"
+    state: directory
+    mode: '0755'
+
+# --------------------------------------------------
+# 4 - Dockerfile
+# --------------------------------------------------
+- name: "4 - Copier Dockerfile"
+  template:
+    src: Dockerfile.j2
+    dest: "{{ modoboa_docker_dir }}/Dockerfile"
+  register: dockerfile_file
+
+# --------------------------------------------------
+# 5 - Entrypoint
+# --------------------------------------------------
+- name: "5 - Copier entrypoint.sh"
+  template:
+    src: entrypoint.sh.j2
+    dest: "{{ modoboa_docker_dir }}/entrypoint.sh"
+    mode: '0755'
+  register: entrypoint_file
+
+# --------------------------------------------------
+# 6 - Compose
+# --------------------------------------------------
+- name: "6 - Copier docker-compose.yml"
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ modoboa_docker_dir }}/docker-compose.yml"
+  register: compose_file
+
+# --------------------------------------------------
+# 7 - Vérifier container existant
+# --------------------------------------------------
+- name: "7 - Check container existence"
+  command: docker ps -q -f name=modoboa
+  register: modoboa_container
+  changed_when: false
+  failed_when: false
+
+# --------------------------------------------------
+# 8 - Stop propre si nécessaire
+# --------------------------------------------------
+- name: "8 - Stop Modoboa si existant"
+  command: docker compose down --remove-orphans
+  args:
+    chdir: "{{ modoboa_docker_dir }}"
+  when: modoboa_container.stdout != ""
+
+# --------------------------------------------------
+# 9 - Build si changement code
+# --------------------------------------------------
+- name: "9 - Build image si nécessaire"
+  command: docker compose build --no-cache
+  args:
+    chdir: "{{ modoboa_docker_dir }}"
+  when: dockerfile_file.changed or entrypoint_file.changed
+
+# --------------------------------------------------
+# 10 - Start services (force recreate)
+# --------------------------------------------------
+- name: "10 - Start Modoboa"
+  command: docker compose up -d --force-recreate
+  args:
+    chdir: "{{ modoboa_docker_dir }}"
+
+# --------------------------------------------------
+# 11 - Attendre PostgreSQL (CRITIQUE)
+# --------------------------------------------------
+- name: "11 - Wait PostgreSQL availability"
+  wait_for:
+    host: "{{ modoboa_db_host }}"
+    port: 5432
+    delay: 3
+    timeout: 60
+
+# --------------------------------------------------
+# 12 - Attendre container prêt
+# --------------------------------------------------
+- name: "12 - Wait Modoboa container ready"
+  command: docker ps --filter "name=modoboa" --format "{% raw %}{{.Status}}{% endraw %}"
+  register: modoboa_status
+  retries: 10
+  delay: 3
+  until: "'Up' in modoboa_status.stdout"
+  changed_when: false
+
+# --------------------------------------------------
+# 13 - Healthcheck Django (safe)
+# --------------------------------------------------
+- name: "13 - Django check (migrations safe)"
+  command: docker exec modoboa python manage.py check
+  register: django_check
+  changed_when: false
+  failed_when: false
+  ignore_errors: true
+
+# --------------------------------------------------
+# 14 - Migrations SAFE (idempotent)
+# --------------------------------------------------
+- name: "14 - Run migrations"
+  command: docker exec modoboa python manage.py migrate --noinput
+  register: migrate_result
+  changed_when: "'Applying' in migrate_result.stdout or migrate_result.stdout != ''"
+  failed_when: false
+  ignore_errors: true
+
+# --------------------------------------------------
+# 15 - Collect static
+# --------------------------------------------------
+- name: "15 - Collect static"
+  command: docker exec modoboa python manage.py collectstatic --noinput
+  failed_when: false
+  ignore_errors: true
+
+# --------------------------------------------------
+# 16 - Vérification finale
+# --------------------------------------------------
+- name: "16 - Final check"
+  command: docker ps --filter "name=modoboa"
+  register: final_status
+  changed_when: false

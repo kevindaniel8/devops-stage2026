@@ -1,0 +1,31 @@
+services:
+  mailserver:
+    image: {{ mailserver_image }}
+    hostname: {{ mailserver_hostname }}
+    container_name: mailserver
+    restart: unless-stopped
+
+    ports:
+{% for p in mailserver_ports %}
+      - "{{ p }}"
+{% endfor %}
+
+    volumes:
+      - "{{ mailserver_data_dir }}:/var/mail"
+      - "{{ mailserver_state_dir }}:/var/mail-state"
+      - "{{ mailserver_config_dir }}:/tmp/docker-mailserver"
+      - "{{ mailserver_config_dir }}/mail-data:/var/mail-data"
+      - "{{ mailserver_config_dir }}/ssl:/tmp/docker-mailserver/ssl"
+
+    environment:
+{% for env in mailserver_env %}
+      - "{{ env }}"
+{% endfor %}
+
+    cap_add:
+      - NET_ADMIN
+      - SYS_PTRACE
+
+networks:
+  default:
+    driver: bridge

@@ -1,0 +1,40 @@
+hostname: {{ harbor_hostname }}
+
+http:
+  port: 80
+
+https:
+  port: 443
+  certificate: {{ harbor_cert_dir }}/harbor.crt
+  private_key: {{ harbor_cert_dir }}/harbor.key
+
+harbor_admin_password: {{ harbor_admin_password }}
+
+database:
+  password: root123
+
+data_volume: /data
+
+log:
+  level: info
+
+jobservice:
+  max_job_workers: 10
+  job_loggers:
+    - stdout
+    - file
+  logger_sweeper_duration: 1
+  logger_sweeper_interval: 24
+
+notification:
+  webhook_job_max_retry: 10
+  webhook_job_http_client_timeout: 30
+
+chart:
+  absolute_url: disabled
+
+trivy:
+  ignore_unfixed: false
+  skip_update: false
+  insecure: false
+

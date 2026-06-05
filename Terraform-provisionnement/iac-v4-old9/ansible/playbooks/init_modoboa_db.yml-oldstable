@@ -1,0 +1,51 @@
+---
+# Playbook pour initialiser la base de données PostgreSQL pour Modoboa
+- hosts: db-postgres-master
+  become: yes
+  vars:
+    modoboa_db_host: "192.168.20.20"
+    modoboa_db_name: "modoboa"
+    modoboa_db_user: "modoboa"
+    modoboa_db_password: "StrongPassword"
+  
+  tasks:
+    - name: "Créer la base de données PostgreSQL pour Modoboa"
+      become_user: postgres
+      community.postgresql.postgresql_db:
+        name: "{{ modoboa_db_name }}"
+        encoding: UTF8
+        lc_collate: C.UTF-8
+        lc_ctype: C.UTF-8
+        template: template0
+        state: present
+
+    - name: "Créer l'utilisateur PostgreSQL pour Modoboa"
+      become_user: postgres
+      community.postgresql.postgresql_user:
+        name: "{{ modoboa_db_user }}"
+        password: "{{ modoboa_db_password }}"
+        db: "{{ modoboa_db_name }}"
+        priv: "ALL"
+        state: present
+
+    - name: "Accorder tous les privilèges à l'utilisateur Modoboa"
+      become_user: postgres
+      community.postgresql.postgresql_privs:
+        db: "{{ modoboa_db_name }}"
+        role: "{{ modoboa_db_user }}"
+        privs: "ALL"
+        type: database
+        state: present
+
+    - name: "Autoriser les connexions distantes pour Modoboa"
+      lineinfile:
+        path: /etc/postgresql/16/main/pg_hba.conf
+        line: "host    {{ modoboa_db_name }}    {{ modoboa_db_user }}    0.0.0.0/0    md5"
+        state: present
+      notify: Reload PostgreSQL
+
+  handlers:
+    - name: Reload PostgreSQL
+      service:
+        name: postgresql
+        state: reloaded

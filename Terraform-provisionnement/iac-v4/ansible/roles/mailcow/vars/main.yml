@@ -1,0 +1,15 @@
+mailcow_hostname: "mail.greencontracts.lan"
+
+mailcow_http_port: 8080
+mailcow_http_bind: "127.0.0.1"
+
+mailcow_repo_dir: "/opt/mailcow-dockerized"
+
+# DB externe MariaDB (désactivé par défaut, mailcow utilisera sa propre DB MySQL)
+# mailcow_db_host: "192.168.20.20"
+# mailcow_db_port: 3306
+# mailcow_db_name: "mailcow"
+# mailcow_db_user: "mailcow"
+# mailcow_db_pass: "mot_de_passe_super_long"
+
+mailcow_timezone: "Europe/Paris"

@@ -1,0 +1,10 @@
+---
+- name: Run SNMP Exporter container
+  community.docker.docker_container:
+    name: snmp-exporter
+    image: prom/snmp-exporter:latest
+    restart_policy: always
+    networks:
+      - name: monitoring
+    ports:
+      - "9116:9116"

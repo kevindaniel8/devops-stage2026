@@ -1,0 +1,11 @@
+server {
+    listen 80;
+    server_name {{ modoboa_domain }};
+
+    location / {
+        #proxy_pass http://127.0.0.1:{{ modoboa_app_port }};
+        proxy_pass http://{{ ansible_default_ipv4.address }}:{{ modoboa_app_port }};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
