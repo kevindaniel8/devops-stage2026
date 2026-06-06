@@ -1,0 +1,103 @@
+#!/bin/bash
+set -euo pipefail
+
+echo "[INFO] Starting Modoboa container..."
+
+DB_HOST="${DB_HOST:-192.168.20.20}"
+DB_PORT="${DB_PORT:-5432}"
+DB_NAME="${DB_NAME:-modoboa}"
+DB_USER="${DB_USER:-modoboa}"
+DB_PASSWORD="${DB_PASSWORD:-StrongPassword}"
+
+APP_PORT="${APP_PORT:-8000}"
+DOMAIN="${DJANGO_ALLOWED_HOSTS:-mail.greencontracts.lan}"
+
+export DATABASE_URL="postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
+export DJANGO_ALLOWED_HOSTS="${DOMAIN}"
+
+INSTANCE_DIR="/data/instance"
+
+echo "[INFO] DATABASE_URL=${DATABASE_URL}"
+echo "[INFO] ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}"
+
+# ------------------------------------------------
+# Déploiement initial
+# ------------------------------------------------
+if [ ! -f "${INSTANCE_DIR}/manage.py" ]; then
+
+    echo "[INFO] First deployment..."
+
+    cd /data
+
+    modoboa-admin.py deploy instance \
+        --dburl "${DATABASE_URL}" \
+        --domain "${DOMAIN}" \
+        --collectstatic
+
+    mv instance "${INSTANCE_DIR}"
+
+fi
+
+SETTINGS_FILE="${INSTANCE_DIR}/instance/settings.py"
+
+if [ ! -f "${SETTINGS_FILE}" ]; then
+    echo "[ERROR] settings.py not found"
+    exit 1
+fi
+
+# ------------------------------------------------
+# Validation Python
+# ------------------------------------------------
+echo "[INFO] Validating settings.py"
+
+python -m py_compile "${SETTINGS_FILE}"
+
+# ------------------------------------------------
+# ALLOWED_HOSTS
+# ------------------------------------------------
+if ! grep -q "DJANGO_ALLOWED_HOSTS" "${SETTINGS_FILE}"; then
+
+cat >> "${SETTINGS_FILE}" <<'EOF'
+
+import os
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",")
+    if host.strip()
+]
+EOF
+
+fi
+
+# ------------------------------------------------
+# Validation après modification
+# ------------------------------------------------
+python -m py_compile "${SETTINGS_FILE}"
+
+# ------------------------------------------------
+# Migrations
+# ------------------------------------------------
+echo "[INFO] Running migrations..."
+
+cd "${INSTANCE_DIR}"
+
+python manage.py migrate --noinput
+
+# ------------------------------------------------
+# Collect static
+# ------------------------------------------------
+echo "[INFO] Collecting static files..."
+
+python manage.py collectstatic --noinput
+
+# ------------------------------------------------
+# Gunicorn
+# ------------------------------------------------
+echo "[INFO] Starting Gunicorn..."
+
+exec gunicorn instance.wsgi:application \
+    --chdir "${INSTANCE_DIR}" \
+    --bind 0.0.0.0:${APP_PORT} \
+    --workers 4 \
+    --timeout 120

@@ -1,0 +1,58 @@
+services:
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - ./data/redis:/data
+
+  front:
+    image: ghcr.io/mailu/nginx:master
+    restart: unless-stopped
+    env_file: .env
+
+    ports:
+      - "127.0.0.1:8080:80"
+      - "25:25"
+      - "587:587"
+      - "993:993"
+
+    volumes:
+      - ./certs:/certs
+      - ./overrides:/overrides
+
+  admin:
+    image: ghcr.io/mailu/admin:master
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./data:/data
+      - ./mail:/mail
+
+  imap:
+    image: ghcr.io/mailu/dovecot:master
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./mail:/mail
+
+  smtp:
+    image: ghcr.io/mailu/postfix:master
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./mail:/mail
+
+  webmail:
+    image: ghcr.io/mailu/webmail:master
+    restart: unless-stopped
+    env_file: .env
+
+  antispam:
+    image: ghcr.io/mailu/rspamd:master
+    restart: unless-stopped
+    env_file: .env
+
+networks:
+  default:
+    driver: bridge

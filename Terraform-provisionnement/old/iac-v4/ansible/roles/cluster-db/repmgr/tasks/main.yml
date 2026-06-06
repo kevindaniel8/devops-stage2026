@@ -1,0 +1,88 @@
+---
+# Configuration de repmgr basée sur le script rebuild_cluster_repmgr.sh
+- name: Création du dossier de configuration repmgr
+  file:
+    path: "/etc/repmgr/16"
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: '0755'
+
+- name: Configuration de repmgr.conf
+  template:
+    src: repmgr.conf.j2
+    dest: "/etc/repmgr/16/repmgr.conf"
+    owner: postgres
+    group: postgres
+    mode: '0644'
+
+- name: Enregistrement du nœud repmgr (master)
+  shell: |
+    export PGPASSWORD={{ repmgr_password }}
+    repmgr -f /etc/repmgr/16/repmgr.conf primary register
+  become_user: postgres
+  when: inventory_hostname == 'db-postgres-master'
+  register: master_register
+  failed_when: false
+
+- name: Enregistrement du nœud repmgr (replica) - clonage depuis master
+  block:
+    - name: Arrêter PostgreSQL sur replica
+      systemd:
+        name: "postgresql@16-main"
+        state: stopped
+      become_user: root
+
+    - name: Nettoyer les données existantes
+      shell: |
+        rm -rf /var/lib/postgresql/16/main/*
+        mkdir -p /var/lib/postgresql/16/main
+        chown postgres:postgres /var/lib/postgresql/16/main
+        chmod 700 /var/lib/postgresql/16/main
+      become_user: root
+
+    - name: Clonage depuis le master
+      shell: |
+        export PGPASSWORD={{ repmgr_password }}
+        repmgr -f /etc/repmgr/16/repmgr.conf standby clone -h {{ master_ip }} -U {{ repmgr_user }} -d {{ repmgr_database }} --verbose
+      become_user: postgres
+      register: clone_result
+      failed_when: false
+
+    - name: Démarrage PostgreSQL replica
+      systemd:
+        name: "postgresql@16-main"
+        state: started
+      become_user: root
+
+    - name: Attendre que PostgreSQL soit prêt
+      shell: |
+        sleep 5
+        sudo -u postgres /usr/lib/postgresql/16/bin/pg_isready -h /var/run/postgresql -p 5432
+      become_user: root
+      retries: 3
+      delay: 5
+
+    - name: Enregistrement du replica
+      shell: |
+        export PGPASSWORD={{ repmgr_password }}
+        repmgr -f /etc/repmgr/16/repmgr.conf standby register
+      become_user: postgres
+      register: replica_register
+      failed_when: false
+  when: inventory_hostname == 'db-postgres-replication'
+
+- name: Vérification du cluster
+  shell: |
+    export PGPASSWORD={{ repmgr_password }}
+    repmgr -f /etc/repmgr/16/repmgr.conf cluster show
+  become_user: postgres
+  register: cluster_status
+  failed_when: false
+
+- name: Affichage du statut du cluster
+  debug:
+    msg: |
+      Statut du cluster:
+      {{ cluster_status.stdout_lines | join('\n') }}
+  when: cluster_status is defined and cluster_status.stdout_lines | length > 0

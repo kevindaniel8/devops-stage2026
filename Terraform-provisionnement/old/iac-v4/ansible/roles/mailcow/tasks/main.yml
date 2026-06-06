@@ -1,0 +1,44 @@
+- name: Installer dépendances
+  apt:
+    name:
+      - git
+    state: present
+    update_cache: yes
+
+- name: Supprimer ancien dossier mailcow
+  file:
+    path: "{{ mailcow_repo_dir }}"
+    state: absent
+
+- name: Cloner mailcow-dockerized
+  git:
+    repo: "https://github.com/mailcow/mailcow-dockerized.git"
+    dest: "{{ mailcow_repo_dir }}"
+    version: master
+
+- name: Déployer mailcow.conf
+  template:
+    src: mailcow.conf.j2
+    dest: "{{ mailcow_repo_dir }}/mailcow.conf"
+
+- name: Déployer .env
+  template:
+    src: env.mailcow.j2
+    dest: "{{ mailcow_repo_dir }}/.env"
+
+- name: Créer répertoire SSL temporaire
+  file:
+    path: "{{ mailcow_repo_dir }}/data/assets/ssl"
+    state: directory
+    mode: '0755'
+
+- name: Générer certificat SSL auto-signé temporaire
+  command: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout "{{ mailcow_repo_dir }}/data/assets/ssl/key.pem" -out "{{ mailcow_repo_dir }}/data/assets/ssl/cert.pem" -subj "/C=FR/ST=France/L=Paris/O=Mailcow/CN=mail.greencontracts.lan"
+  args:
+    creates: "{{ mailcow_repo_dir }}/data/assets/ssl/cert.pem"
+
+- name: Démarrer Mailcow
+  community.docker.docker_compose_v2:
+    project_src: "{{ mailcow_repo_dir }}"
+    state: present
+    pull: always

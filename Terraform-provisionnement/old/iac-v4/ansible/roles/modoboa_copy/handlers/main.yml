@@ -1,0 +1,10 @@
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+
+- name: Reload PostgreSQL
+  service:
+    name: postgresql
+    state: reloaded
+  delegate_to: "{{ modoboa_db_host }}"

@@ -1,0 +1,21 @@
+---
+# Domaine principal du reverse proxy
+reverse_proxy_domain: "kevin.lan"
+
+# Valeurs par défaut (peuvent être utilisées si aucun service n'est défini)
+reverse_proxy_server_name: "_"
+reverse_proxy_backend: "127.0.0.1:3000"
+
+# Liste des services reverse-proxy
+reverse_proxy_services:
+  kevin.lan:
+    backend: "192.168.200.253:80"
+    #backend: "192.168.200.50:443"
+
+# Informations pour la génération des certificats
+reverse_proxy_cert_days: 3650
+reverse_proxy_country: "FR"
+reverse_proxy_state: "Occitanie"
+reverse_proxy_locality: "Montpellier"
+reverse_proxy_org: "Kevin"
+reverse_proxy_ou: "IT"

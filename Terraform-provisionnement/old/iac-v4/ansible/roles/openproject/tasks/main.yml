@@ -1,0 +1,9 @@
+---
+- name: "00 - install postgres client"
+  include_tasks: ../postgres-client/tasks/main.yml
+
+- name: "01 - create db & user"
+  include_tasks: 01-init_db_postgres_op.yml
+
+- name: "02 - install openproject"
+  include_tasks: 02-install-openproject.yml

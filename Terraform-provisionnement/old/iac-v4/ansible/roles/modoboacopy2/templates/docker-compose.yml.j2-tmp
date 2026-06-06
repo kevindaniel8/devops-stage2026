@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  modoboa:
+    build: .
+    container_name: modoboa
+    restart: unless-stopped
+
+    environment:
+      DB_HOST: "{{ modoboa_db_host }}"
+      DB_PORT: "{{ modoboa_db_port }}"
+      DB_NAME: "{{ modoboa_db_name }}"
+      DB_USER: "{{ modoboa_db_user }}"
+      DB_PASSWORD: "{{ modoboa_db_password }}"
+
+      APP_PORT: "{{ modoboa_app_port }}"
+      DJANGO_ALLOWED_HOSTS: "{{ modoboa_domain }}"
+
+    ports:
+      - "{{ modoboa_app_port }}:{{ modoboa_app_port }}"
+
+    volumes:
+      - modoboa_data:/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:{{ modoboa_app_port }}/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+volumes:
+  modoboa_data:
+    driver: local

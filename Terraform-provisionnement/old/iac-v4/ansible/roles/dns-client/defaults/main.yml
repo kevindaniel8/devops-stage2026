@@ -1,0 +1,9 @@
+dns_primary: "192.168.20.2"
+dns_secondary: "8.8.8.8"
+dns_domain: "greencontracts.lan"
+
+dns_servers:
+  - "192.168.20.2"
+  - "8.8.8.8"
+
+dns_search_domains: ["greencontracts.lan"]

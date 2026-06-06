@@ -1,0 +1,39 @@
+# HTTP → HTTPS
+server {
+    listen 80;
+    server_name {{ item.key }};
+    return 301 https://$host$request_uri;
+}
+
+# HTTPS
+server {
+    listen 443 ssl;
+    server_name {{ item.key }};
+
+    {% if item.key == reverse_proxy_domain %}
+        # Certificat du domaine racine (ex: kevin.lan)
+        ssl_certificate     /etc/nginx/certs/{{ reverse_proxy_domain }}.crt;
+        ssl_certificate_key /etc/nginx/certs/{{ reverse_proxy_domain }}.key;
+
+    {% elif item.key.endswith('.' ~ reverse_proxy_domain) %}
+        # Certificat wildcard (*.kevin.lan)
+        ssl_certificate     /etc/nginx/certs/wildcard.{{ reverse_proxy_domain }}.crt;
+        ssl_certificate_key /etc/nginx/certs/wildcard.{{ reverse_proxy_domain }}.key;
+
+    {% else %}
+        # Certificat spécifique au service
+        ssl_certificate     /etc/nginx/certs/{{ item.key }}.crt;
+        ssl_certificate_key /etc/nginx/certs/{{ item.key }}.key;
+    {% endif %}
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    location / {
+        proxy_pass http://{{ item.value.backend }};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
