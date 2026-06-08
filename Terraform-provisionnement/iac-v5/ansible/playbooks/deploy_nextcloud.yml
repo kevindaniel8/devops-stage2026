@@ -1,0 +1,7 @@
+---
+- name: Deploy Nextcloud
+  hosts: nextcloud
+  become: true
+
+  roles:
+    - ../roles/nextcloud

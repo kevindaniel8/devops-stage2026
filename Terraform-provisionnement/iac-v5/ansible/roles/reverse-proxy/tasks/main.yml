@@ -1,0 +1,75 @@
+---
+- name: Installer Nginx
+  ansible.builtin.apt:
+    name: "{{ reverse_proxy_nginx_package }}"
+    state: present
+    update_cache: true
+  become: true
+
+- name: Créer les dossiers de configuration Nginx
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - "{{ reverse_proxy_nginx_sites_dir }}"
+    - "{{ reverse_proxy_nginx_sites_available_dir }}"
+  become: true
+
+# -------------------------------------------------------------------
+# 1) CRÉATION DU DOSSIER DE BACKUP AVANT TOUTE SAUVEGARDE
+# -------------------------------------------------------------------
+- name: Créer le dossier de backup Nginx si nécessaire
+  ansible.builtin.file:
+    path: "{{ reverse_proxy_backup_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+
+# -------------------------------------------------------------------
+# 2) SAUVEGARDE DU VHOST MODOBOA SI PRÉSENT
+# -------------------------------------------------------------------
+- name: Vérifier si le vhost Modoboa existe
+  ansible.builtin.stat:
+    path: "/etc/nginx/sites-available/modoboa.conf"
+  register: modoboa_vhost
+
+- name: Sauvegarder l’ancienne configuration Nginx de Modoboa
+  ansible.builtin.copy:
+    src: "/etc/nginx/sites-available/modoboa.conf"
+    dest: "{{ reverse_proxy_backup_dir }}/modoboa.conf.{{ ansible_date_time.iso8601 }}"
+    remote_src: true
+  when: modoboa_vhost.stat.exists
+  become: true
+
+# -------------------------------------------------------------------
+# 3) SUPPRESSION DU VHOST MODOBOA POUR ÉVITER LES CONFLITS
+# -------------------------------------------------------------------
+- name: Désactiver le vhost Modoboa (sites-enabled)
+  ansible.builtin.file:
+    path: "/etc/nginx/sites-enabled/modoboa.conf"
+    state: absent
+  become: true
+
+- name: Supprimer le vhost Modoboa (sites-available)
+  ansible.builtin.file:
+    path: "/etc/nginx/sites-available/modoboa.conf"
+    state: absent
+  become: true
+
+# -------------------------------------------------------------------
+# 4) PAUSE AVANT GÉNÉRATION DES VHOSTS
+# -------------------------------------------------------------------
+- name: Pause avant la génération des vhosts
+  pause:
+    seconds: 2
+
+# -------------------------------------------------------------------
+# 5) GÉNÉRATION DES VHOSTS DYNAMIQUES
+# -------------------------------------------------------------------
+- name: Générer les vhosts Nginx à partir de services
+  ansible.builtin.include_tasks: vhosts.yml

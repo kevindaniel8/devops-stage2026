@@ -1,0 +1,19 @@
+- name: Ensure agent data directory exists
+  ansible.builtin.file:
+    path: "{{ beszel_agent_data_dir }}"
+    state: directory
+    mode: "0755"
+  when: beszel_agent_enabled
+
+- name: Deploy Beszel agent docker-compose
+  ansible.builtin.template:
+    src: docker-compose-agent.yml.j2
+    dest: "{{ beszel_agent_install_dir }}/docker-compose-agent.yml"
+    mode: "0644"
+  when: beszel_agent_enabled
+
+- name: Start Beszel agent
+  ansible.builtin.command:
+    cmd: docker compose -f docker-compose-agent.yml up -d
+    chdir: "{{ beszel_agent_install_dir }}"
+  when: beszel_agent_enabled

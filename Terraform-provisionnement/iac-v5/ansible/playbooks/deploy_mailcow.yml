@@ -1,0 +1,6 @@
+---
+- hosts: mailserver
+  become: yes
+  roles:
+    - role: ../roles/docker
+    - role: ../roles/mailcow

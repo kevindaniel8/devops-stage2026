@@ -1,0 +1,60 @@
+---
+# Construire la liste des services à exposer
+- name: Construire la liste des services à exposer
+  ansible.builtin.set_fact:
+    reverse_proxy_services: >-
+      {{
+        services
+        | dict2items
+        | selectattr('value.fqdn', 'defined')
+      }}
+
+# Générer les vhosts
+- name: Générer les vhosts pour chaque service exposé
+  ansible.builtin.template:
+    src: vhost.conf.j2
+    dest: "{{ reverse_proxy_nginx_sites_available_dir }}/{{ item.key }}.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ reverse_proxy_services }}"
+  loop_control:
+    label: "{{ item.key }}"
+  vars:
+    svc_name: "{{ item.key }}"
+    svc: "{{ item.value }}"
+  notify: Reload nginx
+  become: true
+
+# Activer les vhosts
+- name: Activer les vhosts (symlink)
+  ansible.builtin.file:
+    src: "{{ reverse_proxy_nginx_sites_available_dir }}/{{ item.key }}.conf"
+    dest: "{{ reverse_proxy_nginx_sites_dir }}/{{ item.key }}.conf"
+    state: link
+  loop: "{{ reverse_proxy_services }}"
+  loop_control:
+    label: "{{ item.key }}"
+  become: true
+
+# Nettoyage des anciens vhosts
+- name: Supprimer les vhosts obsolètes
+  ansible.builtin.file:
+    path: "{{ reverse_proxy_nginx_sites_dir }}/{{ item }}"
+    state: absent
+  loop: >-
+    {{
+      lookup('ansible.builtin.fileglob', reverse_proxy_nginx_sites_dir + '/*.conf', wantlist=True)
+      | map('basename')
+      | list
+      | difference(reverse_proxy_services | map(attribute='key') | map('regex_replace', '$', '.conf') | list)
+    }}
+  when: reverse_proxy_services is defined
+  become: true
+
+# -------------------------------------------------------------------
+# 6) PAUSE APRES NETTOYAGE DES VHOSTS
+# -------------------------------------------------------------------
+- name: Pause après nettoyage des vhosts
+  pause:
+    seconds: 50

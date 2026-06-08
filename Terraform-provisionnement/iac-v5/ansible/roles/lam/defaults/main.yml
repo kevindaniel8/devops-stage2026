@@ -1,0 +1,76 @@
+---
+# Variables pour LAM (LDAP Account Manager)
+# Conteneur Docker connecté au Samba AD existant
+
+# Configuration LAM
+lam_image: "ldapaccountmanager/lam:stable"
+lam_container_name: "lam"
+lam_port: 8090
+lam_language: "fr_FR"
+lam_admin_password: "LamAdmin123!"
+
+# Configuration LDAP (Samba AD)
+ldap_server: "ldap://192.168.56.5"
+ldap_base_dn: "dc=lab,dc=local"
+ldap_admin_dn: "CN=Administrator,CN=Users,DC=lab,DC=local"
+ldap_admin_password: "SuperPassword"
+
+# Configuration Docker
+docker_compose_version: "3.8"
+
+# Configuration du conteneur LAM
+lam_environment:
+  LAM_LANG: "{{ lam_language }}"
+  LAM_PASSWORD: "{{ lam_admin_password }}"
+  LDAP_SERVER: "{{ ldap_server }}"
+  LDAP_BASE_DN: "{{ ldap_base_dn }}"
+  LDAP_ADMIN_DN: "{{ ldap_admin_dn }}"
+  LDAP_ADMIN_PASSWORD: "{{ ldap_admin_password }}"
+
+# Configuration des volumes
+lam_volumes:
+  - lam_data:/var/lib/ldap-account-manager
+
+# Configuration réseau
+lam_network: "bridge"
+
+# Ports à ouvrir
+lam_ports:
+  - { proto: "tcp", port: "{{ lam_port }}" }
+
+# Configuration du docker-compose
+docker_compose_config: |
+  version: '3.8'
+  
+  services:
+    lam:
+      image: {{ lam_image }}
+      container_name: {{ lam_container_name }}
+      restart: unless-stopped
+      ports:
+        - "{{ lam_port }}:80"
+      environment:
+  {% for key, value in lam_environment.items() %}
+        - {{ key }}={{ value }}
+  {% endfor %}
+      volumes:
+  {% for volume in lam_volumes %}
+        - {{ volume }}
+  {% endfor %}
+      networks:
+        - lam_network
+      healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:80"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+        start_period: 40s
+  
+  volumes:
+  {% for volume in lam_volumes %}
+    {{ volume.split(':')[0] }}:
+  {% endfor %}
+  
+  networks:
+    lam_network:
+      driver: {{ lam_network }}

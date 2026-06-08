@@ -1,0 +1,53 @@
+---
+# Variables par défaut pour Modoboa Docker
+
+# Configuration de base
+modoboa_domain: "mail.greencontracts.lan"
+modoboa_hostname: "mail.greencontracts.lan"
+modoboa_install_dir: "/opt/modoboa-docker"
+
+# Ports
+modoboa_http_port: 8080
+modoboa_https_port: 8443
+
+# Base de données PostgreSQL 16
+modoboa_db_host: "192.168.20.20"
+modoboa_db_port: 5432
+modoboa_db_name: "modoboa"
+modoboa_db_user: "modoboa"
+modoboa_db_password: "{{ vault_modoboa_db_password | default('ChangeMe123!') }}"
+
+# Configuration LDAP (AD/DNS Samba)
+modoboa_ldap_enabled: true
+modoboa_ldap_server: "ldap://192.168.20.2"
+modoboa_ldap_bind_dn: "cn=admin,dc=greencontracts,dc=lan"
+modoboa_ldap_bind_password: "{{ vault_ldap_bind_password | default('ChangeMe123!') }}"
+modoboa_ldap_base_dn: "dc=greencontracts,dc=lan"
+modoboa_ldap_user_search_base: "ou=users,dc=greencontracts,dc=lan"
+modoboa_ldap_group_search_base: "ou=groups,dc=greencontracts,dc=lan"
+
+# Stockage NFS (TrueNAS)
+modoboa_nfs_enabled: true
+modoboa_nfs_server: "192.168.20.3"
+modoboa_nfs_path: "/mnt/truenas/mail/modoboa"
+modoboa_nfs_mount_point: "/mnt/modoboa"
+
+# Configuration email
+modoboa_admin_email: "admin@greencontracts.lan"
+modoboa_admin_password: "{{ vault_modoboa_admin_password | default('Admin123!') }}"
+
+# Configuration SSL
+modoboa_ssl_enabled: false
+modoboa_ssl_cert_path: "/etc/ssl/certs/modoboa.crt"
+modoboa_ssl_key_path: "/etc/ssl/private/modoboa.key"
+
+# Docker
+modoboa_docker_network: "modoboa-net"
+modoboa_docker_image: "modoboa/modoboa:latest"
+modoboa_docker_image_amavis: "modoboa/amavis:latest"
+modoboa_docker_image_postfix: "modoboa/postfix:latest"
+modoboa_docker_image_dovecot: "modoboa/dovecot:latest"
+
+# Nettoyage
+modoboa_cleanup: false
+force_reinstall: false

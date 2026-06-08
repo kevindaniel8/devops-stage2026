@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  openproject:
+    image: openproject/openproject:{{ openproject_version }}
+
+    container_name: openproject
+
+    restart: always
+
+    ports:
+      - "{{ openproject_port }}:80"
+
+    environment:
+      OPENPROJECT_HOST_NAME: "{{ openproject_host }}"
+      OPENPROJECT_HTTPS: "false"
+      SECRET_KEY_BASE: "{{ openproject_secret_key }}"
+      OPENPROJECT__ALLOWED__HOSTS: "{{ openproject_host }},192.168.20.4,localhost"
+
+      # FORCER usage DB externe (IMPORTANT)
+      DATABASE_URL: "postgresql://{{ openproject_pg_user }}:{{ openproject_pg_password }}@{{ openproject_pg_host }}:{{ openproject_pg_port }}/{{ openproject_pg_database }}"
+
+    volumes:
+      - "{{ openproject_data_dir }}/assets:/var/openproject/assets"
+      - "{{ openproject_data_dir }}/custom:/var/openproject/custom"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 5

@@ -1,0 +1,4 @@
+- hosts: dns_clients
+  become: yes
+  roles:
+    - ../roles/dns-client

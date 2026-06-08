@@ -1,0 +1,12 @@
+---
+- import_tasks: precheck.yml
+- import_tasks: install.yml
+- import_tasks: dns.yml
+- import_tasks: provision.yml
+- import_tasks: postconfig.yml
+
+
+#- name: Start samba-ad-dc
+#  systemd:
+#    name: samba-ad-dc
+#    state: started

@@ -1,0 +1,38 @@
+---
+- hosts: beszel_agents
+  roles:
+    - ../roles/beszel_hub_extract
+
+- hosts: database,beszel_agents,harbor
+  tasks:
+    - name: Set Beszel variables from snmp for other hosts
+      set_fact:
+        beszel_agent_key: "{{ hostvars['snmp']['beszel_agent_key'] }}"
+        beszel_agent_token: "{{ hostvars['snmp']['beszel_agent_token'] }}"
+      when: inventory_hostname != 'snmp'
+
+- hosts: database,beszel_agents,harbor
+  ignore_unreachable: true
+  become: yes
+  tasks:
+    - name: Check if Docker is already installed
+      command: which docker
+      register: docker_check
+      failed_when: false
+      changed_when: false
+
+    - name: Install Docker only on Beszel agent machines
+      include_role:
+        name: ../roles/docker
+      when: 
+        - beszel_agent_enabled | default(true) | bool
+        - docker_check.rc != 0
+
+    - name: Install Beszel agent only on tagged machines
+      include_role:
+        name: ../roles/beszel-agent
+      when: beszel_agent_enabled | default(true) | bool
+
+    #- role: beszel-agent
+    #  when: beszel_agent_enabled | default(false)
+

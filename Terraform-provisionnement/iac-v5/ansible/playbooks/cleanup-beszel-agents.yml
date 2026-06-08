@@ -1,0 +1,43 @@
+---
+# =============================================================================
+# PLAYBOOK DE NETTOYAGE - Beszel Agents
+# =============================================================================
+# Ce playbook nettoie uniquement les conteneurs beszel-agent et leurs fichiers
+# associés. Il NE touche PAS aux autres conteneurs Docker.
+# =============================================================================
+
+- name: Nettoyage des Beszel Agents
+  hosts: "{{ cleanup_hosts | default('database,beszel_agents,harbor') }}"
+  become: yes
+  tasks:
+    - name: Arrêter le conteneur beszel-agent s'il existe
+      docker_container:
+        name: beszel-agent
+        state: absent
+      ignore_errors: yes
+      register: beszel_container_removed
+
+    - name: Supprimer le fichier docker-compose-agent.yml
+      ansible.builtin.file:
+        path: /opt/beszel/docker-compose-agent.yml
+        state: absent
+      ignore_errors: yes
+
+    - name: Supprimer le répertoire de données beszel-agent
+      ansible.builtin.file:
+        path: /opt/beszel/agent_data
+        state: absent
+      ignore_errors: yes
+
+    - name: Vérifier les autres conteneurs Docker (pour information)
+      command: docker ps --format "table {% raw %}{{.Names}}\t{{.Image}}\t{{.Status}}{% endraw %}"
+      register: docker_ps
+      changed_when: false
+
+    - name: Afficher les conteneurs Docker restants
+      debug:
+        msg: "{{ docker_ps.stdout_lines }}"
+
+    - name: Message de confirmation
+      debug:
+        msg: "✅ Nettoyage des beszel-agent terminé. Les autres conteneurs Docker n'ont pas été touchés."

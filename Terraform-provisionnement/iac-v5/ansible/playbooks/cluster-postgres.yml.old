@@ -1,0 +1,72 @@
+---
+# =============================================================================
+# PLAYBOOK: Cluster PostgreSQL avec repmgr
+# =============================================================================
+# Déploiement du cluster PostgreSQL master/replica pour iac-v3
+# IPs: Master=192.168.20.20, Replica=192.168.20.21 (depuis vm-definitions-infra.json)
+# =============================================================================
+
+- name: "CLUSTER POSTGRESQL | Déploiement du cluster"
+  hosts: database
+  become: yes
+  gather_facts: yes
+  serial: 1  # Déploiement séquentiel: master d'abord, puis replica
+
+  pre_tasks:
+    - name: "INFO | Affichage de la configuration"
+      debug:
+        msg: |
+          ============================================
+          DÉPLOIEMENT DU CLUSTER POSTGRESQL
+          ============================================
+          Environnement: iac-v3 (Proxmox/Terraform)
+          
+          Cluster:
+          - Master: db-postgres-master (192.168.20.20)
+          - Replica: db-postgres-replication (192.168.20.21)
+          
+          Nœud actuel: {{ inventory_hostname }}
+          IP: {{ ansible_host | default('non définie') }}
+          ============================================
+
+    - name: "WAIT | Attente de la connexion SSH"
+      wait_for_connection:
+        timeout: 60
+        delay: 5
+
+  roles:
+    - ../roles/postgresql-cluster
+
+  post_tasks:
+    - name: "VERIFY | Test de connexion PostgreSQL"
+      postgresql_query:
+        query: "SELECT version();"
+      become_user: postgres
+      register: pg_version
+      failed_when: false
+
+    - name: "VERIFY | Affichage de la version"
+      debug:
+        msg: "✅ PostgreSQL installé: {{ pg_version.query_result[0].version | default('Inconnue') }}"
+      when: pg_version is succeeded
+
+    - name: "VERIFY | Vérification réplication (sur master)"
+      postgresql_query:
+        query: "SELECT client_addr, state, sent_lsn, write_lsn FROM pg_stat_replication;"
+      become_user: postgres
+      when: inventory_hostname == 'db-postgres-master'
+      register: replication_status
+      failed_when: false
+
+    - name: "VERIFY | Affichage réplication"
+      debug:
+        msg: |
+          {% if replication_status is succeeded and replication_status.query_result | length > 0 %}
+          ✅ RÉPLICATION ACTIVE:
+          {% for row in replication_status.query_result %}
+            - Client: {{ row.client_addr }}, État: {{ row.state }}
+          {% endfor %}
+          {% else %}
+          ⚠️ Aucune réplication détectée (normal si c'est le premier déploiement)
+          {% endif %}
+      when: inventory_hostname == 'db-postgres-master'

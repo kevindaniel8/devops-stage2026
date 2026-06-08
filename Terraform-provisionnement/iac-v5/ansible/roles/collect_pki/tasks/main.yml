@@ -1,0 +1,40 @@
+---
+- name: Récupérer la CA depuis le reverse-proxy
+  fetch:
+    src: /etc/nginx/certs/ca.crt
+    dest: "{{ cert_store_dir }}/ca/"
+    flat: yes
+
+- name: Récupérer les certificats Nginx
+  vars:
+    certs:
+      - "wildcard.kevin.lan"
+      - "kevin.lan"
+      - "reverse-proxy.kevin.lan"
+  block:
+    - name: Récupérer {{ item }}.crt
+      fetch:
+        src: "/etc/nginx/certs/{{ item }}.crt"
+        dest: "{{ cert_store_dir }}/nginx/"
+        flat: yes
+      loop: "{{ certs }}"
+      loop_control:
+        label: "{{ item }}"
+
+    - name: Récupérer {{ item }}.key
+      fetch:
+        src: "/etc/nginx/certs/{{ item }}.key"
+        dest: "{{ cert_store_dir }}/nginx/"
+        flat: yes
+      loop: "{{ certs }}"
+      loop_control:
+        label: "{{ item }}"
+
+    - name: Récupérer {{ item }}-fullchain.crt
+      fetch:
+        src: "/etc/nginx/certs/{{ item }}-fullchain.crt"
+        dest: "{{ cert_store_dir }}/nginx/"
+        flat: yes
+      loop: "{{ certs }}"
+      loop_control:
+        label: "{{ item }}"
