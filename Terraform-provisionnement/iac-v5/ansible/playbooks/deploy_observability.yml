@@ -1,0 +1,6 @@
+---
+- name: Deploy Observability Configuration for Beszel
+  hosts: snmp
+  become: yes
+  roles:
+    - ../roles/observability

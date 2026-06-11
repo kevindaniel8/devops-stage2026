@@ -1,8 +1,8 @@
 #!/bin/bash
 # =============================================================================
-# SCRIPT 6 - Configuration Firewall OPNsense via API
+# SCRIPT 9 - Configuration Firewall OPNsense via API
 # =============================================================================
-# Usage: ./6-configure-firewall.sh [aliases|rules|nat|all]
+# Usage: ./9-configure-firewall.sh [aliases|rules|nat|all]
 # =============================================================================
 
 set -euo pipefail
@@ -81,12 +81,17 @@ create_aliases() {
     create_alias "INFRA_MGMT" "host" "192.168.20.2"
     create_alias "DEV_NETWORK" "network" "192.168.0.0/24"
     create_alias "INFRA_DATABASE" "host" "192.168.20.20 192.168.20.21"
-    create_alias "INFRA_K8S_CONTROL" "host" "192.168.20.40 192.168.20.41 192.168.20.42"
-    create_alias "INFRA_K8S_WORKERS" "host" "192.168.20.43 192.168.20.44 192.168.20.45"
-    create_alias "INFRA_K8S_ALL" "network" "192.168.20.40/29"
+    create_alias "INFRA_K8S_CONTROL" "host" "192.168.20.220"
+    create_alias "INFRA_K8S_WORKERS" "host" "192.168.20.221 192.168.20.222"
+    create_alias "INFRA_K8S_ALL" "network" "192.168.20.220/29"
     create_alias "INFRA_ALL_SERVERS" "network" "192.168.20.0/24"
     create_alias "INFRA_NAS" "host" "192.168.20.5"
     create_alias "INFRA_NEXTCLOUD" "host" "192.168.20.10"
+    create_alias "INFRA_REVERSE_PROXY" "host" "192.168.20.3"
+    create_alias "INFRA_HARBOR" "host" "192.168.20.205"
+    create_alias "INFRA_WIKIJS" "host" "192.168.20.4"
+    create_alias "INFRA_OPENPROJECT" "host" "192.168.20.4"
+    create_alias "INFRA_MAILSERVER" "host" "192.168.20.3"
     
     # Apply changes
     opn_api POST "firewall/alias/reconfigure" "{}" > /dev/null 2>&1 || true
@@ -145,15 +150,15 @@ create_routing_rules() {
 # Create NAT rule
 create_nat() {
     log_info "=== CREATION REGLES NAT ==="
-    
+
     # NAT HTTP -> Reverse Proxy
-    local json='{"nat":{"interface":"wan","protocol":"tcp","source":"any","destination":"wanip","target":"192.168.20.10","local-port":"80","descr":"HTTP to Reverse Proxy"}}'
+    local json='{"nat":{"interface":"wan","protocol":"tcp","source":"any","destination":"wanip","target":"192.168.20.3","local-port":"80","descr":"HTTP to Reverse Proxy"}}'
     opn_api POST "firewall/nat/addPortForward" "$json" > /dev/null 2>&1 || true
-    
+
     # NAT HTTPS
-    json='{"nat":{"interface":"wan","protocol":"tcp","source":"any","destination":"wanip","target":"192.168.20.10","local-port":"443","descr":"HTTPS to Reverse Proxy"}}'
+    json='{"nat":{"interface":"wan","protocol":"tcp","source":"any","destination":"wanip","target":"192.168.20.3","local-port":"443","descr":"HTTPS to Reverse Proxy"}}'
     opn_api POST "firewall/nat/addPortForward" "$json" > /dev/null 2>&1 || true
-    
+
     opn_api POST "firewall/nat/apply" "{}" > /dev/null 2>&1 || true
     log_ok "NAT crees"
 }
@@ -171,12 +176,17 @@ Name,Type,Content,Description
 DEV_NETWORK,network,192.168.0.0/24,Reseau de developpement (poste dev)
 INFRA_MGMT,host,192.168.20.2,Management station
 INFRA_DATABASE,host,192.168.20.20 192.168.20.21,PostgreSQL servers
-INFRA_K8S_CONTROL,host,192.168.20.40 192.168.20.41 192.168.20.42,K8s Control Plane
-INFRA_K8S_WORKERS,host,192.168.20.43 192.168.20.44 192.168.20.45,K8s Workers
-INFRA_K8S_ALL,network,192.168.20.40/29,All K8s nodes
+INFRA_K8S_CONTROL,host,192.168.20.220,K8s Control Plane
+INFRA_K8S_WORKERS,host,192.168.20.221 192.168.20.222,K8s Workers
+INFRA_K8S_ALL,network,192.168.20.220/29,All K8s nodes
 INFRA_ALL_SERVERS,network,192.168.20.0/24,All infrastructure
 INFRA_NAS,host,192.168.20.5,NAS TrueNAS
-INFRA_NEXTCLOUD,host,192.168.20.10,Nextcloud/Reverse Proxy
+INFRA_NEXTCLOUD,host,192.168.20.10,Nextcloud
+INFRA_REVERSE_PROXY,host,192.168.20.3,Reverse Proxy
+INFRA_HARBOR,host,192.168.20.205,Harbor Registry
+INFRA_WIKIJS,host,192.168.20.4,WikiJS
+INFRA_OPENPROJECT,host,192.168.20.4,OpenProject
+INFRA_MAILSERVER,host,192.168.20.3,Mailserver
 EOF
 
     # Rules CSV
@@ -190,6 +200,11 @@ pass,lan,INFRA_K8S_ALL,INFRA_K8S_ALL,any,any,K8s inter-node
 pass,lan,INFRA_ALL_SERVERS,INFRA_NAS,tcp,"2049,445",NAS access
 pass,wan,DEV_NETWORK,INFRA_ALL_SERVERS,tcp,22,SSH depuis reseau dev
 pass,wan,DEV_NETWORK,INFRA_ALL_SERVERS,icmp,,Ping depuis reseau dev
+pass,wan,DEV_NETWORK,INFRA_REVERSE_PROXY,tcp,"80,443",HTTP/HTTPS vers Reverse Proxy
+pass,wan,DEV_NETWORK,INFRA_HARBOR,tcp,"80,443",HTTP/HTTPS vers Harbor
+pass,wan,DEV_NETWORK,INFRA_WIKIJS,tcp,3000,WikiJS
+pass,wan,DEV_NETWORK,INFRA_OPENPROJECT,tcp,8080,OpenProject
+pass,wan,DEV_NETWORK,INFRA_NEXTCLOUD,tcp,"80,443",Nextcloud
 EOF
 
     log_ok "Configuration exportee dans $outdir/"

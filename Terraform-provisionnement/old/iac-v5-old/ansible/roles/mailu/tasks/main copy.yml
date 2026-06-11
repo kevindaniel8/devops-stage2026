@@ -1,0 +1,40 @@
+---
+
+- name: Créer dossier Mailu
+  file:
+    path: "{{ mailu_data_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Créer sous-dossiers Mailu
+  file:
+    path: "{{ mailu_data_dir }}/{{ item }}"
+    state: directory
+  loop:
+    - data
+    - mail
+    - certs
+    - overrides
+
+- name: Générer .env Mailu
+  template:
+    src: mailu.env.j2
+    dest: "{{ mailu_data_dir }}/.env"
+  notify: restart mailu
+
+- name: Générer docker-compose Mailu
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ mailu_data_dir }}/docker-compose.yml"
+  notify: restart mailu
+
+- name: Lancer Mailu
+  community.docker.docker_compose_v2:
+    project_src: "{{ mailu_data_dir }}"
+    state: present
+
+- name: Attendre disponibilité Web Mailu
+  wait_for:
+    host: 127.0.0.1
+    port: 8080
+    timeout: 300

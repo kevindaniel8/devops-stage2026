@@ -1,0 +1,75 @@
+---
+truenas_config_enabled: true
+
+# TrueNAS connection
+truenas_host: "192.168.20.8"
+truenas_user: "root"
+truenas_password: ""
+
+# Admin user configuration
+truenas_admin_user: "truenas_admin"
+truenas_admin_password: "truenas"
+truenas_admin_full_name: "TrueNAS Administrator"
+truenas_admin_email: "admin@greencontracts.lan"
+truenas_admin_groups: ["wheel"]
+
+# SSH configuration
+truenas_ssh_enabled: true
+truenas_ssh_port: "22"
+truenas_ssh_permit_root_login: "yes"
+
+# ZFS pool configuration
+truenas_pool_name: "tank"
+truenas_pool_disks: []
+# truenas_pool_disks:
+#   - "/dev/ada0"
+#   - "/dev/ada1"
+truenas_pool_raid: "mirror"  # mirror, raidz1, raidz2, raidz3
+
+# ZFS dataset configuration
+truenas_datasets:
+  - name: "postgresql"
+    path: "/mnt/tank/postgresql"
+    compression: "lz4"
+    atime: "off"
+    sync: "standard"
+  - name: "backups"
+    path: "/mnt/tank/backups"
+    compression: "lz4"
+    atime: "off"
+    sync: "standard"
+  - name: "shared"
+    path: "/mnt/tank/shared"
+    compression: "lz4"
+    atime: "off"
+    sync: "standard"
+
+# NFS configuration
+truenas_nfs_enabled: true
+truenas_nfs_shares:
+  - name: "postgresql-backups"
+    path: "/mnt/tank/postgresql"
+    network: "192.168.20.0/24"
+    ro: false
+    maproot_user: "root"
+    maproot_group: "wheel"
+  - name: "shared-data"
+    path: "/mnt/tank/shared"
+    network: "192.168.20.0/24"
+    ro: false
+    maproot_user: "truenas_admin"
+    maproot_group: "wheel"
+
+# SFTP configuration
+truenas_sftp_enabled: true
+truenas_sftp_port: "22"
+truenas_sftp_users:
+  - username: "truenas_admin"
+    home: "/mnt/tank/shared"
+    chroot: true
+
+# Service configuration
+truenas_services:
+  nfs: true
+  sshd: true
+  sftp: true

@@ -1,0 +1,88 @@
+---
+- name: Get system ID for {{ service_item.key }}
+  ansible.builtin.set_fact:
+    current_system_id: "{{ beszel_system_map[service_item.value.host] | default(beszel_system_map[service_item.key]) }}"
+  when: service_item.value.host in beszel_system_map or service_item.key in beszel_system_map
+
+- name: Skip if system not found in Beszel
+  ansible.builtin.debug:
+    msg: "System {{ service_item.value.host }} not found in Beszel, skipping alert configuration"
+  when: current_system_id is not defined
+
+- name: Configure CPU alert for {{ service_item.key }}
+  ansible.builtin.command:
+    cmd: >
+      docker exec beszel-server sqlite3 /beszel_data/data.db
+      "INSERT OR REPLACE INTO alerts (name, system, min, user)
+       VALUES ('{{ service_item.key }}_cpu_{{ service_item.value.priority }}', '{{ current_system_id }}',
+       {{ service_item.value.metrics.cpu.warning }}, 'admin');"
+  delegate_to: "{{ observability_beszel_hub_host }}"
+  when:
+    - current_system_id is defined
+    - service_item.value.alerts_enabled
+    - service_item.value.metrics.cpu is defined
+  failed_when: false
+  changed_when: false
+
+- name: Configure Memory alert for {{ service_item.key }}
+  ansible.builtin.command:
+    cmd: >
+      docker exec beszel-server sqlite3 /beszel_data/data.db
+      "INSERT OR REPLACE INTO alerts (name, system, min, user)
+       VALUES ('{{ service_item.key }}_memory_{{ service_item.value.priority }}', '{{ current_system_id }}',
+       {{ service_item.value.metrics.memory.warning }}, 'admin');"
+  delegate_to: "{{ observability_beszel_hub_host }}"
+  when:
+    - current_system_id is defined
+    - service_item.value.alerts_enabled
+    - service_item.value.metrics.memory is defined
+  failed_when: false
+  changed_when: false
+
+- name: Configure Disk alert for {{ service_item.key }}
+  ansible.builtin.command:
+    cmd: >
+      docker exec beszel-server sqlite3 /beszel_data/data.db
+      "INSERT OR REPLACE INTO alerts (name, system, min, user)
+       VALUES ('{{ service_item.key }}_disk_{{ service_item.value.priority }}', '{{ current_system_id }}',
+       {{ service_item.value.metrics.disk.warning }}, 'admin');"
+  delegate_to: "{{ observability_beszel_hub_host }}"
+  when:
+    - current_system_id is defined
+    - service_item.value.alerts_enabled
+    - service_item.value.metrics.disk is defined
+  failed_when: false
+  changed_when: false
+
+- name: Configure custom alert for {{ service_item.key }}
+  ansible.builtin.command:
+    cmd: >
+      docker exec beszel-server sqlite3 /beszel_data/data.db
+      "INSERT OR REPLACE INTO alerts (name, system, min, user)
+       VALUES ('{{ service_item.key }}_{{ metric_key }}_{{ service_item.value.priority }}', '{{ current_system_id }}',
+       {{ metric_value.warning }}, 'admin');"
+  delegate_to: "{{ observability_beszel_hub_host }}"
+  when:
+    - current_system_id is defined
+    - service_item.value.alerts_enabled
+    - metric_key is defined
+    - metric_value.warning is defined
+    - metric_key not in ['cpu', 'memory', 'disk']
+  loop: "{{ service_item.value.metrics | dict2items }}"
+  loop_control:
+    loop_var: metric_item
+    label: "{{ metric_item.key }}"
+  vars:
+    metric_key: "{{ metric_item.key }}"
+    metric_value: "{{ metric_item.value }}"
+  failed_when: false
+  changed_when: false
+
+- name: Display alert configuration for {{ service_item.key }}
+  ansible.builtin.debug:
+    msg:
+      - "Service: {{ service_item.value.name }}"
+      - "Priority: {{ service_item.value.priority }}"
+      - "System ID: {{ current_system_id | default('Not found') }}"
+      - "Alerts enabled: {{ service_item.value.alerts_enabled }}"
+      - "Metrics: {{ service_item.value.metrics | list }}"

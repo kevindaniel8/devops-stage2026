@@ -1,0 +1,105 @@
+---
+- name: Nettoyage complet - Arrêter et supprimer les conteneurs modoboa
+  command: docker compose -f {{ modoboa_install_dir }}/docker-compose.yml down -v
+  delegate_to: "{{ inventory_hostname }}"
+  when: modoboa_cleanup | default(false)
+  tags: ['cleanup']
+  ignore_errors: yes
+
+- name: Nettoyage complet - Supprimer le répertoire modoboa
+  file:
+    path: "{{ modoboa_install_dir }}"
+    state: absent
+  when: modoboa_cleanup | default(false)
+  tags: ['cleanup']
+
+- name: Nettoyage complet - Supprimer les images Docker modoboa
+  shell: docker rmi $(docker images --format "{% raw %}{{.Repository}}:{{.Tag}}{% endraw %}" | grep modoboa)
+  delegate_to: "{{ inventory_hostname }}"
+  when: modoboa_cleanup | default(false)
+  tags: ['cleanup']
+  ignore_errors: yes
+
+- name: Installer dépendances
+  apt:
+    name:
+      - git
+      - nfs-common
+    state: present
+    update_cache: yes
+
+- name: Créer répertoire d'installation
+  file:
+    path: "{{ modoboa_install_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Monter le partage NFS pour le stockage des emails
+  mount:
+    path: "{{ modoboa_nfs_mount_point }}"
+    src: "{{ modoboa_nfs_server }}:{{ modoboa_nfs_path }}"
+    fstype: nfs
+    opts: rw,sync,hard
+    state: mounted
+  when: modoboa_nfs_enabled
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: Créer les sous-répertoires NFS
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ modoboa_nfs_mount_point }}/mailboxes"
+    - "{{ modoboa_nfs_mount_point }}/vmail"
+  when: modoboa_nfs_enabled
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: Déployer docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ modoboa_install_dir }}/docker-compose.yml"
+    mode: '0644'
+
+- name: Déployer settings.py
+  template:
+    src: settings.py.j2
+    dest: "{{ modoboa_install_dir }}/settings.py"
+    mode: '0644'
+
+- name: Créer réseau Docker
+  docker_network:
+    name: "{{ modoboa_docker_network }}"
+    state: present
+
+- name: Démarrer Modoboa
+  command: docker compose -f {{ modoboa_install_dir }}/docker-compose.yml up -d
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: Attendre que Modoboa soit démarré
+  wait_for:
+    port: "{{ modoboa_http_port }}"
+    host: "0.0.0.0"
+    delay: 10
+    timeout: 120
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: Exécuter les migrations Django
+  command: docker exec modoboa-web python manage.py migrate
+  delegate_to: "{{ inventory_hostname }}"
+  ignore_errors: yes
+
+- name: Créer l'administrateur Modoboa
+  command: >
+    docker exec modoboa-web python manage.py createsuperuser
+    --username admin
+    --email {{ modoboa_admin_email }}
+    --noinput
+  delegate_to: "{{ inventory_hostname }}"
+  ignore_errors: yes
+
+- name: Définir le mot de passe administrateur
+  command: >
+    docker exec modoboa-web python manage.py changepassword admin
+  delegate_to: "{{ inventory_hostname }}"
+  ignore_errors: yes

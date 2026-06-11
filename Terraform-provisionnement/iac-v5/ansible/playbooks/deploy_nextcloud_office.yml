@@ -1,0 +1,6 @@
+---
+- name: Deploy Nextcloud Office (Collabora Online)
+  hosts: nextcloud
+  become: yes
+  roles:
+    - ../roles/nextcloud-office

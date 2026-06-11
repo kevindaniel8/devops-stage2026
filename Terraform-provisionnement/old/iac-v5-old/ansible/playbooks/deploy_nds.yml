@@ -1,0 +1,11 @@
+---
+- import_playbook: dns-bind9.yml
+- import_playbook: dns-client.yml # fait bugger le systeme actuellement car casse les ip sans reconfigurer
+- name: Attendre stabilisation DNS
+  hosts: dns_clients
+  tasks:
+    - name: Pause pour stabilisation DNS
+      pause:
+        seconds: 10
+- import_playbook: reverse-proxy.yml
+- import_playbook: ssl-orchestrator.yml

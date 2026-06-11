@@ -1,0 +1,23 @@
+# ============================================================
+# Configuration Mailcow
+# ============================================================
+
+mailcow_hostname: "{{ mail_domain | default('mail.' + main_domain) }}"
+
+mailcow_http_port: 8080
+mailcow_http_bind: "127.0.0.1"
+
+mailcow_repo_dir: "/opt/mailcow-dockerized"
+
+# Base de données MariaDB externe (optionnel)
+# Si mailcow_db_host est vide, mailcow utilisera sa propre base de données MySQL
+mailcow_db_host: ""
+mailcow_db_port: 3306
+mailcow_db_name: "mailcow"
+mailcow_db_user: "mailcow"
+mailcow_db_pass: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters,digits') }}"
+
+mailcow_timezone: "Europe/Paris"
+
+# Mot de passe admin par défaut (à changer lors de la première connexion)
+mailcow_admin_password: "Admin123!"

@@ -1,0 +1,121 @@
+- name: Nettoyage complet - Vérifier si docker-compose.yml existe
+  stat:
+    path: "{{ mailcow_repo_dir }}/docker-compose.yml"
+  register: docker_compose_file
+  when: mailcow_cleanup | default(false)
+  tags: ['cleanup']
+
+- name: Nettoyage complet - Arrêter et supprimer les conteneurs mailcow
+  command: docker compose -f {{ mailcow_repo_dir }}/docker-compose.yml down -v
+  delegate_to: "{{ inventory_hostname }}"
+  when: mailcow_cleanup | default(false) and docker_compose_file.stat.exists
+  tags: ['cleanup']
+  ignore_errors: yes
+
+- name: Nettoyage complet - Supprimer le répertoire mailcow
+  file:
+    path: "{{ mailcow_repo_dir }}"
+    state: absent
+  when: mailcow_cleanup | default(false)
+  tags: ['cleanup']
+
+- name: Nettoyage complet - Supprimer les images Docker mailcow
+  shell: docker rmi $(docker images --format "{% raw %}{{.Repository}}:{{.Tag}}{% endraw %}" | grep mailcow)
+  delegate_to: "{{ inventory_hostname }}"
+  when: mailcow_cleanup | default(false)
+  tags: ['cleanup']
+  ignore_errors: yes
+
+- name: Installer dépendances
+  apt:
+    name:
+      - git
+    state: present
+    update_cache: yes
+
+- name: Vérifier si mailcow existe déjà
+  stat:
+    path: "{{ mailcow_repo_dir }}"
+  register: mailcow_dir
+
+- name: Supprimer ancien dossier mailcow
+  file:
+    path: "{{ mailcow_repo_dir }}"
+    state: absent
+  when: not mailcow_dir.stat.exists or force_reinstall | default(false)
+
+- name: Cloner mailcow-dockerized
+  git:
+    repo: "https://github.com/mailcow/mailcow-dockerized.git"
+    dest: "{{ mailcow_repo_dir }}"
+    version: master
+    update: yes
+  when: not mailcow_dir.stat.exists or force_reinstall | default(false)
+
+- name: Déployer mailcow.conf
+  template:
+    src: mailcow.conf.j2
+    dest: "{{ mailcow_repo_dir }}/mailcow.conf"
+
+- name: Déployer .env
+  template:
+    src: env.mailcow.j2
+    dest: "{{ mailcow_repo_dir }}/.env"
+
+- name: Créer répertoire SSL temporaire
+  file:
+    path: "{{ mailcow_repo_dir }}/data/assets/ssl"
+    state: directory
+    mode: '0755'
+
+- name: Générer certificat SSL auto-signé temporaire
+  command: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout "{{ mailcow_repo_dir }}/data/assets/ssl/key.pem" -out "{{ mailcow_repo_dir }}/data/assets/ssl/cert.pem" -subj "/C=FR/ST=France/L=Paris/O=Mailcow/CN=mail.greencontracts.lan"
+  args:
+    creates: "{{ mailcow_repo_dir }}/data/assets/ssl/cert.pem"
+
+- name: Configurer MySQL client pour désactiver SSL
+  lineinfile:
+    path: "{{ mailcow_repo_dir }}/data/conf/mysql/my.cnf"
+    line: "ssl=0"
+    insertafter: "[client]"
+    create: yes
+
+- name: Démarrer Mailcow
+  community.docker.docker_compose_v2:
+    project_src: "{{ mailcow_repo_dir }}"
+    state: present
+    pull: always
+
+- name: Attendre que nginx-mailcow soit démarré
+  wait_for:
+    timeout: 60
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: Vérifier si la configuration nginx a déjà été corrigée
+  command: docker exec mailcowdockerized-nginx-mailcow-1 grep -q "fastcgi_pass php-fpm-mailcow:9000" /etc/nginx/includes/sites-default.conf
+  register: nginx_config_fixed
+  failed_when: false
+  changed_when: false
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: Corriger configuration nginx pour utiliser port 9000
+  command: docker exec mailcowdockerized-nginx-mailcow-1 sed -i 's/:9002/:9000/g' /etc/nginx/includes/sites-default.conf
+  delegate_to: "{{ inventory_hostname }}"
+  when: nginx_config_fixed.rc != 0
+
+
+- name: Redémarrer nginx pour monter les certificats SSL
+  command: docker restart mailcowdockerized-nginx-mailcow-1
+  delegate_to: "{{ inventory_hostname }}"
+  when: nginx_config_fixed.rc != 0
+
+- name: Attendre que nginx soit prêt
+  wait_for:
+    timeout: 30
+  delegate_to: "{{ inventory_hostname }}"
+  when: nginx_config_fixed.rc != 0
+
+- name: Recharger nginx
+  command: docker exec mailcowdockerized-nginx-mailcow-1 nginx -s reload
+  delegate_to: "{{ inventory_hostname }}"
+  when: nginx_config_fixed.rc != 0

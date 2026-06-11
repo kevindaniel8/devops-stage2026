@@ -1,0 +1,6 @@
+---
+
+- name: restart mailu
+  community.docker.docker_compose_v2:
+    project_src: "{{ mailu_data_dir }}"
+    state: restarted

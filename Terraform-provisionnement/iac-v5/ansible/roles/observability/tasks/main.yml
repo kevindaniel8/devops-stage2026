@@ -1,0 +1,58 @@
+---
+- name: Check if Beszel Hub is accessible
+  ansible.builtin.command:
+    cmd: "docker exec beszel-server sh -c 'which sqlite3'"
+  register: sqlite_check
+  delegate_to: "{{ observability_beszel_hub_host }}"
+  failed_when: false
+  changed_when: false
+
+- name: Install sqlite if missing
+  ansible.builtin.command:
+    cmd: "docker exec beszel-server apk add --no-cache sqlite"
+  delegate_to: "{{ observability_beszel_hub_host }}"
+  when: sqlite_check.rc != 0
+
+- name: Get system IDs from Beszel database
+  ansible.builtin.command:
+    cmd: "docker exec beszel-server sqlite3 /beszel_data/data.db 'SELECT id, name FROM systems;'"
+  register: beszel_systems
+  delegate_to: "{{ observability_beszel_hub_host }}"
+  changed_when: false
+
+- name: Parse system IDs
+  ansible.builtin.set_fact:
+    beszel_system_map: "{{ beszel_system_map | default({}) | combine({item.split('|')[1].strip(): item.split('|')[0].strip()}) }}"
+  loop: "{{ beszel_systems.stdout_lines }}"
+  when: "'|' in item"
+  delegate_to: "{{ observability_beszel_hub_host }}"
+
+- name: Display system mapping
+  ansible.builtin.debug:
+    msg: "System mapping: {{ beszel_system_map }}"
+
+- name: Configure alerts for each service
+  ansible.builtin.include_tasks: configure_service_alerts.yml
+  loop: "{{ observability_services | dict2items }}"
+  loop_control:
+    loop_var: service_item
+  when: observability_alert_enabled
+
+- name: Configure global alert settings
+  ansible.builtin.command:
+    cmd: >
+      docker exec beszel-server sqlite3 /beszel_data/data.db
+      "UPDATE user_settings SET settings = json_set(settings, '$.alertEmail', '{{ observability_alert_email }}')
+       WHERE user = 'admin';"
+  delegate_to: "{{ observability_beszel_hub_host }}"
+  when: observability_alert_notification_enabled
+  failed_when: false
+  changed_when: false
+
+- name: Display configuration summary
+  ansible.builtin.debug:
+    msg:
+      - "Observability configuration completed"
+      - "Services configured: {{ observability_services | length }}"
+      - "Alerts enabled: {{ observability_alert_enabled }}"
+      - "Notifications enabled: {{ observability_alert_notification_enabled }}"

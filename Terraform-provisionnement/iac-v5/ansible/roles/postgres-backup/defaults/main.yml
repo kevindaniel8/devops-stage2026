@@ -1,0 +1,54 @@
+---
+postgres_backup_enabled: true
+
+# PostgreSQL connection
+postgres_backup_host: "localhost"
+postgres_backup_port: "5432"
+postgres_backup_user: "postgres"
+postgres_backup_password: ""
+
+# Backup configuration
+postgres_backup_dir: "/var/backups/postgresql"
+postgres_backup_retention_days: 7
+postgres_backup_format: "custom"  # custom, plain, tar, directory
+postgres_backup_compression: "9"  # 0-9, 0 = no compression
+
+# Cron schedule
+postgres_backup_cron_enabled: true
+postgres_backup_cron_schedule: "0 2 * * *"  # Tous les jours à 2h du matin
+postgres_backup_cron_user: "postgres"
+
+# Databases to backup (empty = backup all databases except system databases)
+postgres_backup_databases: []
+# postgres_backup_databases:
+#   - myapp
+#   - nextcloud
+#   - moodle
+
+# Databases to exclude (system databases by default)
+postgres_backup_exclude_databases:
+  - "postgres"
+  - "template0"
+  - "template1"
+
+# NAS configuration
+postgres_backup_nas_enabled: true
+postgres_backup_nas_host: "192.168.20.5"
+postgres_backup_nas_user: "ubuntu"
+postgres_backup_nas_path: "/mnt/pool/postgresql-backups"
+postgres_backup_nas_ssh_key: "~/.ssh/id_rsa"
+
+# Remote backup configuration (optional)
+postgres_backup_remote_enabled: false
+postgres_backup_remote_host: ""
+postgres_backup_remote_user: "ubuntu"
+postgres_backup_remote_path: "/var/backups/postgresql"
+postgres_backup_remote_ssh_key: "~/.ssh/id_rsa"
+
+# Backup notification
+postgres_backup_notification_enabled: false
+postgres_backup_notification_email: "admin@greencontracts.lan"
+
+# Logging
+postgres_backup_log_dir: "/var/log/postgresql-backup"
+postgres_backup_log_retention_days: 30

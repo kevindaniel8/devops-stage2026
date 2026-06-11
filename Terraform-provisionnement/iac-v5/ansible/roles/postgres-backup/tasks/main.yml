@@ -1,0 +1,158 @@
+---
+- name: Check if PostgreSQL is installed
+  ansible.builtin.command:
+    cmd: which pg_dump
+  register: pg_dump_check
+  failed_when: false
+  changed_when: false
+
+- name: Fail if PostgreSQL is not installed
+  ansible.builtin.fail:
+    msg: "PostgreSQL is not installed. Please install PostgreSQL first."
+  when: pg_dump_check.rc != 0
+
+- name: Create backup directory
+  ansible.builtin.file:
+    path: "{{ postgres_backup_dir }}"
+    state: directory
+    owner: "{{ postgres_backup_cron_user }}"
+    group: "{{ postgres_backup_cron_user }}"
+    mode: '0755'
+
+- name: Create log directory
+  ansible.builtin.file:
+    path: "{{ postgres_backup_log_dir }}"
+    state: directory
+    owner: "{{ postgres_backup_cron_user }}"
+    group: "{{ postgres_backup_cron_user }}"
+    mode: '0755'
+
+- name: Deploy backup script
+  ansible.builtin.template:
+    src: postgres-backup.sh.j2
+    dest: "/usr/local/bin/postgres-backup.sh"
+    owner: "{{ postgres_backup_cron_user }}"
+    group: "{{ postgres_backup_cron_user }}"
+    mode: '0755'
+
+- name: Test PostgreSQL connection
+  ansible.builtin.command:
+    cmd: psql -h {{ postgres_backup_host }} -p {{ postgres_backup_port }} -U {{ postgres_backup_user }} -d postgres -c "SELECT version();"
+  environment:
+    PGPASSWORD: "{{ postgres_backup_password }}"
+  register: pg_connection_test
+  failed_when: false
+  changed_when: false
+
+- name: Warn if PostgreSQL connection failed
+  ansible.builtin.debug:
+    msg: "Warning: Could not connect to PostgreSQL. Please check credentials and network connectivity."
+  when: pg_connection_test.rc != 0
+
+- name: Get list of databases
+  ansible.builtin.command:
+    cmd: psql -h {{ postgres_backup_host }} -p {{ postgres_backup_port }} -U {{ postgres_backup_user }} -d postgres -t -c "SELECT datname FROM pg_database WHERE datistemplate = false ORDER BY datname;"
+  environment:
+    PGPASSWORD: "{{ postgres_backup_password }}"
+  register: pg_databases
+  failed_when: false
+  changed_when: false
+  when: pg_connection_test.rc == 0
+
+- name: Display available databases
+  ansible.builtin.debug:
+    msg: "Available databases: {{ pg_databases.stdout_lines | default([]) }}"
+  when: pg_connection_test.rc == 0
+
+- name: Configure cron job
+  ansible.builtin.cron:
+    name: "PostgreSQL Backup"
+    job: "/usr/local/bin/postgres-backup.sh"
+    user: "{{ postgres_backup_cron_user }}"
+    cron_file: postgres-backup
+    minute: "{{ postgres_backup_cron_schedule.split()[0] }}"
+    hour: "{{ postgres_backup_cron_schedule.split()[1] }}"
+    day: "{{ postgres_backup_cron_schedule.split()[2] }}"
+    month: "{{ postgres_backup_cron_schedule.split()[3] }}"
+    weekday: "{{ postgres_backup_cron_schedule.split()[4] }}"
+    state: present
+  when: postgres_backup_cron_enabled
+
+- name: Remove cron job if disabled
+  ansible.builtin.cron:
+    name: "PostgreSQL Backup"
+    cron_file: postgres-backup
+    state: absent
+  when: not postgres_backup_cron_enabled
+
+- name: Setup SSH key for NAS access
+  ansible.builtin.copy:
+    src: "{{ postgres_backup_nas_ssh_key }}"
+    dest: "/home/{{ postgres_backup_cron_user }}/.ssh/nas_key"
+    owner: "{{ postgres_backup_cron_user }}"
+    group: "{{ postgres_backup_cron_user }}"
+    mode: '0600'
+    remote_src: true
+  when:
+    - postgres_backup_nas_enabled
+    - postgres_backup_nas_ssh_key | exists
+
+- name: Setup SSH key for remote backup access
+  ansible.builtin.copy:
+    src: "{{ postgres_backup_remote_ssh_key }}"
+    dest: "/home/{{ postgres_backup_cron_user }}/.ssh/remote_backup_key"
+    owner: "{{ postgres_backup_cron_user }}"
+    group: "{{ postgres_backup_cron_user }}"
+    mode: '0600'
+    remote_src: true
+  when:
+    - postgres_backup_remote_enabled
+    - postgres_backup_remote_ssh_key | exists
+
+- name: Test NAS connectivity
+  ansible.builtin.command:
+    cmd: "ssh -i {{ postgres_backup_nas_ssh_key }} -o StrictHostKeyChecking=no -o ConnectTimeout=5 {{ postgres_backup_nas_user }}@{{ postgres_backup_nas_host }} echo 'NAS_OK'"
+  register: nas_test
+  failed_when: false
+  changed_when: false
+  when: postgres_backup_nas_enabled
+
+- name: Warn if NAS is not accessible
+  ansible.builtin.debug:
+    msg: "Warning: NAS is not accessible. Backups will be stored locally only."
+  when:
+    - postgres_backup_nas_enabled
+    - nas_test.rc != 0
+
+- name: Test remote backup connectivity
+  ansible.builtin.command:
+    cmd: "ssh -i {{ postgres_backup_remote_ssh_key }} -o StrictHostKeyChecking=no -o ConnectTimeout=5 {{ postgres_backup_remote_user }}@{{ postgres_backup_remote_host }} echo 'REMOTE_OK'"
+  register: remote_test
+  failed_when: false
+  changed_when: false
+  when:
+    - postgres_backup_remote_enabled
+    - postgres_backup_remote_host | length > 0
+
+- name: Warn if remote backup host is not accessible
+  ansible.builtin.debug:
+    msg: "Warning: Remote backup host is not accessible. Backups will be stored locally and on NAS only."
+  when:
+    - postgres_backup_remote_enabled
+    - postgres_backup_remote_host | length > 0
+    - remote_test.rc != 0
+
+- name: Display backup configuration summary
+  ansible.builtin.debug:
+    msg:
+      - "=== PostgreSQL Backup Configuration ==="
+      - "Backup directory: {{ postgres_backup_dir }}"
+      - "Log directory: {{ postgres_backup_log_dir }}"
+      - "Retention days: {{ postgres_backup_retention_days }}"
+      - "Backup format: {{ postgres_backup_format }}"
+      - "Cron enabled: {{ postgres_backup_cron_enabled }}"
+      - "Cron schedule: {{ postgres_backup_cron_schedule }}"
+      - "NAS backup enabled: {{ postgres_backup_nas_enabled }}"
+      - "NAS host: {{ postgres_backup_nas_host }}"
+      - "Remote backup enabled: {{ postgres_backup_remote_enabled }}"
+      - "Remote host: {{ postgres_backup_remote_host }}"

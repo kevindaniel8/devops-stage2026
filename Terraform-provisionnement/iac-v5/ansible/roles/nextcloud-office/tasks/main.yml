@@ -1,0 +1,159 @@
+---
+- name: Check if Nextcloud is installed
+  ansible.builtin.command:
+    cmd: which nextcloud.occ
+  register: nextcloud_check
+  failed_when: false
+  changed_when: false
+
+- name: Fail if Nextcloud is not installed
+  ansible.builtin.fail:
+    msg: "Nextcloud is not installed. Please install Nextcloud first."
+  when: nextcloud_check.rc != 0
+
+- name: Check if Docker is installed
+  ansible.builtin.command:
+    cmd: which docker
+  register: docker_check
+  failed_when: false
+  changed_when: false
+
+- name: Install Docker if not installed
+  ansible.builtin.include_role:
+    name: ../roles/docker
+  when: docker_check.rc != 0
+
+- name: Create Collabora data directory
+  ansible.builtin.file:
+    path: "{{ nextcloud_office_data_dir }}"
+    state: directory
+    mode: '0755'
+  when: nextcloud_office_collabora_enabled
+
+- name: Stop existing Collabora container if exists
+  ansible.builtin.command:
+    cmd: "docker stop {{ nextcloud_office_container_name }}"
+  register: collabora_stop
+  failed_when: false
+  changed_when: false
+  when: nextcloud_office_collabora_enabled
+
+- name: Remove existing Collabora container if exists
+  ansible.builtin.command:
+    cmd: "docker rm {{ nextcloud_office_container_name }}"
+  register: collabora_remove
+  failed_when: false
+  changed_when: false
+  when: nextcloud_office_collabora_enabled
+
+- name: Pull Collabora Docker image
+  ansible.builtin.command:
+    cmd: "docker pull {{ nextcloud_office_docker_image }}:{{ nextcloud_office_docker_tag }}"
+  when: nextcloud_office_collabora_enabled
+
+- name: Run Collabora Online container
+  ansible.builtin.command:
+    cmd: >
+      docker run -d --name {{ nextcloud_office_container_name }}
+      --restart always
+      -p "{{ nextcloud_office_collabora_port }}:9980"
+      -e "domain={{ nextcloud_office_collabora_domain }}"
+      -e "username={{ nextcloud_office_collabora_admin_user }}"
+      -e "password={{ nextcloud_office_collabora_admin_password }}"
+      -e "extra_params=--o:ssl.enable=false"
+      {{ nextcloud_office_docker_image }}:{{ nextcloud_office_docker_tag }}
+  when: nextcloud_office_collabora_enabled
+
+- name: Wait for Collabora to be ready
+  ansible.builtin.wait_for:
+    host: "localhost"
+    port: "{{ nextcloud_office_collabora_port }}"
+    delay: 5
+    timeout: 60
+  when: nextcloud_office_collabora_enabled
+
+- name: Check Nextcloud apps status
+  ansible.builtin.command:
+    cmd: nextcloud.occ app:list
+  register: nextcloud_apps
+  changed_when: false
+  when: nextcloud_office_richdocuments_enabled or nextcloud_office_richdocumentscode_enabled
+
+- name: Install richdocuments app
+  ansible.builtin.command:
+    cmd: nextcloud.occ app:install richdocuments
+  register: richdocuments_install
+  failed_when: false
+  when:
+    - nextcloud_office_richdocuments_enabled
+    - "'richdocuments:' not in nextcloud_apps.stdout"
+
+- name: Install richdocumentscode app
+  ansible.builtin.command:
+    cmd: nextcloud.occ app:install richdocumentscode
+  register: richdocumentscode_install
+  failed_when: false
+  when:
+    - nextcloud_office_richdocumentscode_enabled
+    - "'richdocumentscode:' not in nextcloud_apps.stdout"
+
+- name: Enable richdocuments app
+  ansible.builtin.command:
+    cmd: nextcloud.occ app:enable richdocuments
+  register: richdocuments_enable
+  failed_when: false
+  changed_when: richdocuments_enable.rc == 0
+  when:
+    - nextcloud_office_richdocuments_enabled
+    - "'richdocuments: enabled' not in nextcloud_apps.stdout"
+
+- name: Enable richdocumentscode app
+  ansible.builtin.command:
+    cmd: nextcloud.occ app:enable richdocumentscode
+  register: richdocumentscode_enable
+  failed_when: false
+  changed_when: richdocumentscode_enable.rc == 0
+  when:
+    - nextcloud_office_richdocumentscode_enabled
+    - "'richdocumentscode: enabled' not in nextcloud_apps.stdout"
+
+- name: Configure Collabora Online settings
+  ansible.builtin.command:
+    cmd: >
+      nextcloud.occ config:app:set richdocuments wopi_url
+      --value="http://{{ nextcloud_office_collabora_domain }}:{{ nextcloud_office_collabora_port }}"
+  register: collabora_config
+  failed_when: false
+  changed_when: collabora_config.rc == 0
+  when:
+    - nextcloud_office_collabora_enabled
+    - nextcloud_office_richdocuments_enabled
+
+- name: Restart Nextcloud
+  ansible.builtin.command:
+    cmd: snap restart nextcloud
+  changed_when: false
+  when:
+    - richdocuments_install.changed or
+      richdocumentscode_install.changed or
+      richdocuments_enable.changed or
+      richdocumentscode_enable.changed or
+      collabora_config.changed
+# modified 15/10/2025
+- name: Re-check Nextcloud apps status after installation
+  ansible.builtin.command:
+    cmd: nextcloud.occ app:list
+  register: nextcloud_apps_final
+  changed_when: false
+  when: nextcloud_office_collabora_enabled
+
+- name: Display Collabora Online information
+  ansible.builtin.debug:
+    msg:
+      - "Collabora Online container: {{ nextcloud_office_container_name }}"
+      - "Collabora Online URL: http://{{ nextcloud_office_collabora_domain }}:{{ nextcloud_office_collabora_port }}"
+      - "Richdocuments app: {{ 'enabled' if 'richdocuments:' in nextcloud_apps_final.stdout and 'Enabled:' in nextcloud_apps_final.stdout else 'disabled' }}"
+      - "Richdocumentscode app: {{ 'enabled' if 'richdocumentscode:' in nextcloud_apps_final.stdout and 'Enabled:' in nextcloud_apps_final.stdout else 'disabled' }}"
+  when: nextcloud_office_collabora_enabled
+#      - "Richdocuments app: {{ 'enabled' if 'richdocuments: enabled' in nextcloud_apps.stdout else 'disabled' }}"
+#      - "Richdocumentscode app: {{ 'enabled' if 'richdocumentscode: enabled' in nextcloud_apps.stdout else 'disabled' }}"

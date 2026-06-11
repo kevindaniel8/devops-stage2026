@@ -1,0 +1,166 @@
+---
+- name: Check if TrueNAS is accessible
+  ansible.builtin.ping:
+  register: truenas_ping
+  failed_when: false
+
+- name: Warn if TrueNAS is not accessible
+  ansible.builtin.debug:
+    msg: "Warning: TrueNAS at {{ truenas_host }} is not accessible. Please check network connectivity and SSH configuration."
+  when: truenas_ping.failed
+
+- name: Fail if TrueNAS is not accessible and configuration is required
+  ansible.builtin.fail:
+    msg: "TrueNAS is not accessible. Cannot proceed with configuration."
+  when: truenas_ping.failed and truenas_config_enabled
+
+- name: Check if admin user exists
+  ansible.builtin.command:
+    cmd: "id {{ truenas_admin_user }}"
+  register: admin_user_check
+  failed_when: false
+  changed_when: false
+
+- name: Create admin user
+  ansible.builtin.user:
+    name: "{{ truenas_admin_user }}"
+    password: "{{ truenas_admin_password | password_hash('sha512') }}"
+    comment: "{{ truenas_admin_full_name }}"
+    shell: "/bin/sh"
+    groups: "{{ truenas_admin_groups }}"
+    append: true
+  when: admin_user_check.rc != 0
+
+- name: Ensure admin user has sudo privileges
+  ansible.builtin.lineinfile:
+    path: "/usr/local/etc/sudoers"
+    line: "{{ truenas_admin_user }} ALL=(ALL) ALL"
+    validate: "visudo -cf %s"
+    state: present
+  when: admin_user_check.rc != 0
+
+- name: Enable SSH service
+  ansible.builtin.service:
+    name: sshd
+    enabled: true
+    state: started
+  when: truenas_ssh_enabled
+
+- name: Configure SSH to allow root login
+  ansible.builtin.lineinfile:
+    path: "/etc/ssh/sshd_config"
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin {{ truenas_ssh_permit_root_login }}"
+    state: present
+  notify: Restart SSH
+  when: truenas_ssh_enabled
+
+- name: Configure SSH port
+  ansible.builtin.lineinfile:
+    path: "/etc/ssh/sshd_config"
+    regexp: "^Port"
+    line: "Port {{ truenas_ssh_port }}"
+    state: present
+  notify: Restart SSH
+  when: truenas_ssh_enabled
+
+- name: Check if ZFS pool exists
+  ansible.builtin.command:
+    cmd: "zpool list {{ truenas_pool_name }}"
+  register: zpool_check
+  failed_when: false
+  changed_when: false
+
+- name: Create ZFS pool if disks are specified
+  ansible.builtin.command:
+    cmd: "zpool create {{ truenas_pool_name }} {{ truenas_pool_raid }} {{ truenas_pool_disks | join(' ') }}"
+  when:
+    - zpool_check.rc != 0
+    - truenas_pool_disks | length > 0
+  notify: Import ZFS pool
+
+- name: Create ZFS datasets
+  ansible.builtin.zfs:
+    name: "{{ truenas_pool_name }}/{{ item.name }}"
+    state: present
+    compression: "{{ item.compression }}"
+    atime: "{{ item.atime }}"
+    sync: "{{ item.sync }}"
+    extra_zfs_properties:
+      mountpoint: "{{ item.path }}"
+  loop: "{{ truenas_datasets }}"
+  when: zpool_check.rc == 0
+
+- name: Ensure dataset directories exist
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ truenas_admin_user }}"
+    group: "wheel"
+    mode: '0755'
+  loop: "{{ truenas_datasets }}"
+
+- name: Enable NFS service
+  ansible.builtin.service:
+    name: nfsd
+    enabled: true
+    state: started
+  when: truenas_nfs_enabled
+
+- name: Configure NFS exports
+  ansible.builtin.lineinfile:
+    path: "/etc/exports"
+    line: "{{ item.path }} {{ item.network }} {{ 'ro' if item.ro else 'rw' }},maproot={{ item.maproot_user }}:{{ item.maproot_group }}"
+    state: present
+  loop: "{{ truenas_nfs_shares }}"
+  notify: Reload NFS
+  when: truenas_nfs_enabled
+
+- name: Configure SFTP subsystem
+  ansible.builtin.lineinfile:
+    path: "/etc/ssh/sshd_config"
+    regexp: "^Subsystem sftp"
+    line: "Subsystem sftp /usr/libexec/sftp-server"
+    state: present
+  notify: Restart SSH
+  when: truenas_sftp_enabled
+
+- name: Create SFTP user home directory
+  ansible.builtin.file:
+    path: "{{ item.home }}"
+    state: directory
+    owner: "{{ item.username }}"
+    group: "wheel"
+    mode: '0755'
+  loop: "{{ truenas_sftp_users }}"
+  when: truenas_sftp_enabled
+
+- name: Configure SFTP chroot for users
+  ansible.builtin.blockinfile:
+    path: "/etc/ssh/sshd_config"
+    block: |
+      Match User {{ item.username }}
+          ChrootDirectory {{ item.home }}
+          ForceCommand internal-sftp
+          AllowTcpForwarding no
+          X11Forwarding no
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - {{ item.username }}"
+  loop: "{{ truenas_sftp_users }}"
+  notify: Restart SSH
+  when: truenas_sftp_enabled
+
+- name: Display TrueNAS configuration summary
+  ansible.builtin.debug:
+    msg:
+      - "=== TrueNAS Configuration Summary ==="
+      - "Host: {{ truenas_host }}"
+      - "Admin user: {{ truenas_admin_user }}"
+      - "SSH enabled: {{ truenas_ssh_enabled }}"
+      - "SSH port: {{ truenas_ssh_port }}"
+      - "ZFS pool: {{ truenas_pool_name }}"
+      - "ZFS pool exists: {{ zpool_check.rc == 0 }}"
+      - "Datasets: {{ truenas_datasets | length }}"
+      - "NFS enabled: {{ truenas_nfs_enabled }}"
+      - "NFS shares: {{ truenas_nfs_shares | length }}"
+      - "SFTP enabled: {{ truenas_sftp_enabled }}"
+      - "SFTP users: {{ truenas_sftp_users | length }}"

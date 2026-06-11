@@ -1,0 +1,11 @@
+---
+- hosts: snmp
+  become: true
+
+  roles:
+    - ../roles/docker          # ton rôle existant
+    - ../roles/monitoring_network
+    - ../roles/snmp_exporter
+    - ../roles/alertmanager
+    - ../roles/prometheus
+    - ../roles/grafana

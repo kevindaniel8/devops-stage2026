@@ -1,0 +1,12 @@
+---
+- hosts: db
+  become: yes
+  roles:
+    - role: ../roles/db-mariadb
+      mariadb_root_password: "SuperSecret123"
+      mariadb_databases:
+        - name: appdb
+      mariadb_users:
+        - name: appuser
+          password: "UserPass123"
+          priv: "appdb.*:ALL"

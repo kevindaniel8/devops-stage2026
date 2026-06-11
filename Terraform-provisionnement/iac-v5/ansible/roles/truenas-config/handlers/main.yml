@@ -1,0 +1,15 @@
+---
+- name: Restart SSH
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+
+- name: Reload NFS
+  ansible.builtin.command:
+    cmd: "service nfsd restart"
+  changed_when: false
+
+- name: Import ZFS pool
+  ansible.builtin.command:
+    cmd: "zpool import {{ truenas_pool_name }}"
+  changed_when: false

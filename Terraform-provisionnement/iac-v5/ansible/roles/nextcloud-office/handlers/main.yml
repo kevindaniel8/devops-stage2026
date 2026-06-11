@@ -1,0 +1,10 @@
+---
+- name: Restart Nextcloud
+  ansible.builtin.command:
+    cmd: snap restart nextcloud
+  changed_when: false
+
+- name: Restart Collabora container
+  ansible.builtin.command:
+    cmd: "docker restart {{ nextcloud_office_container_name }}"
+  changed_when: false

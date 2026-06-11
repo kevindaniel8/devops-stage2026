@@ -1,0 +1,24 @@
+---
+nextcloud_office_enabled: true
+
+# Nextcloud configuration
+nextcloud_office_nextcloud_ip: "{{ ansible_default_ipv4.address }}"
+nextcloud_office_nextcloud_port: "80"
+
+# Collabora Online configuration
+nextcloud_office_collabora_enabled: true
+nextcloud_office_collabora_domain: "{{ nextcloud_office_nextcloud_ip }}"
+nextcloud_office_collabora_port: "9980"
+nextcloud_office_collabora_ssl: false
+nextcloud_office_collabora_admin_user: "admin"
+nextcloud_office_collabora_admin_password: "changeme"
+
+# Nextcloud apps
+nextcloud_office_richdocuments_enabled: true
+nextcloud_office_richdocumentscode_enabled: true
+
+# Docker configuration for Collabora
+nextcloud_office_docker_image: "collabora/code"
+nextcloud_office_docker_tag: "latest"
+nextcloud_office_container_name: "collabora-online"
+nextcloud_office_data_dir: "/opt/collabora"

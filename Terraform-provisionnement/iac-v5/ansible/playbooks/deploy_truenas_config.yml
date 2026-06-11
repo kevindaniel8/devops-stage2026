@@ -1,0 +1,6 @@
+---
+- name: Deploy TrueNAS Configuration
+  hosts: truenas
+  become: yes
+  roles:
+    - ../roles/truenas-config

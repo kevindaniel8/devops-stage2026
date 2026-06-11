@@ -1,0 +1,6 @@
+---
+- name: Deploy PostgreSQL Backup Configuration
+  hosts: db_master
+  become: yes
+  roles:
+    - ../roles/postgres-backup

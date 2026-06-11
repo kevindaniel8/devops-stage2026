@@ -1,0 +1,39 @@
+---
+- name: Check openssh in container
+  command: docker exec beszel-server sh -c "which ssh-keygen"
+  register: ssh_check
+  failed_when: false
+  changed_when: false
+
+- name: Install openssh if missing
+  command: docker exec beszel-server apk add --no-cache openssh
+  when: ssh_check.rc != 0
+
+- name: Generate SSH public key from private key
+  command: >
+    docker exec beszel-server sh -c
+    "ssh-keygen -y -f /beszel_data/id_ed25519"
+  register: beszel_pubkey
+  changed_when: false
+
+- name: Check sqlite3 in container
+  command: docker exec beszel-server sh -c "which sqlite3"
+  register: sqlite_check
+  failed_when: false
+  changed_when: false
+
+- name: Install sqlite if missing
+  command: docker exec beszel-server apk add --no-cache sqlite
+  when: sqlite_check.rc != 0
+
+- name: Get universal token from database
+  command: >
+    docker exec beszel-server sqlite3 /beszel_data/data.db
+    "SELECT token FROM universal_tokens LIMIT 1;"
+  register: beszel_token_raw
+  changed_when: false
+
+- name: Set global variables
+  set_fact:
+    beszel_agent_key: "{{ beszel_pubkey.stdout }}"
+    beszel_agent_token: "{{ beszel_token_raw.stdout }}"

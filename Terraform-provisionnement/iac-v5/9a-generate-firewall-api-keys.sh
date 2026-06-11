@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# SCRIPT 6a - Génération automatique des clés API OPNsense via SSH
+# SCRIPT 9a - Génération automatique des clés API OPNsense via SSH
 # =============================================================================
 # Ce script se connecte en SSH à OPNsense et génère les clés API automatiquement
 # =============================================================================
@@ -162,7 +162,7 @@ EOF
     echo "⚠️  Prochaines étapes:"
     echo "   1. Vérifiez le fichier: cat ssh/opnsense-conf-co.txt"
     echo "   2. Copiez les valeurs dans env.conf manuellement"
-    echo "   3. Puis lancez: ./6-configure-firewall.sh check"
+    echo "   3. Puis lancez: ./9-configure-firewall.sh check"
     echo ""
 }
 
@@ -172,7 +172,7 @@ EOF
 main() {
     echo ""
     echo "╔════════════════════════════════════════════════════════════════════╗"
-    echo "║     6a - GÉNÉRATION CLÉS API OPNsense (via SSH)                   ║"
+    echo "║     9a - GÉNÉRATION CLÉS API OPNsense (via SSH)                   ║"
     echo "╚════════════════════════════════════════════════════════════════════╝"
     echo ""
     

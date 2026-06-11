@@ -1,0 +1,120 @@
+---
+# Ce rôle ne dépend d'aucune collection Galaxy
+# Il utilise uniquement les binaires PostgreSQL
+
+# 1. Vérifier connectivité PostgreSQL
+- name: Vérifier accès PostgreSQL
+  wait_for:
+    host: "{{ openproject_pg_host }}"
+    port: "{{ openproject_pg_port }}"
+    timeout: 30
+
+# 2. Vérifier si la base existe
+- name: Vérifier si la base existe
+  shell: |
+    PGPASSWORD="{{ openproject_pg_admin_password }}" \
+    psql -h {{ openproject_pg_host }} -U {{ openproject_pg_admin_user }} -tAc \
+    "SELECT 1 FROM pg_database WHERE datname='{{ openproject_pg_database }}';"
+  register: db_exists
+  changed_when: false
+  failed_when: false
+  delegate_to: db-postgres-master
+
+# 3. Créer la base si absente
+- name: Créer la base OpenProject
+  shell: |
+    PGPASSWORD="{{ openproject_pg_admin_password }}" \
+    createdb -h {{ openproject_pg_host }} \
+    -U {{ openproject_pg_admin_user }} \
+    {{ openproject_pg_database }}
+  when: db_exists.stdout != "1"
+  delegate_to: db-postgres-master
+
+# 4. Vérifier si l'utilisateur existe
+- name: Vérifier utilisateur PostgreSQL
+  shell: |
+    PGPASSWORD="{{ openproject_pg_admin_password }}" \
+    psql -h {{ openproject_pg_host }} -U {{ openproject_pg_admin_user }} -tAc \
+    "SELECT 1 FROM pg_roles WHERE rolname='{{ openproject_pg_user }}';"
+  register: user_exists
+  changed_when: false
+  failed_when: false
+  delegate_to: db-postgres-master
+
+# 5. Créer utilisateur si absent
+- name: Créer utilisateur OpenProject
+  shell: |
+    PGPASSWORD="{{ openproject_pg_admin_password }}" \
+    createuser -h {{ openproject_pg_host }} \
+    -U {{ openproject_pg_admin_user }} \
+    {{ openproject_pg_user }}
+  when: user_exists.stdout != "1"
+  delegate_to: db-postgres-master
+
+# 6. Définir mot de passe utilisateur
+- name: Définir mot de passe user OpenProject
+  shell: |
+    PGPASSWORD="{{ openproject_pg_admin_password }}" \
+    psql -h {{ openproject_pg_host }} \
+    -U {{ openproject_pg_admin_user }} \
+    -c "ALTER USER {{ openproject_pg_user }} WITH PASSWORD '{{ openproject_pg_password }}';"
+  delegate_to: db-postgres-master
+
+# 7. Donner droits sur la base
+- name: Donner droits sur la base
+  shell: |
+    PGPASSWORD="{{ openproject_pg_admin_password }}" \
+    psql -h {{ openproject_pg_host }} \
+    -U {{ openproject_pg_admin_user }} \
+    -c "GRANT ALL PRIVILEGES ON DATABASE {{ openproject_pg_database }} TO {{ openproject_pg_user }};"
+  delegate_to: db-postgres-master
+
+# 8. Donner droits sur le schéma public
+- name: Donner droits sur le schéma public
+  shell: |
+    PGPASSWORD="{{ openproject_pg_admin_password }}" \
+    psql -h {{ openproject_pg_host }} \
+    -U {{ openproject_pg_admin_user }} \
+    -d {{ openproject_pg_database }} \
+    -c "GRANT ALL ON SCHEMA public TO {{ openproject_pg_user }};"
+  delegate_to: db-postgres-master
+
+# 9. Donner droits sur les tables existantes et futures
+- name: Donner droits sur les tables
+  shell: |
+    PGPASSWORD="{{ openproject_pg_admin_password }}" \
+    psql -h {{ openproject_pg_host }} \
+    -U {{ openproject_pg_admin_user }} \
+    -d {{ openproject_pg_database }} \
+    -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO {{ openproject_pg_user }};"
+  delegate_to: db-postgres-master
+
+# 10. Donner droits sur les séquences
+- name: Donner droits sur les séquences
+  shell: |
+    PGPASSWORD="{{ openproject_pg_admin_password }}" \
+    psql -h {{ openproject_pg_host }} \
+    -U {{ openproject_pg_admin_user }} \
+    -d {{ openproject_pg_database }} \
+    -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO {{ openproject_pg_user }};"
+  delegate_to: db-postgres-master
+
+# 11. Donner droits par défaut sur les nouvelles tables
+- name: Donner droits par défaut sur les nouvelles tables
+  shell: |
+    PGPASSWORD="{{ openproject_pg_admin_password }}" \
+    psql -h {{ openproject_pg_host }} \
+    -U {{ openproject_pg_admin_user }} \
+    -d {{ openproject_pg_database }} \
+    -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO {{ openproject_pg_user }};"
+  delegate_to: db-postgres-master
+
+# 12. Donner droits par défaut sur les nouvelles séquences
+- name: Donner droits par défaut sur les nouvelles séquences
+  shell: |
+    PGPASSWORD="{{ openproject_pg_admin_password }}" \
+    psql -h {{ openproject_pg_host }} \
+    -U {{ openproject_pg_admin_user }} \
+    -d {{ openproject_pg_database }} \
+    -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO {{ openproject_pg_user }};"
+  delegate_to: db-postgres-master

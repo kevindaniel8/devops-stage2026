@@ -1,0 +1,7 @@
+---
+- name: Installation du manager K3s
+  hosts: k3s_manager
+  become: yes
+
+  roles:
+    - ../roles/k3s-manager

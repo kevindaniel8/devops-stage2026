@@ -1,0 +1,58 @@
+---
+- name: Créer le dossier SSL Nginx
+  file:
+    path: /etc/nginx/certs
+    state: directory
+    mode: '0755'
+  tags: [certificat]
+
+- name: Déployer les certificats Nginx
+  vars:
+    certs:
+      - name: "wildcard.kevin.lan"
+      - name: "kevin.lan"
+      - name: "reverse-proxy.kevin.lan"
+  block:
+    - name: Déployer {{ item.name }}.crt
+      copy:
+        src: "{{ cert_store_dir }}/nginx/{{ item.name }}.crt"
+        dest: "/etc/nginx/certs/{{ item.name }}.crt"
+        mode: '0644'
+        force: true
+      loop: "{{ certs }}"
+      loop_control:
+        label: "{{ item.name }}"
+      notify: reload nginx
+      tags: [certificat]
+
+    - name: Déployer {{ item.name }}.key
+      copy:
+        src: "{{ cert_store_dir }}/nginx/{{ item.name }}.key"
+        dest: "/etc/nginx/certs/{{ item.name }}.key"
+        mode: '0400'
+        force: true
+      loop: "{{ certs }}"
+      loop_control:
+        label: "{{ item.name }}"
+      notify: reload nginx
+      tags: [certificat]
+
+    - name: Déployer {{ item.name }}-fullchain.crt
+      copy:
+        src: "{{ cert_store_dir }}/nginx/{{ item.name }}-fullchain.crt"
+        dest: "/etc/nginx/certs/{{ item.name }}-fullchain.crt"
+        mode: '0644'
+        force: true
+      loop: "{{ certs }}"
+      loop_control:
+        label: "{{ item.name }}"
+      notify: reload nginx
+      tags: [certificat]
+
+- name: Déployer la CA pour référence
+  copy:
+    src: "{{ cert_store_dir }}/ca/ca.crt"
+    dest: /etc/nginx/certs/ca.crt
+    mode: '0644'
+    force: true
+  tags: [certificat]

@@ -1,0 +1,250 @@
+---
+observability_enabled: true
+
+# Beszel Hub configuration
+observability_beszel_hub_host: "snmp"
+observability_beszel_hub_ip: "192.168.20.4"
+observability_beszel_hub_port: "8090"
+
+# Alert configuration
+observability_alert_enabled: true
+observability_alert_notification_enabled: true
+observability_alert_email: "admin@greencontracts.lan"
+
+# Service priorities and alert thresholds
+observability_services:
+
+  # CRITICAL SERVICES (Priority 1)
+  postgresql_master:
+    priority: 1
+    name: "PostgreSQL Master"
+    host: "db-postgres-master"
+    metrics:
+      cpu:
+        warning: 80
+        critical: 90
+      memory:
+        warning: 80
+        critical: 90
+      disk:
+        warning: 80
+        critical: 90
+      connections:
+        warning: 100
+        critical: 200
+    alerts_enabled: true
+
+  postgresql_replica:
+    priority: 1
+    name: "PostgreSQL Replica"
+    host: "db-postgres-replication"
+    metrics:
+      cpu:
+        warning: 80
+        critical: 90
+      memory:
+        warning: 80
+        critical: 90
+      disk:
+        warning: 80
+        critical: 90
+      replication_lag:
+        warning: 5
+        critical: 10
+    alerts_enabled: true
+
+  reverse_proxy:
+    priority: 1
+    name: "Reverse Proxy"
+    host: "reverse-proxy"
+    metrics:
+      cpu:
+        warning: 70
+        critical: 85
+      memory:
+        warning: 75
+        critical: 85
+      disk:
+        warning: 80
+        critical: 90
+      response_time:
+        warning: 1
+        critical: 2
+    alerts_enabled: true
+
+  samba_ad_dc:
+    priority: 1
+    name: "Samba AD DC"
+    host: "samba-ad-dc"
+    metrics:
+      cpu:
+        warning: 75
+        critical: 85
+      memory:
+        warning: 75
+        critical: 85
+      disk:
+        warning: 80
+        critical: 90
+      dns_response_time:
+        warning: 100
+        critical: 200
+    alerts_enabled: true
+
+  k3s_cluster:
+    priority: 1
+    name: "K3s Cluster"
+    host: "k3s-manager"
+    metrics:
+      cpu:
+        warning: 75
+        critical: 85
+      memory:
+        warning: 75
+        critical: 85
+      disk:
+        warning: 80
+        critical: 90
+      pod_restart_count:
+        warning: 5
+        critical: 10
+    alerts_enabled: true
+
+  harbor:
+    priority: 1
+    name: "Harbor Registry"
+    host: "harbor"
+    metrics:
+      cpu:
+        warning: 75
+        critical: 85
+      memory:
+        warning: 75
+        critical: 85
+      disk:
+        warning: 80
+        critical: 90
+    alerts_enabled: true
+
+  # IMPORTANT SERVICES (Priority 2)
+  nextcloud:
+    priority: 2
+    name: "Nextcloud"
+    host: "nextcloud"
+    metrics:
+      cpu:
+        warning: 70
+        critical: 85
+      memory:
+        warning: 75
+        critical: 85
+      disk:
+        warning: 85
+        critical: 95
+    alerts_enabled: true
+
+  mailserver:
+    priority: 2
+    name: "Mailserver"
+    host: "mailserver"
+    metrics:
+      cpu:
+        warning: 70
+        critical: 85
+      memory:
+        warning: 75
+        critical: 85
+      disk:
+        warning: 85
+        critical: 95
+      queue_size:
+        warning: 1000
+        critical: 5000
+    alerts_enabled: true
+
+  moodle:
+    priority: 2
+    name: "Moodle"
+    host: "k3s-manager"
+    metrics:
+      cpu:
+        warning: 70
+        critical: 85
+      memory:
+        warning: 75
+        critical: 85
+    alerts_enabled: true
+
+  argocd:
+    priority: 2
+    name: "ArgoCD"
+    host: "k3s-manager"
+    metrics:
+      cpu:
+        warning: 70
+        critical: 85
+      memory:
+        warning: 75
+        critical: 85
+    alerts_enabled: true
+
+  # SECONDARY SERVICES (Priority 3)
+  wikijs:
+    priority: 3
+    name: "WikiJS"
+    host: "snmp"
+    metrics:
+      cpu:
+        warning: 80
+        critical: 90
+      memory:
+        warning: 80
+        critical: 90
+    alerts_enabled: true
+
+  openproject:
+    priority: 3
+    name: "OpenProject"
+    host: "snmp"
+    metrics:
+      cpu:
+        warning: 80
+        critical: 90
+      memory:
+        warning: 80
+        critical: 90
+    alerts_enabled: true
+
+  beszel_hub:
+    priority: 3
+    name: "Beszel Hub"
+    host: "snmp"
+    metrics:
+      cpu:
+        warning: 80
+        critical: 90
+      memory:
+        warning: 80
+        critical: 90
+      disk:
+        warning: 85
+        critical: 95
+    alerts_enabled: true
+
+# Global thresholds for services without specific configuration
+observability_global_thresholds:
+  cpu:
+    warning: 80
+    critical: 90
+  memory:
+    warning: 80
+    critical: 90
+  disk:
+    warning: 85
+    critical: 95
+
+# Quiet hours (no alerts during these periods)
+observability_quiet_hours_enabled: false
+observability_quiet_hours:
+  start: "22:00"
+  end: "08:00"
