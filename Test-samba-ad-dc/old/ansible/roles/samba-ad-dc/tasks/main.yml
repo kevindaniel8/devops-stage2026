@@ -1,9 +1,0 @@
----
-- import_tasks: install.yml
-- import_tasks: configure.yml
-- import_tasks: provision.yml
-
-- name: Start samba-ad-dc
-  systemd:
-    name: samba-ad-dc
-    state: started

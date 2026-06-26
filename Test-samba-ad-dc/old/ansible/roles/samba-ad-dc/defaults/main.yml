@@ -1,5 +1,0 @@
----
-samba_domain: LAB
-samba_realm: LAB.LOCAL
-samba_admin_password: "ChangeMe123!"
-samba_dns_forwarder: "8.8.8.8"
