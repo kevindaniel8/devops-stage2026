@@ -1,7 +1,0 @@
----
-k3s_version: "v1.35.0+k3s1"
-
-# Ces deux variables seront fournies par le playbook global k3s.yml
-k3s_token: "{{ hostvars['global_k3s_config'].k3s_token }}"
-k3s_server_url: "{{ hostvars['global_k3s_config'].k3s_server_url }}"
-

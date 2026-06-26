@@ -1,7 +1,0 @@
----
-- name: Installation du worker K3s
-  hosts: k3s_worker
-  become: yes
-
-  roles:
-    - k3s-worker
