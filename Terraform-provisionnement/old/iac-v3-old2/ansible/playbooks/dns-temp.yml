@@ -1,4 +1,0 @@
-- hosts: dns_temp
-  become: yes
-  roles:
-    - dns-client
