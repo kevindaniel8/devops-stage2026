@@ -1,9 +1,0 @@
----
-- name: "01 - Vérifier que Docker est disponible"
-  include_tasks: 01-check-docker.yml
-
-- name: "02 - Déployer Modoboa en Docker"
-  include_tasks: 02-modoboa.yml
-
-- name: "03 - Configurer Nginx reverse proxy"
-  include_tasks: 03-nginx.yml

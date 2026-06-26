@@ -1,7 +1,0 @@
----
-reverse_proxy_nginx_package: nginx
-reverse_proxy_nginx_conf_dir: /etc/nginx
-reverse_proxy_nginx_sites_dir: /etc/nginx/sites-enabled
-reverse_proxy_nginx_sites_available_dir: /etc/nginx/sites-available
-reverse_proxy_nginx_user: www-data
-reverse_proxy_backup_dir: /var/backups/nginx
