@@ -1,8 +1,0 @@
-ca_common_name: "Kevin-Root-CA"
-
-nginx_cert_base_dir: "{{ cert_store_dir }}/nginx"
-ca_cert_base_dir: "{{ cert_store_dir }}/ca"
-
-wildcard_domain: "*.kevin.lan"
-root_domain: "kevin.lan"
-reverse_proxy_domain: "reverse-proxy.kevin.lan"
