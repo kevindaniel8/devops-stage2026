@@ -1,6 +1,0 @@
-- hosts: harbor
-  become: true
-  roles:
-    - role: docker
-      when: install_docker | default(true)
-    - role: harbor

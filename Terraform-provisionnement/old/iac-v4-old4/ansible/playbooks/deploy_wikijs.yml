@@ -1,5 +1,0 @@
-- hosts: wikijs
-  become: yes
-  roles:
-    - docker
-    - wikijs

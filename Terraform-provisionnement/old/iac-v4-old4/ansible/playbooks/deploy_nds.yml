@@ -1,5 +1,0 @@
----
-- import_playbook: dns-bind9.yml
-- import_playbook: dns-client.yml # fait bugger le systeme actuellement car casse les ip sans reconfigurer
-- import_playbook: reverse-proxy.yml
-#- import_playbook: ssl-orchestrateur.yml
