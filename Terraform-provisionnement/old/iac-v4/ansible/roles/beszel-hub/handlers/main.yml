@@ -1,9 +1,0 @@
-- name: Stop Beszel
-  ansible.builtin.command:
-    cmd: docker compose down
-    chdir: "{{ beszel_install_dir }}"
-
-- name: Start Beszel
-  ansible.builtin.command:
-    cmd: docker compose up -d
-    chdir: "{{ beszel_install_dir }}"

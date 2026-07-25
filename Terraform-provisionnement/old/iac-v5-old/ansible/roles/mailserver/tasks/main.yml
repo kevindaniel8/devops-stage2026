@@ -1,3 +1,0 @@
----
-- name: Déployer docker-mailserver
-  include_tasks: deploy_mailserver.yml

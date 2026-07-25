@@ -1,4 +1,0 @@
-- hosts: dns
-  become: yes
-  roles:
-    - ../roles/dns-bind9

@@ -1,5 +1,0 @@
----
-- hosts: reverse-proxy
-  become: true
-  roles:
-    - ../roles/reverse-proxy

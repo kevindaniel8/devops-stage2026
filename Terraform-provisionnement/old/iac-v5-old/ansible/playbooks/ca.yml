@@ -1,5 +1,0 @@
----
-- hosts: reverse-proxy
-  become: yes
-  roles:
-    - ../roles/ca

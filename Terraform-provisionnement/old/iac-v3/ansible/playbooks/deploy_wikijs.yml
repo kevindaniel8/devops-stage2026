@@ -1,6 +1,0 @@
-- import_playbook: docker.yml
-
-- hosts: wikijs
-  become: yes
-  roles:
-    - wikijs

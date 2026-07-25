@@ -1,8 +1,0 @@
----
-- hosts: dc
-  become: yes
-  roles:
-    #- ../roles/docker
-    - ../roles/samba-ad-dc
-
-

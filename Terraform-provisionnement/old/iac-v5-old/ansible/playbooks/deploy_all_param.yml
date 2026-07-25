@@ -1,8 +1,0 @@
----
-- import_playbook: deploy_nextcloud_office.yml # Group 2
-- import_playbook: deploy_beszel_agents.yml # Group 2 deploy ne peut etre deployer ici car il faut recuperer la clé ssh et le token
-#- import_playbook: deploy_observability.yml # Group 2 deploy ne peut etre deployer ici car il faut attendre que beszel agent soit deployer
-#- import_playbook: samba-ad-cleanup.yml # nettoyage après déploiement de samba-ad et lui laisse le temps de se stabiliser si et seulement si docker est deployer sur la machine
-# playbook paramterage ici #Group2
-
-

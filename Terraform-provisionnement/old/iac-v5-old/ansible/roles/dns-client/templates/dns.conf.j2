@@ -1,5 +1,0 @@
-[Resolve]
-DNS={{ dns_servers | join(" ") }}
-{% if dns_search_domains | length > 0 %}
-Domains={{ dns_search_domains | join(" ") }}
-{% endif %}

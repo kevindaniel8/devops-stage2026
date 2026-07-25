@@ -1,6 +1,0 @@
----
-- hosts: mailserver
-  become: yes
-  roles:
-    - ../roles/docker
-    - ../roles/modoboa

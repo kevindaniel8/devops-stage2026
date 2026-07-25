@@ -1,7 +1,0 @@
-- name: Configurer le reverse-proxy
-  hosts: reverse_proxy
-  become: true
-  vars:                 # a supprimé si besoin
-    enable_tls: true    # a supprimé si besoin
-  roles:
-    - ../roles/reverse-proxy

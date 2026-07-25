@@ -1,7 +1,0 @@
----
-- name: Deploy Nextcloud
-  hosts: nextcloud_servers
-  become: true
-
-  roles:
-    - nextcloud

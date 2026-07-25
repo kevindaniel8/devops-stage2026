@@ -1,6 +1,0 @@
-mariadb_version: "10.11"
-mariadb_root_password: "SuperSecret123"
-mariadb_database: "appdb"
-mariadb_user: "appuser"
-mariadb_password: "UserPass123"
-

@@ -1,4 +1,0 @@
-- hosts: samba-ad-dc
-  become: true
-  roles:
-    - ../roles/dns-server

@@ -1,7 +1,0 @@
----
-- hosts: db
-  become: yes
-  roles:
-    - ../roles/docker
-    - ../roles/db-mariadb
-
